@@ -1,6 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
 
 /** All helpers below run in the browser against RLS-protected tables. */
 
@@ -186,10 +187,9 @@ export async function createJob(input: {
   return data.id;
 }
 
-export async function updateMyProfile(
-  userId: string,
-  patch: Record<string, unknown>,
-): Promise<void> {
+type ProfilePatch = Database["public"]["Tables"]["profiles"]["Update"];
+
+export async function updateMyProfile(userId: string, patch: ProfilePatch): Promise<void> {
   const { error } = await supabase.from("profiles").update(patch).eq("id", userId);
   if (error) throw new Error(error.message);
 }
