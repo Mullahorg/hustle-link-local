@@ -33,9 +33,9 @@ export async function fetchHomeFeed() {
 
 export async function fetchJobs(args: { q?: string; category?: string; area?: string }) {
   const { data, error } = await publicClient().rpc("search_jobs", {
-    _q: args.q ?? null,
-    _category: args.category ?? null,
-    _area: args.area ?? null,
+    _q: args.q ?? undefined,
+    _category: args.category ?? undefined,
+    _area: args.area ?? undefined,
     _limit: 30,
     _offset: 0,
   });
@@ -45,8 +45,8 @@ export async function fetchJobs(args: { q?: string; category?: string; area?: st
 
 export async function fetchWorkers(args: { q?: string; category?: string }) {
   const { data, error } = await publicClient().rpc("search_workers", {
-    _q: args.q ?? null,
-    _category: args.category ?? null,
+    _q: args.q ?? undefined,
+    _category: args.category ?? undefined,
     _limit: 30,
     _offset: 0,
   });
