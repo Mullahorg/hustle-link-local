@@ -4,26 +4,32 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
+/**
+ * HustlerLink buttons.
+ * Sunlight rules: solid fills only, no translucency, 48dp minimum height,
+ * icon strokes thick, label never below 16px on primary actions.
+ */
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl font-semibold cursor-pointer transition-[background-color,color,transform,box-shadow] duration-150 active:scale-[0.985] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-[1.15em] [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2.5 whitespace-nowrap rounded-2xl font-bold cursor-pointer transition-[background-color,color,box-shadow,transform] duration-150 ease-out active:scale-[0.99] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-45 [&_svg]:pointer-events-none [&_svg]:size-[1.25em] [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground shadow-soft hover:bg-primary/92",
-        accent: "bg-accent text-accent-foreground shadow-soft hover:bg-accent/90",
-        soft: "bg-primary-soft text-primary hover:bg-primary-soft/70",
-        outline: "border border-border bg-card text-foreground hover:bg-muted",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/70",
+        default: "bg-primary text-primary-foreground shadow-soft hover:bg-primary-ink",
+        accent: "bg-accent text-accent-foreground shadow-soft hover:brightness-95",
+        soft: "bg-primary-soft text-primary-ink hover:bg-accent-soft hover:text-accent-foreground",
+        outline:
+          "border-2 border-border-strong bg-card text-foreground hover:border-primary hover:text-primary-ink",
+        secondary: "bg-secondary text-secondary-foreground hover:bg-muted",
         ghost: "text-foreground hover:bg-muted",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        link: "text-primary underline-offset-4 hover:underline",
+        destructive: "bg-destructive text-destructive-foreground shadow-soft hover:brightness-95",
+        link: "text-primary-ink underline underline-offset-4",
       },
       size: {
-        default: "h-12 px-5 text-[0.95rem]",
-        sm: "h-10 rounded-lg px-4 text-sm",
-        lg: "h-14 px-7 text-base",
-        icon: "h-11 w-11 rounded-xl",
-        pill: "h-10 rounded-full px-4 text-sm",
+        default: "h-12 px-6 text-base",
+        sm: "h-11 rounded-xl px-4 text-[0.9375rem]",
+        lg: "h-14 px-7 text-[1.0625rem]",
+        icon: "size-12 rounded-2xl",
+        pill: "h-12 rounded-full px-5 text-base",
       },
       block: {
         true: "w-full",

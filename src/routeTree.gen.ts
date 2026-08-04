@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ActivityRouteImport } from './routes/activity'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as NotificationsRouteImport } from './routes/notifications'
@@ -18,6 +19,7 @@ import { Route as PostJobRouteImport } from './routes/post-job'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as JobsJobIdRouteImport } from './routes/jobs.$jobId'
+import { Route as MessagesConversationIdRouteImport } from './routes/messages.$conversationId'
 import { Route as WorkersWorkerIdRouteImport } from './routes/workers.$workerId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -28,6 +30,11 @@ const IndexRoute = IndexRouteImport.update({
 const ActivityRoute = ActivityRouteImport.update({
   id: '/activity',
   path: '/activity',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DiscoverRoute = DiscoverRouteImport.update({
@@ -65,6 +72,11 @@ const JobsJobIdRoute = JobsJobIdRouteImport.update({
   path: '/jobs/$jobId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MessagesConversationIdRoute = MessagesConversationIdRouteImport.update({
+  id: '/$conversationId',
+  path: '/$conversationId',
+  getParentRoute: () => MessagesRoute,
+} as any)
 const WorkersWorkerIdRoute = WorkersWorkerIdRouteImport.update({
   id: '/workers/$workerId',
   path: '/workers/$workerId',
@@ -74,38 +86,44 @@ const WorkersWorkerIdRoute = WorkersWorkerIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/activity': typeof ActivityRoute
+  '/auth': typeof AuthRoute
   '/discover': typeof DiscoverRoute
-  '/messages': typeof MessagesRoute
+  '/messages': typeof MessagesRouteWithChildren
   '/notifications': typeof NotificationsRoute
   '/post-job': typeof PostJobRoute
   '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
+  '/messages/$conversationId': typeof MessagesConversationIdRoute
   '/workers/$workerId': typeof WorkersWorkerIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/activity': typeof ActivityRoute
+  '/auth': typeof AuthRoute
   '/discover': typeof DiscoverRoute
-  '/messages': typeof MessagesRoute
+  '/messages': typeof MessagesRouteWithChildren
   '/notifications': typeof NotificationsRoute
   '/post-job': typeof PostJobRoute
   '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
+  '/messages/$conversationId': typeof MessagesConversationIdRoute
   '/workers/$workerId': typeof WorkersWorkerIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/activity': typeof ActivityRoute
+  '/auth': typeof AuthRoute
   '/discover': typeof DiscoverRoute
-  '/messages': typeof MessagesRoute
+  '/messages': typeof MessagesRouteWithChildren
   '/notifications': typeof NotificationsRoute
   '/post-job': typeof PostJobRoute
   '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
+  '/messages/$conversationId': typeof MessagesConversationIdRoute
   '/workers/$workerId': typeof WorkersWorkerIdRoute
 }
 export interface FileRouteTypes {
@@ -113,6 +131,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/activity'
+    | '/auth'
     | '/discover'
     | '/messages'
     | '/notifications'
@@ -120,11 +139,13 @@ export interface FileRouteTypes {
     | '/profile'
     | '/settings'
     | '/jobs/$jobId'
+    | '/messages/$conversationId'
     | '/workers/$workerId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/activity'
+    | '/auth'
     | '/discover'
     | '/messages'
     | '/notifications'
@@ -132,11 +153,13 @@ export interface FileRouteTypes {
     | '/profile'
     | '/settings'
     | '/jobs/$jobId'
+    | '/messages/$conversationId'
     | '/workers/$workerId'
   id:
     | '__root__'
     | '/'
     | '/activity'
+    | '/auth'
     | '/discover'
     | '/messages'
     | '/notifications'
@@ -144,14 +167,16 @@ export interface FileRouteTypes {
     | '/profile'
     | '/settings'
     | '/jobs/$jobId'
+    | '/messages/$conversationId'
     | '/workers/$workerId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ActivityRoute: typeof ActivityRoute
+  AuthRoute: typeof AuthRoute
   DiscoverRoute: typeof DiscoverRoute
-  MessagesRoute: typeof MessagesRoute
+  MessagesRoute: typeof MessagesRouteWithChildren
   NotificationsRoute: typeof NotificationsRoute
   PostJobRoute: typeof PostJobRoute
   ProfileRoute: typeof ProfileRoute
@@ -174,6 +199,13 @@ declare module '@tanstack/react-router' {
       path: '/activity'
       fullPath: '/activity'
       preLoaderRoute: typeof ActivityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/discover': {
@@ -225,6 +257,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JobsJobIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/messages/$conversationId': {
+      id: '/messages/$conversationId'
+      path: '/$conversationId'
+      fullPath: '/messages/$conversationId'
+      preLoaderRoute: typeof MessagesConversationIdRouteImport
+      parentRoute: typeof MessagesRoute
+    }
     '/workers/$workerId': {
       id: '/workers/$workerId'
       path: '/workers/$workerId'
@@ -235,11 +274,24 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface MessagesRouteChildren {
+  MessagesConversationIdRoute: typeof MessagesConversationIdRoute
+}
+
+const MessagesRouteChildren: MessagesRouteChildren = {
+  MessagesConversationIdRoute: MessagesConversationIdRoute,
+}
+
+const MessagesRouteWithChildren = MessagesRoute._addFileChildren(
+  MessagesRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ActivityRoute: ActivityRoute,
+  AuthRoute: AuthRoute,
   DiscoverRoute: DiscoverRoute,
-  MessagesRoute: MessagesRoute,
+  MessagesRoute: MessagesRouteWithChildren,
   NotificationsRoute: NotificationsRoute,
   PostJobRoute: PostJobRoute,
   ProfileRoute: ProfileRoute,
@@ -250,13 +302,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

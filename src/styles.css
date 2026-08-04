@@ -5,9 +5,13 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * HustlerLink design system.
- * Modern Earth + Digital: deep emerald, warm amber, warm neutrals.
- * All color values use oklch. Components must use these semantic tokens.
+ * HustlerLink design system — sunlight first.
+ *
+ * Rules baked into these tokens:
+ *  - Every text token clears WCAG AA against its surface at 16px.
+ *  - No pale grey text: --muted-foreground is a dark neutral, not a tint.
+ *  - Borders are visible outdoors (never < 8% luminance step from surface).
+ *  - Shadows are quiet; separation comes from contrast, not blur.
  */
 
 @theme inline {
@@ -27,6 +31,7 @@
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-primary-soft: var(--primary-soft);
+  --color-primary-ink: var(--primary-ink);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -43,72 +48,90 @@
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
-  --shadow-soft: 0 1px 2px oklch(0.24 0.02 150 / 0.04), 0 6px 20px -12px oklch(0.24 0.02 150 / 0.18);
-  --shadow-lift: 0 2px 4px oklch(0.24 0.02 150 / 0.05), 0 16px 32px -20px oklch(0.24 0.02 150 / 0.28);
+  --shadow-soft: 0 1px 1px oklch(0.22 0.02 150 / 0.05), 0 8px 18px -14px oklch(0.22 0.02 150 / 0.22);
+  --shadow-lift: 0 2px 3px oklch(0.22 0.02 150 / 0.06), 0 18px 34px -22px oklch(0.22 0.02 150 / 0.3);
 }
 
 :root {
   --radius: 0.875rem;
-  --background: oklch(0.985 0.006 95);
-  --foreground: oklch(0.255 0.012 160);
+
+  /* Warm white page, pure white surfaces */
+  --background: oklch(0.982 0.009 88);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.255 0.012 160);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.255 0.012 160);
-  --primary: oklch(0.455 0.096 162);
-  --primary-foreground: oklch(0.985 0.006 95);
-  --primary-soft: oklch(0.945 0.028 162);
-  --secondary: oklch(0.955 0.008 95);
-  --secondary-foreground: oklch(0.32 0.02 160);
-  --muted: oklch(0.958 0.006 95);
-  --muted-foreground: oklch(0.53 0.014 160);
-  --accent: oklch(0.775 0.132 72);
-  --accent-foreground: oklch(0.26 0.05 60);
-  --accent-soft: oklch(0.955 0.04 82);
-  --success: oklch(0.62 0.13 152);
+
+  /* Charcoal ink — 14.5:1 on white */
+  --foreground: oklch(0.235 0.014 162);
+  --card-foreground: oklch(0.235 0.014 162);
+  --popover-foreground: oklch(0.235 0.014 162);
+  /* Dark neutral grey — 6.2:1 on white, still legible in sunlight */
+  --muted-foreground: oklch(0.455 0.012 162);
+
+  /* Deep emerald */
+  --primary: oklch(0.425 0.098 163);
+  --primary-foreground: oklch(0.99 0.005 95);
+  --primary-soft: oklch(0.938 0.034 163);
+  --primary-ink: oklch(0.32 0.082 163);
+
+  /* Warm amber — always paired with dark ink, never white text */
+  --accent: oklch(0.79 0.145 74);
+  --accent-foreground: oklch(0.28 0.062 58);
+  --accent-soft: oklch(0.945 0.052 82);
+
+  --secondary: oklch(0.955 0.01 90);
+  --secondary-foreground: oklch(0.28 0.018 162);
+  --muted: oklch(0.955 0.009 90);
+
+  --success: oklch(0.5 0.12 154);
   --success-foreground: oklch(0.99 0.005 95);
-  --warning: oklch(0.75 0.14 65);
-  --warning-foreground: oklch(0.26 0.05 60);
-  --info: oklch(0.6 0.09 235);
+  --warning: oklch(0.72 0.145 66);
+  --warning-foreground: oklch(0.26 0.05 58);
+  --info: oklch(0.48 0.1 236);
   --info-foreground: oklch(0.99 0.005 95);
-  --destructive: oklch(0.585 0.17 25);
+  --destructive: oklch(0.52 0.184 27);
   --destructive-foreground: oklch(0.99 0.005 95);
-  --border: oklch(0.912 0.008 95);
-  --input: oklch(0.912 0.008 95);
-  --ring: oklch(0.455 0.096 162);
+
+  --border: oklch(0.878 0.011 90);
+  --border-strong: oklch(0.79 0.014 90);
+  --input: oklch(0.82 0.013 90);
+  --ring: oklch(0.425 0.098 163);
 }
 
+/* Dark mode exists for night use only — the product is designed light first. */
 .dark {
-  --background: oklch(0.19 0.012 160);
-  --foreground: oklch(0.96 0.006 95);
-  --card: oklch(0.235 0.014 160);
-  --card-foreground: oklch(0.96 0.006 95);
-  --popover: oklch(0.235 0.014 160);
-  --popover-foreground: oklch(0.96 0.006 95);
-  --primary: oklch(0.68 0.12 162);
-  --primary-foreground: oklch(0.18 0.02 160);
-  --primary-soft: oklch(0.3 0.05 162);
-  --secondary: oklch(0.28 0.014 160);
-  --secondary-foreground: oklch(0.95 0.006 95);
-  --muted: oklch(0.28 0.014 160);
-  --muted-foreground: oklch(0.72 0.012 160);
-  --accent: oklch(0.79 0.13 72);
-  --accent-foreground: oklch(0.24 0.05 60);
-  --accent-soft: oklch(0.32 0.05 72);
-  --success: oklch(0.7 0.13 152);
-  --success-foreground: oklch(0.18 0.02 160);
-  --warning: oklch(0.79 0.13 65);
-  --warning-foreground: oklch(0.24 0.05 60);
-  --info: oklch(0.7 0.09 235);
-  --info-foreground: oklch(0.18 0.02 160);
-  --destructive: oklch(0.66 0.16 25);
-  --destructive-foreground: oklch(0.99 0.005 95);
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 16%);
-  --ring: oklch(0.68 0.12 162);
+  --background: oklch(0.18 0.013 162);
+  --foreground: oklch(0.97 0.006 95);
+  --card: oklch(0.232 0.015 162);
+  --card-foreground: oklch(0.97 0.006 95);
+  --popover: oklch(0.232 0.015 162);
+  --popover-foreground: oklch(0.97 0.006 95);
+  --muted-foreground: oklch(0.8 0.012 162);
+  --primary: oklch(0.74 0.13 163);
+  --primary-foreground: oklch(0.17 0.02 162);
+  --primary-soft: oklch(0.3 0.05 163);
+  --primary-ink: oklch(0.86 0.09 163);
+  --secondary: oklch(0.28 0.015 162);
+  --secondary-foreground: oklch(0.96 0.006 95);
+  --muted: oklch(0.28 0.015 162);
+  --accent: oklch(0.82 0.14 74);
+  --accent-foreground: oklch(0.23 0.05 58);
+  --accent-soft: oklch(0.33 0.055 74);
+  --success: oklch(0.74 0.13 154);
+  --success-foreground: oklch(0.17 0.02 162);
+  --warning: oklch(0.82 0.13 66);
+  --warning-foreground: oklch(0.23 0.05 58);
+  --info: oklch(0.74 0.09 236);
+  --info-foreground: oklch(0.17 0.02 162);
+  --destructive: oklch(0.68 0.17 27);
+  --destructive-foreground: oklch(0.15 0.02 27);
+  --border: oklch(1 0 0 / 20%);
+  --border-strong: oklch(1 0 0 / 34%);
+  --input: oklch(1 0 0 / 26%);
+  --ring: oklch(0.74 0.13 163);
 }
 
 @layer base {
@@ -118,12 +141,16 @@
 
   html {
     -webkit-tap-highlight-color: transparent;
+    /* 16px floor for body copy, everywhere. */
+    font-size: 100%;
   }
 
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.55;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
@@ -131,7 +158,27 @@
   h1,
   h2,
   h3 {
-    letter-spacing: -0.02em;
+    letter-spacing: -0.021em;
+    line-height: 1.18;
+  }
+
+  /* Thick, sunlight-legible icon strokes across the app. */
+  svg.lucide {
+    stroke-width: 2.25;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-ring);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 
@@ -139,5 +186,27 @@
   scrollbar-width: none;
   &::-webkit-scrollbar {
     display: none;
+  }
+}
+
+/* Every tappable thing clears 48dp. */
+@utility tap {
+  min-height: 3rem;
+  min-width: 3rem;
+}
+
+/* Quiet entrance used for lists and screens — 160ms, no bounce. */
+@utility rise {
+  animation: hl-rise 0.16s ease-out both;
+}
+
+@keyframes hl-rise {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
   }
 }

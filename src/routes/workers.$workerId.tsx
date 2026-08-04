@@ -1,149 +1,166 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ArrowLeft, BadgeCheck, MapPin, MessageCircle } from "lucide-react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { MapPin, MessageCircle } from "lucide-react";
+import { toast } from "sonner";
 
-import { AppShell } from "@/components/layout/AppShell";
-import { Avatar, Chip, Rating } from "@/components/hl/primitives";
+import { Avatar, Chip, EmptyState, Rating, VerifiedMark } from "@/components/hl/primitives";
+import { BackHeader } from "@/components/layout/AppShell";
 import { Button } from "@/components/ui/button";
-import { workers } from "@/data/demo";
+import { useAuth } from "@/hooks/useAuth";
+import { openConversation } from "@/lib/account";
+import { timeAgo } from "@/lib/format";
+import { workerDetailQuery } from "@/lib/queries";
 
 export const Route = createFileRoute("/workers/$workerId")({
-  loader: ({ params }) => {
-    const worker = workers.find((item) => item.id === params.workerId);
-    if (!worker) throw notFound();
-    return { worker };
-  },
-  head: ({ loaderData }) => {
-    if (!loaderData) {
-      return {
-        meta: [
-          { title: "Profile unavailable — HustlerLink" },
-          { name: "robots", content: "noindex" },
-        ],
-      };
-    }
-    const { worker } = loaderData;
-    const description = `${worker.trade} in ${worker.area} · ${worker.rating} stars from ${worker.reviews} reviews`;
-    return {
-      meta: [
-        { title: `${worker.name}, ${worker.trade} — HustlerLink` },
-        { name: "description", content: description },
-        { property: "og:title", content: `${worker.name}, ${worker.trade} — HustlerLink` },
-        { property: "og:description", content: description },
-      ],
-    };
-  },
-  component: WorkerDetailScreen,
-  notFoundComponent: WorkerNotFound,
+  head: () => ({
+    meta: [
+      { title: "Worker profile — HustlerLink" },
+      {
+        name: "description",
+        content: "Skills, rates, verification and honest reviews before you hire.",
+      },
+      { property: "og:title", content: "Worker profile — HustlerLink" },
+      {
+        property: "og:description",
+        content: "Skills, rates, verification and honest reviews before you hire.",
+      },
+    ],
+  }),
+  loader: ({ context, params }) =>
+    context.queryClient.ensureQueryData(workerDetailQuery(params.workerId)),
+  component: WorkerScreen,
 });
 
-function WorkerNotFound() {
-  return (
-    <AppShell>
-      <div className="px-5 pt-24 text-center">
-        <h1 className="text-xl font-bold">This profile is not available</h1>
-        <Button asChild className="mt-6">
-          <Link to="/discover">Find other workers</Link>
-        </Button>
+function WorkerScreen() {
+  const { workerId } = Route.useParams();
+  const { data } = useSuspenseQuery(workerDetailQuery(workerId));
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const worker = data.profile;
+
+  if (!worker) {
+    return (
+      <div className="min-h-dvh bg-background">
+        <BackHeader title="Worker" to="/discover" />
+        <div className="px-5 pt-10">
+          <EmptyState
+            icon={<MapPin className="size-7" aria-hidden="true" />}
+            title="Profile not found"
+            body="This person may have removed their profile."
+            action={
+              <Button asChild block>
+                <Link to="/discover" search={{ tab: "workers" }}>
+                  Browse workers
+                </Link>
+              </Button>
+            }
+          />
+        </div>
       </div>
-    </AppShell>
-  );
-}
+    );
+  }
 
-const reviews = [
-  {
-    id: "r1",
-    name: "Daniel M.",
-    rating: 5,
-    body: "Came on time, did the work well and cleaned up after. I will call again.",
-    when: "2 weeks ago",
-  },
-  {
-    id: "r2",
-    name: "Aisha B.",
-    rating: 5,
-    body: "Very honest about the price from the beginning. No surprises.",
-    when: "Last month",
-  },
-];
+  async function handleMessage() {
+    if (!user) {
+      void navigate({ to: "/auth" });
+      return;
+    }
+    try {
+      const id = await openConversation(user.id, workerId);
+      void navigate({ to: "/messages/$conversationId", params: { conversationId: id } });
+    } catch (error) {
+      toast.error("Could not open chat", { description: (error as Error).message });
+    }
+  }
 
-function WorkerDetailScreen() {
-  const { worker } = Route.useLoaderData();
+  const isMe = user?.id === workerId;
 
   return (
     <div className="min-h-dvh bg-background">
       <div className="mx-auto max-w-screen-sm pb-32">
-        <header className="px-5 pt-8">
-          <Link
-            to="/discover"
-            aria-label="Back"
-            className="grid size-11 place-items-center rounded-xl border border-border bg-card"
-          >
-            <ArrowLeft className="size-5" aria-hidden="true" />
-          </Link>
-        </header>
+        <BackHeader title="Worker" to="/discover" />
 
-        <section className="flex flex-col items-center px-5 pt-6 text-center">
-          <Avatar initials={worker.initials} size="lg" />
-          <h1 className="mt-4 flex items-center gap-1.5 text-xl font-bold">
-            {worker.name}
-            {worker.verified ? (
-              <BadgeCheck className="size-5 text-primary" aria-label="Verified" />
-            ) : null}
+        <section className="flex flex-col items-center px-5 pt-8 text-center">
+          <Avatar name={worker.full_name} url={worker.avatar_url} size="lg" />
+          <h1 className="mt-5 flex items-center gap-2 text-2xl font-extrabold">
+            {worker.full_name}
+            <VerifiedMark verification={worker.verification} />
           </h1>
-          <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
-            <MapPin className="size-4" aria-hidden="true" />
-            {worker.trade} · {worker.area}
-          </p>
-          <div className="mt-3 flex items-center gap-3">
-            <Rating value={worker.rating} count={worker.reviews} />
-            <Chip tone="primary">{worker.rate}</Chip>
+          {worker.headline || worker.area ? (
+            <p className="mt-1.5 flex items-center gap-2 text-base font-semibold text-muted-foreground">
+              <MapPin className="size-5" aria-hidden="true" />
+              {[worker.headline, worker.area].filter(Boolean).join(" · ")}
+            </p>
+          ) : null}
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+            <Rating value={worker.rating_avg ?? 0} count={worker.rating_count ?? 0} />
+            {worker.rate_label ? <Chip tone="primary">{worker.rate_label}</Chip> : null}
           </div>
         </section>
 
-        <section className="px-5 pt-8">
-          <h2 className="text-lg font-bold">About</h2>
-          <p className="mt-2 text-[0.95rem] leading-relaxed text-muted-foreground">
-            {worker.about}
-          </p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {worker.skills.map((skill) => (
-              <Chip key={skill}>{skill}</Chip>
-            ))}
-          </div>
-        </section>
+        {worker.bio ? (
+          <section className="px-5 pt-9">
+            <h2 className="text-xl font-extrabold">About</h2>
+            <p className="mt-2 text-base leading-relaxed font-medium text-foreground">
+              {worker.bio}
+            </p>
+          </section>
+        ) : null}
 
-        <section className="px-5 pt-8">
-          <h2 className="text-lg font-bold">Reviews</h2>
-          <ul className="mt-3 space-y-3">
-            {reviews.map((review) => (
-              <li
-                key={review.id}
-                className="rounded-2xl border border-border bg-card p-5 shadow-soft"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <p className="truncate font-bold">{review.name}</p>
-                  <Rating value={review.rating} />
-                </div>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{review.body}</p>
-                <p className="mt-2 text-xs text-muted-foreground">{review.when}</p>
-              </li>
-            ))}
-          </ul>
+        {worker.skills && worker.skills.length > 0 ? (
+          <section className="px-5 pt-7">
+            <h2 className="text-xl font-extrabold">Skills</h2>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {worker.skills.map((skill: string) => (
+                <Chip key={skill}>{skill}</Chip>
+              ))}
+            </div>
+          </section>
+        ) : null}
+
+        <section className="px-5 pt-9">
+          <h2 className="text-xl font-extrabold">Reviews</h2>
+          {data.reviews.length === 0 ? (
+            <p className="mt-2 text-base font-medium text-muted-foreground">
+              No reviews yet. Be the first to work with {worker.full_name.split(" ")[0]}.
+            </p>
+          ) : (
+            <ul className="mt-4 space-y-3">
+              {data.reviews.map((review) => {
+                const reviewer = review.reviewer as unknown as { full_name: string } | null;
+                return (
+                  <li key={review.id} className="rounded-3xl border-2 border-border bg-card p-5">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="truncate text-base font-extrabold">
+                        {reviewer?.full_name ?? "HustlerLink user"}
+                      </p>
+                      <Rating value={review.rating} count={1} />
+                    </div>
+                    {review.body ? (
+                      <p className="mt-2 text-base font-medium text-foreground">{review.body}</p>
+                    ) : null}
+                    <p className="mt-2 text-[0.875rem] font-bold text-muted-foreground">
+                      {timeAgo(review.created_at)}
+                    </p>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </section>
       </div>
 
-      <div className="fixed inset-x-0 bottom-0 border-t border-border bg-card/95 backdrop-blur">
-        <div className="mx-auto flex max-w-screen-sm gap-3 px-5 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
-          <Button asChild variant="outline" size="lg" className="shrink-0">
-            <Link to="/messages" aria-label="Message this worker">
+      {!isMe ? (
+        <div className="fixed inset-x-0 bottom-0 border-t-2 border-border bg-card">
+          <div className="mx-auto max-w-screen-sm px-5 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+            <Button block size="lg" onClick={() => void handleMessage()}>
               <MessageCircle aria-hidden="true" />
-            </Link>
-          </Button>
-          <Button block size="lg">
-            Request this worker
-          </Button>
+              Message {worker.full_name.split(" ")[0]}
+            </Button>
+          </div>
         </div>
-      </div>
+      ) : null}
     </div>
   );
 }

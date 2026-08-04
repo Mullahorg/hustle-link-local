@@ -1,134 +1,190 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Search, SlidersHorizontal } from "lucide-react";
-import { useMemo, useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { keepPreviousData, useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { Search, SearchX, X } from "lucide-react";
+import { useEffect, useState } from "react";
 
 import { AppShell, ScreenHeader } from "@/components/layout/AppShell";
-import { EmptyState, JobCard, WorkerCard } from "@/components/hl/primitives";
-import { CategoryRail } from "@/components/hl/CategoryRail";
+import { CardSkeleton, EmptyState, JobCard, WorkerCard } from "@/components/hl/primitives";
+import { homeFeedQuery, jobsQuery, workersQuery } from "@/lib/queries";
 import { cn } from "@/lib/utils";
-import { jobs, workers } from "@/data/demo";
 
-type DiscoverSearch = { category?: string | undefined };
+type Tab = "jobs" | "workers";
+
+type DiscoverSearch = { tab: Tab; category?: string; q?: string };
 
 export const Route = createFileRoute("/discover")({
-  validateSearch: (search: Record<string, unknown>): DiscoverSearch => ({
-    category: typeof search["category"] === "string" ? search["category"] : undefined,
-  }),
   head: () => ({
     meta: [
-      { title: "Discover work and workers — HustlerLink" },
+      { title: "Discover jobs and workers — HustlerLink" },
       {
         name: "description",
-        content: "Search open jobs and skilled workers near you by trade, area and rating.",
+        content:
+          "Search open jobs or browse verified fundis, cleaners, tutors and drivers near you.",
       },
-      { property: "og:title", content: "Discover work and workers — HustlerLink" },
+      { property: "og:title", content: "Discover jobs and workers — HustlerLink" },
       {
         property: "og:description",
-        content: "Search open jobs and skilled workers near you by trade, area and rating.",
+        content: "Search open jobs or browse verified workers near you.",
       },
     ],
   }),
+  validateSearch: (search: Record<string, unknown>): DiscoverSearch => {
+    const tab = search["tab"] === "workers" ? "workers" : "jobs";
+    const category = typeof search["category"] === "string" ? search["category"] : undefined;
+    const q = typeof search["q"] === "string" ? search["q"] : undefined;
+    return {
+      tab,
+      ...(category ? { category } : {}),
+      ...(q ? { q } : {}),
+    };
+  },
+  loaderDeps: ({ search }) => search,
+  loader: ({ context }) => context.queryClient.ensureQueryData(homeFeedQuery()),
   component: DiscoverScreen,
 });
 
 function DiscoverScreen() {
-  const [tab, setTab] = useState<"jobs" | "workers">("jobs");
-  const [query, setQuery] = useState("");
+  const { tab, category, q } = Route.useSearch();
+  const navigate = useNavigate({ from: "/discover" });
+  const { data: feed } = useSuspenseQuery(homeFeedQuery());
 
-  const q = query.trim().toLowerCase();
-  const filteredJobs = useMemo(
-    () =>
-      jobs.filter(
-        (job) =>
-          !q ||
-          job.title.toLowerCase().includes(q) ||
-          job.category.toLowerCase().includes(q) ||
-          job.area.toLowerCase().includes(q),
-      ),
-    [q],
-  );
-  const filteredWorkers = useMemo(
-    () =>
-      workers.filter(
-        (worker) =>
-          !q ||
-          worker.name.toLowerCase().includes(q) ||
-          worker.trade.toLowerCase().includes(q) ||
-          worker.area.toLowerCase().includes(q),
-      ),
-    [q],
-  );
+  const [draft, setDraft] = useState(q ?? "");
+
+  // Debounce typing into the URL so the query layer caches per search term.
+  useEffect(() => {
+    const id = setTimeout(() => {
+      if ((q ?? "") === draft) return;
+      void navigate({
+        search: (prev: DiscoverSearch) => ({ ...prev, ...(draft ? { q: draft } : { q: undefined }) }),
+        replace: true,
+      });
+    }, 250);
+    return () => clearTimeout(id);
+  }, [draft, q, navigate]);
+
+  const args = { ...(q ? { q } : {}), ...(category ? { category } : {}) };
+  const jobs = useQuery({
+    ...jobsQuery(args),
+    enabled: tab === "jobs",
+    placeholderData: keepPreviousData,
+  });
+  const workers = useQuery({
+    ...workersQuery(args),
+    enabled: tab === "workers",
+    placeholderData: keepPreviousData,
+  });
+
+  const setTab = (next: Tab) =>
+    void navigate({ search: (prev: DiscoverSearch) => ({ ...prev, tab: next }), replace: true });
+
+  const setCategory = (slug: string | undefined) =>
+    void navigate({ search: (prev: DiscoverSearch) => ({ ...prev, category: slug }), replace: true });
+
+  const active = tab === "jobs" ? jobs : workers;
+  const results = tab === "jobs" ? (jobs.data ?? []) : (workers.data ?? []);
 
   return (
     <AppShell>
-      <ScreenHeader title="Discover" subtitle="Find work or find someone to do it" />
+      <ScreenHeader title="Discover" subtitle="Find work, or find the right person." />
 
-      <div className="flex items-center gap-3 px-5">
-        <label className="flex h-12 flex-1 items-center gap-3 rounded-2xl border border-border bg-card px-4 shadow-soft focus-within:ring-2 focus-within:ring-ring">
-          <Search className="size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
+      <div className="px-5">
+        <div className="flex items-center gap-3 rounded-2xl border-2 border-border-strong bg-card px-4">
+          <Search className="size-6 shrink-0 text-muted-foreground" aria-hidden="true" />
           <input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search jobs, trades, areas"
-            aria-label="Search jobs and workers"
-            className="min-w-0 flex-1 bg-transparent text-sm font-medium outline-none placeholder:text-muted-foreground"
+            value={draft}
+            onChange={(event) => setDraft(event.target.value)}
+            type="search"
+            enterKeyHint="search"
+            aria-label={tab === "jobs" ? "Search jobs" : "Search workers"}
+            placeholder={tab === "jobs" ? "Leaking sink, tutor…" : "Plumber, cleaner…"}
+            className="h-14 min-w-0 flex-1 bg-transparent text-base font-semibold text-foreground outline-none placeholder:font-medium placeholder:text-muted-foreground"
           />
-        </label>
-        <button
-          type="button"
-          aria-label="Filters"
-          className="grid size-12 shrink-0 place-items-center rounded-2xl border border-border bg-card text-foreground shadow-soft"
-        >
-          <SlidersHorizontal className="size-5" aria-hidden="true" />
-        </button>
-      </div>
-
-      <div className="mt-5 px-5">
-        <div
-          role="tablist"
-          aria-label="Discover type"
-          className="grid grid-cols-2 gap-1 rounded-2xl bg-muted p-1"
-        >
-          {(["jobs", "workers"] as const).map((value) => (
+          {draft ? (
             <button
-              key={value}
-              role="tab"
-              aria-selected={tab === value}
-              onClick={() => setTab(value)}
-              className={cn(
-                "h-10 rounded-xl text-sm font-semibold capitalize transition-colors",
-                tab === value ? "bg-card text-foreground shadow-soft" : "text-muted-foreground",
-              )}
+              type="button"
+              onClick={() => setDraft("")}
+              aria-label="Clear search"
+              className="grid size-11 shrink-0 place-items-center rounded-full text-muted-foreground"
             >
-              {value}
+              <X className="size-5" aria-hidden="true" />
             </button>
-          ))}
+          ) : null}
         </div>
       </div>
 
-      <div className="pt-6">
-        <CategoryRail />
+      <div
+        role="tablist"
+        aria-label="Discover"
+        className="mt-5 grid grid-cols-2 gap-2 rounded-2xl border-2 border-border bg-card p-1.5 mx-5"
+      >
+        {(["jobs", "workers"] as const).map((value) => (
+          <button
+            key={value}
+            role="tab"
+            aria-selected={tab === value}
+            onClick={() => setTab(value)}
+            className={cn(
+              "min-h-12 rounded-xl text-base font-bold capitalize transition-colors",
+              tab === value
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            {value}
+          </button>
+        ))}
       </div>
 
-      <div className="space-y-3 px-5 pt-6">
-        {tab === "jobs" ? (
-          filteredJobs.length ? (
-            filteredJobs.map((job) => <JobCard key={job.id} job={job} />)
-          ) : (
-            <EmptyState
-              icon={<Search className="size-6" aria-hidden="true" />}
-              title="No jobs match that"
-              body="Try a different trade or clear the search to see everything near you."
-            />
-          )
-        ) : filteredWorkers.length ? (
-          filteredWorkers.map((worker) => <WorkerCard key={worker.id} worker={worker} />)
-        ) : (
+      <ul className="no-scrollbar mt-4 flex gap-2 overflow-x-auto px-5 pb-1">
+        <li>
+          <button
+            type="button"
+            onClick={() => setCategory(undefined)}
+            className={cn(
+              "min-h-12 rounded-full border-2 px-5 text-[0.9375rem] font-bold whitespace-nowrap",
+              !category
+                ? "border-primary bg-primary-soft text-primary-ink"
+                : "border-border bg-card text-muted-foreground",
+            )}
+          >
+            All
+          </button>
+        </li>
+        {feed.categories.map((item) => (
+          <li key={item.slug}>
+            <button
+              type="button"
+              onClick={() => setCategory(category === item.slug ? undefined : item.slug)}
+              className={cn(
+                "min-h-12 rounded-full border-2 px-5 text-[0.9375rem] font-bold whitespace-nowrap",
+                category === item.slug
+                  ? "border-primary bg-primary-soft text-primary-ink"
+                  : "border-border bg-card text-muted-foreground",
+              )}
+            >
+              {item.name}
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      <div className="mt-6 space-y-3 px-5">
+        {active.isPending ? (
+          <CardSkeleton kind={tab === "jobs" ? "job" : "worker"} />
+        ) : results.length === 0 ? (
           <EmptyState
-            icon={<Search className="size-6" aria-hidden="true" />}
-            title="No workers match that"
-            body="Try a different trade or area."
+            icon={<SearchX className="size-7" aria-hidden="true" />}
+            title="Nothing matches yet"
+            body={
+              q || category
+                ? "Try a different word, or clear the filter to see everything."
+                : "New posts show up here as soon as people add them."
+            }
           />
+        ) : tab === "jobs" ? (
+          jobs.data?.map((job) => <JobCard key={job.id} job={job} />)
+        ) : (
+          workers.data?.map((worker) => <WorkerCard key={worker.id} worker={worker} />)
         )}
       </div>
     </AppShell>
