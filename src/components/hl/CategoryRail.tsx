@@ -4,6 +4,8 @@ import {
   Droplets,
   Flame,
   GraduationCap,
+  Hammer,
+  Layers,
   PaintRoller,
   Scissors,
   Sparkles,
@@ -13,7 +15,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-import { categories } from "@/data/demo";
+import type { CategoryRow } from "@/lib/types";
 
 const icons: Record<string, LucideIcon> = {
   Zap,
@@ -26,9 +28,13 @@ const icons: Record<string, LucideIcon> = {
   Scissors,
   Car,
   Sprout,
+  Hammer,
+  Layers,
 };
 
-export function CategoryRail() {
+export function CategoryRail({ categories }: { categories: CategoryRow[] }) {
+  if (categories.length === 0) return null;
+
   return (
     <ul className="no-scrollbar flex gap-3 overflow-x-auto px-5 pb-1">
       {categories.map((category) => {
@@ -37,13 +43,13 @@ export function CategoryRail() {
           <li key={category.slug}>
             <Link
               to="/discover"
-              search={{ category: category.slug }}
-              className="flex w-24 flex-col items-center gap-2 rounded-2xl border border-border bg-card px-3 py-4 text-center shadow-soft"
+              search={{ category: category.slug, tab: "jobs" }}
+              className="flex w-[6.5rem] flex-col items-center gap-2.5 rounded-3xl border-2 border-border bg-card px-3 py-4 text-center transition-colors hover:border-primary"
             >
-              <span className="grid size-11 place-items-center rounded-xl bg-primary-soft text-primary">
-                <Icon className="size-5" aria-hidden="true" />
+              <span className="grid size-12 place-items-center rounded-2xl bg-primary-soft text-primary-ink">
+                <Icon className="size-6" aria-hidden="true" />
               </span>
-              <span className="text-xs leading-tight font-semibold text-foreground">
+              <span className="text-[0.8125rem] leading-tight font-bold text-foreground">
                 {category.name}
               </span>
             </Link>

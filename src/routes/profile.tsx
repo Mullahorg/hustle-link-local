@@ -1,18 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-  BadgeCheck,
-  Bell,
-  ChevronRight,
-  Flag,
-  LogOut,
-  Settings,
-  ShieldCheck,
-  Star,
-} from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Bell, ChevronRight, Flag, LogOut, Settings, ShieldCheck, Star } from "lucide-react";
 
 import { AppShell } from "@/components/layout/AppShell";
-import { Avatar, Chip, Rating } from "@/components/hl/primitives";
+import { Avatar, CardSkeleton, Chip, Rating, VerifiedMark } from "@/components/hl/primitives";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
+import { myProfileQuery } from "@/lib/account";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -33,56 +27,118 @@ export const Route = createFileRoute("/profile")({
 });
 
 const rows = [
-  { icon: Star, label: "Reviews about you", to: "/profile" },
-  { icon: ShieldCheck, label: "Verification", to: "/profile" },
+  { icon: ShieldCheck, label: "Verification", to: "/settings" },
   { icon: Bell, label: "Notifications", to: "/notifications" },
   { icon: Settings, label: "Settings", to: "/settings" },
   { icon: Flag, label: "Report a problem", to: "/settings" },
 ] as const;
 
 function ProfileScreen() {
+  const { user, loading, signOut } = useAuth();
+  const { data: profile, isPending } = useQuery(myProfileQuery(user?.id));
+
+  if (loading) {
+    return (
+      <AppShell>
+        <div className="px-5 pt-10">
+          <CardSkeleton rows={2} kind="worker" />
+        </div>
+      </AppShell>
+    );
+  }
+
+  if (!user) {
+    return (
+      <AppShell>
+        <section className="flex flex-col items-center px-5 pt-16 text-center">
+          <Avatar name={null} size="lg" />
+          <h1 className="mt-6 text-2xl font-extrabold text-balance">
+            Your hustle, in one profile
+          </h1>
+          <p className="mt-2 max-w-[30ch] text-base font-medium text-muted-foreground">
+            Sign in to post jobs, apply for work and keep your reviews in one place.
+          </p>
+          <Button asChild block size="lg" className="mt-8 max-w-xs">
+            <Link to="/auth">Sign in or create account</Link>
+          </Button>
+        </section>
+      </AppShell>
+    );
+  }
+
   return (
     <AppShell>
       <section className="flex flex-col items-center px-5 pt-10 text-center">
-        <Avatar initials="NK" size="lg" />
-        <h1 className="mt-4 flex items-center gap-1.5 text-xl font-bold">
-          Njeri Kamau
-          <BadgeCheck className="size-5 text-primary" aria-label="Verified" />
+        <Avatar name={profile?.full_name} url={profile?.avatar_url} size="lg" />
+        <h1 className="mt-5 flex items-center gap-2 text-2xl font-extrabold">
+          {isPending ? "…" : (profile?.full_name ?? "Your name")}
+          <VerifiedMark verification={profile?.verification} />
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">Homeowner · Lavington, Nairobi</p>
-        <div className="mt-3 flex items-center gap-3">
-          <Rating value={4.9} count={23} />
-          <Chip tone="primary">ID verified</Chip>
+        <p className="mt-1 text-base font-semibold text-muted-foreground">
+          {profile?.headline ?? (profile?.is_worker ? "Worker" : "Client")}
+          {profile?.area ? ` · ${profile.area}` : ""}
+        </p>
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+          <Rating value={profile?.rating_avg ?? 0} count={profile?.rating_count ?? 0} />
+          <Chip tone={profile?.verification === "verified" ? "success" : "muted"}>
+            {profile?.verification === "verified"
+              ? "ID verified"
+              : profile?.verification === "pending"
+                ? "Verification pending"
+                : "Not verified"}
+          </Chip>
         </div>
-        <Button variant="outline" block className="mt-6">
-          Edit profile
+        <Button asChild variant="outline" block size="lg" className="mt-7">
+          <Link to="/settings">Edit profile</Link>
         </Button>
       </section>
 
-      <section className="px-5 pt-8">
-        <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card shadow-soft">
+      <section className="px-5 pt-9">
+        <ul className="divide-y-2 divide-border overflow-hidden rounded-3xl border-2 border-border bg-card">
           {rows.map((row) => {
             const Icon = row.icon;
             return (
               <li key={row.label}>
                 <Link
                   to={row.to}
-                  className="flex min-h-14 items-center gap-4 px-4 py-3.5 transition-colors hover:bg-muted"
+                  className="flex min-h-16 items-center gap-4 px-4 py-3 transition-colors hover:bg-muted"
                 >
-                  <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-muted text-foreground">
-                    <Icon className="size-5" aria-hidden="true" />
+                  <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-primary-soft text-primary-ink">
+                    <Icon className="size-6" aria-hidden="true" />
                   </span>
-                  <span className="min-w-0 flex-1 truncate text-[0.95rem] font-semibold">
-                    {row.label}
-                  </span>
-                  <ChevronRight className="size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
+                  <span className="min-w-0 flex-1 truncate text-base font-bold">{row.label}</span>
+                  <ChevronRight
+                    className="size-6 shrink-0 text-muted-foreground"
+                    aria-hidden="true"
+                  />
                 </Link>
               </li>
             );
           })}
+          <li>
+            <Link
+              to="/workers/$workerId"
+              params={{ workerId: user.id }}
+              className="flex min-h-16 items-center gap-4 px-4 py-3 transition-colors hover:bg-muted"
+            >
+              <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-primary-soft text-primary-ink">
+                <Star className="size-6" aria-hidden="true" />
+              </span>
+              <span className="min-w-0 flex-1 truncate text-base font-bold">
+                View your public page
+              </span>
+              <ChevronRight className="size-6 shrink-0 text-muted-foreground" aria-hidden="true" />
+            </Link>
+          </li>
         </ul>
 
-        <Button variant="ghost" block className="mt-6 text-muted-foreground">
+        <Button
+          variant="ghost"
+          block
+          size="lg"
+          className="mt-7 text-muted-foreground"
+          onClick={() => void signOut()}
+        >
           <LogOut aria-hidden="true" />
           Log out
         </Button>

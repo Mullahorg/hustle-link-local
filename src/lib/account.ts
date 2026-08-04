@@ -76,7 +76,7 @@ export const conversationsQuery = (userId: string | undefined) =>
       const { data, error } = await supabase
         .from("conversations")
         .select(
-          "id, user_a, user_b, last_message, last_message_at, a:user_a (id, full_name, avatar_url), b:user_b (id, full_name, avatar_url)",
+          "id, user_a, user_b, last_message, last_message_at, a:profiles!conversations_user_a_fkey (id, full_name, avatar_url), b:profiles!conversations_user_b_fkey (id, full_name, avatar_url)",
         )
         .order("last_message_at", { ascending: false });
       if (error) throw new Error(error.message);

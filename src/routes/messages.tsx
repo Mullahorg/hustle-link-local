@@ -1,9 +1,14 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { MessageCircle, Search } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { MessagesSquare } from "lucide-react";
 
 import { AppShell, ScreenHeader } from "@/components/layout/AppShell";
-import { Avatar, EmptyState } from "@/components/hl/primitives";
-import { conversations } from "@/data/demo";
+import { AuthGate } from "@/components/hl/AuthGate";
+import { Avatar, CardSkeleton, EmptyState } from "@/components/hl/primitives";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
+import { conversationsQuery } from "@/lib/account";
+import { shortTime } from "@/lib/format";
 
 export const Route = createFileRoute("/messages")({
   head: () => ({
@@ -11,12 +16,12 @@ export const Route = createFileRoute("/messages")({
       { title: "Messages — HustlerLink" },
       {
         name: "description",
-        content: "Agree on the work, the time and the price before anyone travels.",
+        content: "Agree the details, the price and the time before anyone travels.",
       },
       { property: "og:title", content: "Messages — HustlerLink" },
       {
         property: "og:description",
-        content: "Agree on the work, the time and the price before anyone travels.",
+        content: "Agree the details, the price and the time before anyone travels.",
       },
     ],
   }),
@@ -26,64 +31,86 @@ export const Route = createFileRoute("/messages")({
 function MessagesScreen() {
   return (
     <AppShell>
-      <ScreenHeader title="Messages" subtitle="Talk before you travel" />
-
-      <div className="px-5">
-        <label className="flex h-12 items-center gap-3 rounded-2xl border border-border bg-card px-4 shadow-soft focus-within:ring-2 focus-within:ring-ring">
-          <Search className="size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
-          <input
-            placeholder="Search conversations"
-            aria-label="Search conversations"
-            className="min-w-0 flex-1 bg-transparent text-sm font-medium outline-none placeholder:text-muted-foreground"
-          />
-        </label>
-      </div>
-
-      <div className="px-5 pt-5">
-        {conversations.length ? (
-          <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card shadow-soft">
-            {conversations.map((conversation) => (
-              <li key={conversation.id}>
-                <button
-                  type="button"
-                  className="flex w-full items-center gap-4 px-4 py-4 text-left transition-colors hover:bg-muted"
-                >
-                  <span className="relative shrink-0">
-                    <Avatar initials={conversation.initials} />
-                    {conversation.online ? (
-                      <span className="absolute right-0 bottom-0 size-3.5 rounded-full border-2 border-card bg-success" />
-                    ) : null}
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="flex items-baseline justify-between gap-3">
-                      <span className="truncate text-base font-bold">{conversation.name}</span>
-                      <span className="shrink-0 text-xs font-medium text-muted-foreground">
-                        {conversation.time}
-                      </span>
-                    </span>
-                    <span className="mt-0.5 flex items-center justify-between gap-3">
-                      <span className="truncate text-sm text-muted-foreground">
-                        {conversation.lastMessage}
-                      </span>
-                      {conversation.unread ? (
-                        <span className="grid size-5 shrink-0 place-items-center rounded-full bg-primary text-[0.65rem] font-bold text-primary-foreground">
-                          {conversation.unread}
-                        </span>
-                      ) : null}
-                    </span>
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <EmptyState
-            icon={<MessageCircle className="size-6" aria-hidden="true" />}
-            title="No messages yet"
-            body="When you apply for a job or hire someone, your chat appears here."
-          />
-        )}
-      </div>
+      <ScreenHeader title="Messages" subtitle="Agree the details before anyone travels." />
+      <AuthGate
+        title="Sign in to see your chats"
+        body="Your conversations with workers and clients live here."
+      >
+        <Inbox />
+      </AuthGate>
     </AppShell>
+  );
+}
+
+function Inbox() {
+  const { user } = useAuth();
+  const { data, isPending } = useQuery(conversationsQuery(user?.id));
+
+  if (isPending) {
+    return (
+      <div className="px-5">
+        <CardSkeleton kind="worker" />
+      </div>
+    );
+  }
+
+  if (!data || data.length === 0) {
+    return (
+      <div className="px-5">
+        <EmptyState
+          icon={<MessagesSquare className="size-7" aria-hidden="true" />}
+          title="No chats yet"
+          body="Message a worker from their profile, or wait for someone to reply to your job."
+          action={
+            <Button asChild block>
+              <Link to="/discover" search={{ tab: "workers" }}>
+                Browse workers
+              </Link>
+            </Button>
+          }
+        />
+      </div>
+    );
+  }
+
+  return (
+    <ul className="space-y-3 px-5">
+      {data.map((conversation) => {
+        const other =
+          conversation.user_a === user?.id
+            ? (conversation.b as unknown as { id: string; full_name: string; avatar_url: string | null } | null)
+            : (conversation.a as unknown as {
+                id: string;
+                full_name: string;
+                avatar_url: string | null;
+              } | null);
+        return (
+          <li key={conversation.id}>
+            <Link
+              to="/messages/$conversationId"
+              params={{ conversationId: conversation.id }}
+              className="flex items-center gap-4 rounded-3xl border-2 border-border bg-card p-4 transition-colors hover:border-primary"
+            >
+              <Avatar name={other?.full_name} url={other?.avatar_url} />
+              <span className="min-w-0 flex-1">
+                <span className="flex items-baseline justify-between gap-3">
+                  <span className="truncate text-[1.0625rem] font-extrabold text-foreground">
+                    {other?.full_name ?? "HustlerLink user"}
+                  </span>
+                  {conversation.last_message_at ? (
+                    <span className="shrink-0 text-[0.8125rem] font-bold text-muted-foreground">
+                      {shortTime(conversation.last_message_at)}
+                    </span>
+                  ) : null}
+                </span>
+                <span className="mt-0.5 block truncate text-[0.9375rem] font-medium text-muted-foreground">
+                  {conversation.last_message ?? "Say hello"}
+                </span>
+              </span>
+            </Link>
+          </li>
+        );
+      })}
+    </ul>
   );
 }
