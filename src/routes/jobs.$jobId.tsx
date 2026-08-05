@@ -174,7 +174,7 @@ function JobDetailScreen() {
 
   if (!job) return <JobMissing />;
 
-  const employer = (job as { profiles?: Employer }).profiles ?? null;
+  const employer: Employer = job.employer ?? null;
 
   async function messagePerson(otherId: string) {
     if (!user) {
