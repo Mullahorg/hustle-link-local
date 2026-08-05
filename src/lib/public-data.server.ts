@@ -59,12 +59,20 @@ export async function fetchJobDetail(id: string) {
   const { data, error } = await supabase
     .from("jobs")
     .select(
-      "id, title, description, category_slug, area, budget_min, budget_max, budget_note, urgent, status, applicants_count, created_at, employer_id, profiles:employer_id (full_name, area, rating_avg, rating_count, verification)",
+      "id, title, description, category_slug, area, budget_min, budget_max, budget_note, urgent, status, applicants_count, created_at, employer_id",
     )
     .eq("id", id)
     .maybeSingle();
   if (error) throw new Error(error.message);
-  return data;
+  if (!data) return null;
+
+  const { data: employer } = await supabase
+    .from("profiles")
+    .select("id, full_name, area, avatar_url, rating_avg, rating_count, verification")
+    .eq("id", data.employer_id)
+    .maybeSingle();
+
+  return { ...data, employer: employer ?? null };
 }
 
 export async function fetchWorkerDetail(id: string) {
