@@ -92,7 +92,15 @@ export function ScreenHeader({
   );
 }
 
-export function BackHeader({ title, to = "/" }: { title: string; to?: string }) {
+export function BackHeader({
+  title,
+  to = "/",
+  action,
+}: {
+  title: string;
+  to?: string;
+  action?: ReactNode;
+}) {
   return (
     <header className="sticky top-0 z-30 flex items-center gap-3 border-b-2 border-border bg-card px-4 py-3">
       <Link
