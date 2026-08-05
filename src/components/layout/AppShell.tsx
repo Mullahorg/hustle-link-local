@@ -122,7 +122,8 @@ export function BackHeader({
           <path d="m15 18-6-6 6-6" />
         </svg>
       </Link>
-      <h1 className="min-w-0 truncate text-xl font-extrabold text-foreground">{title}</h1>
+      <h1 className="min-w-0 flex-1 truncate text-xl font-extrabold text-foreground">{title}</h1>
+      {action}
     </header>
   );
 }
