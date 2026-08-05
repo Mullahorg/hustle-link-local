@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      blocked_users: {
+        Row: {
+          blocked_id: string
+          blocker_id: string
+          created_at: string
+        }
+        Insert: {
+          blocked_id: string
+          blocker_id: string
+          created_at?: string
+        }
+        Update: {
+          blocked_id?: string
+          blocker_id?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           icon: string
@@ -262,6 +280,7 @@ export type Database = {
       profiles: {
         Row: {
           area: string | null
+          available: boolean
           avatar_url: string | null
           bio: string | null
           category_slug: string | null
@@ -270,6 +289,7 @@ export type Database = {
           headline: string | null
           id: string
           is_worker: boolean
+          last_seen_at: string
           phone: string | null
           rate_label: string | null
           rating_avg: number
@@ -281,6 +301,7 @@ export type Database = {
         }
         Insert: {
           area?: string | null
+          available?: boolean
           avatar_url?: string | null
           bio?: string | null
           category_slug?: string | null
@@ -289,6 +310,7 @@ export type Database = {
           headline?: string | null
           id: string
           is_worker?: boolean
+          last_seen_at?: string
           phone?: string | null
           rate_label?: string | null
           rating_avg?: number
@@ -300,6 +322,7 @@ export type Database = {
         }
         Update: {
           area?: string | null
+          available?: boolean
           avatar_url?: string | null
           bio?: string | null
           category_slug?: string | null
@@ -308,6 +331,7 @@ export type Database = {
           headline?: string | null
           id?: string
           is_worker?: boolean
+          last_seen_at?: string
           phone?: string | null
           rate_label?: string | null
           rating_avg?: number
@@ -551,11 +575,13 @@ export type Database = {
         }
         Returns: {
           area: string
+          available: boolean
           avatar_url: string
           category_slug: string
           full_name: string
           headline: string
           id: string
+          last_seen_at: string
           rate_label: string
           rating_avg: number
           rating_count: number
