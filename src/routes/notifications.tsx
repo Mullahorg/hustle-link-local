@@ -1,7 +1,25 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, BadgeCheck, Briefcase, MessageCircle, Star } from "lucide-react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  BadgeCheck,
+  Bell,
+  Briefcase,
+  CheckCheck,
+  MessageCircle,
+  Star,
+} from "lucide-react";
+import { useEffect } from "react";
+import { toast } from "sonner";
 
-import { AppShell } from "@/components/layout/AppShell";
+import { AppShell, ScreenHeader } from "@/components/layout/AppShell";
+import { AuthGate } from "@/components/hl/AuthGate";
+import { CardSkeleton, EmptyState, ErrorState } from "@/components/hl/primitives";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { markNotificationsRead, notificationsQuery } from "@/lib/account";
+import { timeAgo } from "@/lib/format";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/notifications")({
   head: () => ({
@@ -13,76 +31,157 @@ export const Route = createFileRoute("/notifications")({
         property: "og:description",
         content: "Job matches, replies and review reminders in one list.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: NotificationsScreen,
 });
 
-const items = [
-  {
-    id: "n1",
-    icon: Briefcase,
-    title: "3 workers applied to your plumbing job",
-    time: "20 minutes ago",
-    unread: true,
-  },
-  {
-    id: "n2",
-    icon: MessageCircle,
-    title: "Samuel Otieno sent you a message",
-    time: "1 hour ago",
-    unread: true,
-  },
-  {
-    id: "n3",
-    icon: BadgeCheck,
-    title: "Your ID verification was approved",
-    time: "Yesterday",
-    unread: false,
-  },
-  {
-    id: "n4",
-    icon: Star,
-    title: "Grace Wanjiru left you a 5 star review",
-    time: "Monday",
-    unread: false,
-  },
-];
+const iconFor: Record<string, typeof Bell> = {
+  application: Briefcase,
+  message: MessageCircle,
+  review: Star,
+  verification: BadgeCheck,
+  job: Briefcase,
+};
 
 function NotificationsScreen() {
   return (
     <AppShell>
-      <header className="flex items-center gap-3 px-5 pt-8 pb-5">
-        <Link
-          to="/"
-          aria-label="Back"
-          className="grid size-11 shrink-0 place-items-center rounded-xl border border-border bg-card"
-        >
-          <ArrowLeft className="size-5" aria-hidden="true" />
-        </Link>
-        <h1 className="truncate text-2xl font-bold">Notifications</h1>
-      </header>
+      <ScreenHeader title="Notifications" subtitle="Everything that needs your attention." />
+      <AuthGate
+        title="Sign in to see your alerts"
+        body="Applications, replies and reviews all land here."
+      >
+        <NotificationList />
+      </AuthGate>
+    </AppShell>
+  );
+}
+
+function NotificationList() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { data, isPending, isError, refetch } = useQuery(notificationsQuery(user?.id));
+
+  // Live updates for new notifications.
+  useEffect(() => {
+    if (!user) return;
+    const channel = supabase
+      .channel(`notifications:${user.id}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
+        () => {
+          void queryClient.invalidateQueries({ queryKey: ["notifications", user.id] });
+        },
+      )
+      .subscribe();
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [user, queryClient]);
+
+  const markAll = useMutation({
+    mutationFn: async () => {
+      if (!user) throw new Error("Sign in first");
+      await markNotificationsRead(user.id);
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["notifications", user?.id] }),
+    onError: (error: Error) => toast.error("Could not update", { description: error.message }),
+  });
+
+  if (isPending) {
+    return (
+      <div className="px-5">
+        <CardSkeleton rows={4} kind="worker" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="px-5">
+        <ErrorState onRetry={() => void refetch()} />
+      </div>
+    );
+  }
+
+  const items = data ?? [];
+  const unread = items.filter((item) => !item.read).length;
+
+  if (items.length === 0) {
+    return (
+      <div className="px-5">
+        <EmptyState
+          icon={<Bell className="size-7" aria-hidden="true" />}
+          title="Nothing yet"
+          body="When someone applies, replies or reviews you, it shows up here."
+        />
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {unread > 0 ? (
+        <div className="mb-4 px-5">
+          <Button
+            variant="outline"
+            block
+            onClick={() => markAll.mutate()}
+            disabled={markAll.isPending}
+          >
+            <CheckCheck aria-hidden="true" />
+            Mark all {unread} as read
+          </Button>
+        </div>
+      ) : null}
 
       <ul className="space-y-3 px-5">
         {items.map((item) => {
-          const Icon = item.icon;
+          const Icon = iconFor[item.kind] ?? Bell;
           return (
-            <li
-              key={item.id}
-              className="flex items-start gap-4 rounded-2xl border border-border bg-card p-4 shadow-soft"
-            >
-              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary-soft text-primary">
-                <Icon className="size-5" aria-hidden="true" />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block text-[0.95rem] font-semibold">{item.title}</span>
-                <span className="mt-0.5 block text-xs text-muted-foreground">{item.time}</span>
-              </span>
-              {item.unread ? <span className="mt-2 size-2 shrink-0 rounded-full bg-accent" /> : null}
+            <li key={item.id}>
+              <button
+                type="button"
+                onClick={() => {
+                  if (item.link) void navigate({ to: item.link as never });
+                }}
+                className={cn(
+                  "flex w-full items-start gap-4 rounded-3xl border-2 bg-card p-4 text-left transition-colors",
+                  item.read ? "border-border" : "border-primary",
+                )}
+              >
+                <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-primary-soft text-primary-ink">
+                  <Icon className="size-6" aria-hidden="true" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-base font-extrabold text-foreground">
+                    {item.title}
+                  </span>
+                  {item.body ? (
+                    <span className="mt-0.5 block text-[0.9375rem] font-medium text-muted-foreground">
+                      {item.body}
+                    </span>
+                  ) : null}
+                  <span className="mt-1 block text-[0.875rem] font-semibold text-muted-foreground">
+                    {timeAgo(item.created_at)}
+                  </span>
+                </span>
+                {!item.read ? (
+                  <span
+                    className="mt-2 size-3 shrink-0 rounded-full bg-accent"
+                    aria-label="Unread"
+                  />
+                ) : null}
+              </button>
             </li>
           );
         })}
       </ul>
-    </AppShell>
+    </>
   );
 }

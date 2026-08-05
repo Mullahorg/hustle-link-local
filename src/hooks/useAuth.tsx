@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useMemo, type ReactNode } from "r
 import type { Session, User } from "@supabase/supabase-js";
 
 import { supabase } from "@/integrations/supabase/client";
+import { touchPresence } from "@/lib/workflow";
 
 type AuthValue = {
   session: Session | null;
@@ -38,6 +39,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
     return () => sub.subscription.unsubscribe();
   }, [queryClient, router]);
+
+  // Keep "online now" / "last active" fresh for the signed-in member.
+  const userId = data?.user?.id;
+  useEffect(() => {
+    if (!userId) return;
+    void touchPresence(userId);
+    const timer = setInterval(() => void touchPresence(userId), 4 * 60 * 1000);
+    return () => clearInterval(timer);
+  }, [userId]);
 
   const value = useMemo<AuthValue>(
     () => ({

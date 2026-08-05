@@ -92,7 +92,15 @@ export function ScreenHeader({
   );
 }
 
-export function BackHeader({ title, to = "/" }: { title: string; to?: string }) {
+export function BackHeader({
+  title,
+  to = "/",
+  action,
+}: {
+  title: string;
+  to?: string;
+  action?: ReactNode;
+}) {
   return (
     <header className="sticky top-0 z-30 flex items-center gap-3 border-b-2 border-border bg-card px-4 py-3">
       <Link
@@ -114,7 +122,8 @@ export function BackHeader({ title, to = "/" }: { title: string; to?: string }) 
           <path d="m15 18-6-6 6-6" />
         </svg>
       </Link>
-      <h1 className="min-w-0 truncate text-xl font-extrabold text-foreground">{title}</h1>
+      <h1 className="min-w-0 flex-1 truncate text-xl font-extrabold text-foreground">{title}</h1>
+      {action}
     </header>
   );
 }
