@@ -31,27 +31,52 @@ export async function fetchHomeFeed() {
   return data as unknown as import("./types").HomeFeed;
 }
 
-export async function fetchJobs(args: { q?: string; category?: string; area?: string }) {
+export async function fetchJobs(args: {
+  q?: string;
+  category?: string;
+  area?: string;
+  limit?: number;
+  offset?: number;
+}) {
   const { data, error } = await publicClient().rpc("search_jobs", {
     ...(args.q ? { _q: args.q } : {}),
     ...(args.category ? { _category: args.category } : {}),
     ...(args.area ? { _area: args.area } : {}),
-    _limit: 30,
-    _offset: 0,
+    _limit: args.limit ?? 20,
+    _offset: args.offset ?? 0,
   });
   if (error) throw new Error(error.message);
   return (data ?? []) as unknown as import("./types").JobRow[];
 }
 
-export async function fetchWorkers(args: { q?: string; category?: string }) {
+export async function fetchWorkers(args: {
+  q?: string;
+  category?: string;
+  limit?: number;
+  offset?: number;
+}) {
   const { data, error } = await publicClient().rpc("search_workers", {
     ...(args.q ? { _q: args.q } : {}),
     ...(args.category ? { _category: args.category } : {}),
-    _limit: 30,
-    _offset: 0,
+    _limit: args.limit ?? 20,
+    _offset: args.offset ?? 0,
   });
   if (error) throw new Error(error.message);
   return (data ?? []) as unknown as import("./types").WorkerRow[];
+}
+
+export const REVIEW_PAGE = 5;
+
+/** Older reviews for a worker profile, page by page. */
+export async function fetchWorkerReviews(id: string, offset: number) {
+  const { data, error } = await publicClient()
+    .from("reviews")
+    .select("id, rating, body, created_at, reviewer:reviewer_id (full_name)")
+    .eq("subject_id", id)
+    .order("created_at", { ascending: false })
+    .range(offset, offset + REVIEW_PAGE - 1);
+  if (error) throw new Error(error.message);
+  return data ?? [];
 }
 
 export async function fetchJobDetail(id: string) {
@@ -90,7 +115,7 @@ export async function fetchWorkerDetail(id: string) {
       .select("id, rating, body, created_at, reviewer:reviewer_id (full_name)")
       .eq("subject_id", id)
       .order("created_at", { ascending: false })
-      .limit(10),
+      .limit(REVIEW_PAGE),
   ]);
   if (profile.error) throw new Error(profile.error.message);
   return { profile: profile.data, reviews: reviews.data ?? [] };
