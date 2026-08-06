@@ -182,7 +182,8 @@ export const blockedUsersQuery = (userId: string | undefined) =>
         .order("created_at", { ascending: false });
       if (error) throw new Error(error.message);
       const rows = data ?? [];
-      if (rows.length === 0) return [] as { id: string; full_name: string; avatar_url: string | null }[];
+      if (rows.length === 0)
+        return [] as { id: string; full_name: string; avatar_url: string | null }[];
       const { data: people, error: peopleError } = await supabase
         .from("profiles")
         .select("id, full_name, avatar_url")
@@ -230,7 +231,10 @@ export async function unblockUser(blockerId: string, blockedId: string) {
 /* ---------------------------------------------------------------- presence */
 
 export async function touchPresence(userId: string) {
-  await supabase.from("profiles").update({ last_seen_at: new Date().toISOString() }).eq("id", userId);
+  await supabase
+    .from("profiles")
+    .update({ last_seen_at: new Date().toISOString() })
+    .eq("id", userId);
 }
 
 export function presenceLabel(lastSeen: string | null | undefined): string {

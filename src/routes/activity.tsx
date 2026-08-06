@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { Bookmark, ClipboardList, Briefcase } from "lucide-react";
 import { useState } from "react";
 
 import { AppShell, ScreenHeader } from "@/components/layout/AppShell";
 import { AuthGate } from "@/components/hl/AuthGate";
 import { CardSkeleton, Chip, EmptyState, JobCard } from "@/components/hl/primitives";
+import { LoadMore } from "@/components/hl/LoadMore";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { myApplicationsQuery, myJobsQuery, savedJobsQuery } from "@/lib/account";
@@ -90,7 +91,9 @@ function ActivityScreen() {
 
 function Applied() {
   const { user } = useAuth();
-  const { data, isPending } = useQuery(myApplicationsQuery(user?.id));
+  const query = useInfiniteQuery(myApplicationsQuery(user?.id));
+  const { isPending } = query;
+  const data = query.data?.pages.flat();
 
   if (isPending) return <Loading />;
   if (!data || data.length === 0) {
@@ -136,13 +139,23 @@ function Applied() {
           </li>
         );
       })}
+      <li>
+        <LoadMore
+          hasMore={Boolean(query.hasNextPage)}
+          loading={query.isFetchingNextPage}
+          onLoad={() => void query.fetchNextPage()}
+          label="Show older applications"
+        />
+      </li>
     </ul>
   );
 }
 
 function Saved() {
   const { user } = useAuth();
-  const { data, isPending } = useQuery(savedJobsQuery(user?.id));
+  const query = useInfiniteQuery(savedJobsQuery(user?.id));
+  const { isPending } = query;
+  const data = query.data?.pages.flat();
 
   if (isPending) return <Loading />;
   if (!data || data.length === 0) {
@@ -190,13 +203,23 @@ function Saved() {
           </li>
         );
       })}
+      <li>
+        <LoadMore
+          hasMore={Boolean(query.hasNextPage)}
+          loading={query.isFetchingNextPage}
+          onLoad={() => void query.fetchNextPage()}
+          label="Show more saved jobs"
+        />
+      </li>
     </ul>
   );
 }
 
 function Posted() {
   const { user } = useAuth();
-  const { data, isPending } = useQuery(myJobsQuery(user?.id));
+  const query = useInfiniteQuery(myJobsQuery(user?.id));
+  const { isPending } = query;
+  const data = query.data?.pages.flat();
 
   if (isPending) return <Loading />;
   if (!data || data.length === 0) {
@@ -240,6 +263,14 @@ function Posted() {
           </Link>
         </li>
       ))}
+      <li>
+        <LoadMore
+          hasMore={Boolean(query.hasNextPage)}
+          loading={query.isFetchingNextPage}
+          onLoad={() => void query.fetchNextPage()}
+          label="Show older jobs"
+        />
+      </li>
     </ul>
   );
 }

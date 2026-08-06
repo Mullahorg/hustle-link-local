@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { MapPin, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 
@@ -9,7 +9,9 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { openConversation } from "@/lib/account";
 import { timeAgo } from "@/lib/format";
-import { workerDetailQuery } from "@/lib/queries";
+import { workerDetailQuery, workerReviewsQuery } from "@/lib/queries";
+import { LoadMore } from "@/components/hl/LoadMore";
+import { ReportDialog } from "@/components/hl/ReportDialog";
 
 export const Route = createFileRoute("/workers/$workerId")({
   head: () => ({
@@ -38,6 +40,11 @@ function WorkerScreen() {
   const navigate = useNavigate();
 
   const worker = data.profile;
+  const reviewPages = useInfiniteQuery({
+    ...workerReviewsQuery(workerId),
+    initialData: { pages: [data.reviews], pageParams: [0] },
+  });
+  const reviews = reviewPages.data?.pages.flat() ?? data.reviews;
 
   if (!worker) {
     return (
@@ -79,7 +86,11 @@ function WorkerScreen() {
   return (
     <div className="min-h-dvh bg-background">
       <div className="mx-auto max-w-screen-sm pb-32">
-        <BackHeader title="Worker" to="/discover" />
+        <BackHeader
+          title="Profile"
+          to="/discover"
+          {...(isMe ? {} : { action: <ReportDialog subjectUserId={workerId} allowBlock /> })}
+        />
 
         <section className="flex flex-col items-center px-5 pt-8 text-center">
           <Avatar name={worker.full_name} url={worker.avatar_url} size="lg" />
@@ -121,13 +132,13 @@ function WorkerScreen() {
 
         <section className="px-5 pt-9">
           <h2 className="text-xl font-extrabold">Reviews</h2>
-          {data.reviews.length === 0 ? (
+          {reviews.length === 0 ? (
             <p className="mt-2 text-base font-medium text-muted-foreground">
               No reviews yet. Be the first to work with {worker.full_name.split(" ")[0]}.
             </p>
           ) : (
             <ul className="mt-4 space-y-3">
-              {data.reviews.map((review) => {
+              {reviews.map((review) => {
                 const reviewer = review.reviewer as unknown as { full_name: string } | null;
                 return (
                   <li key={review.id} className="rounded-3xl border-2 border-border bg-card p-5">
@@ -146,6 +157,14 @@ function WorkerScreen() {
                   </li>
                 );
               })}
+              <li>
+                <LoadMore
+                  hasMore={Boolean(reviewPages.hasNextPage)}
+                  loading={reviewPages.isFetchingNextPage}
+                  onLoad={() => void reviewPages.fetchNextPage()}
+                  label="Show more reviews"
+                />
+              </li>
             </ul>
           )}
         </section>

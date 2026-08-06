@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { SendHorizonal } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -7,7 +7,10 @@ import { toast } from "sonner";
 import { AuthGate } from "@/components/hl/AuthGate";
 import { CardSkeleton } from "@/components/hl/primitives";
 import { useAuth } from "@/hooks/useAuth";
-import { messagesQuery, sendMessage } from "@/lib/account";
+import { conversationPeerQuery, messagesQuery, sendMessage } from "@/lib/account";
+import { LoadMore } from "@/components/hl/LoadMore";
+import { ReportDialog } from "@/components/hl/ReportDialog";
+import { presenceLabel } from "@/lib/workflow";
 import { supabase } from "@/integrations/supabase/client";
 import { shortTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -30,6 +33,8 @@ export const Route = createFileRoute("/messages/$conversationId")({
 function ChatScreen() {
   const { conversationId } = Route.useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { data: peer } = useQuery(conversationPeerQuery(conversationId, user?.id));
 
   return (
     <div className="flex min-h-dvh flex-col bg-background">
@@ -53,11 +58,22 @@ function ChatScreen() {
             <path d="m15 18-6-6 6-6" />
           </svg>
         </button>
-        <h1 className="min-w-0 truncate text-xl font-extrabold">Chat</h1>
+        <div className="min-w-0 flex-1">
+          <h1 className="truncate text-xl font-extrabold">{peer?.full_name ?? "Chat"}</h1>
+          {peer?.last_seen_at ? (
+            <p className="truncate text-[0.8125rem] font-bold text-muted-foreground">
+              {presenceLabel(peer.last_seen_at)}
+            </p>
+          ) : null}
+        </div>
+        {peer?.id ? <ReportDialog subjectUserId={peer.id} label="Report" allowBlock /> : null}
       </header>
 
       <div className="mx-auto w-full max-w-screen-sm flex-1">
-        <AuthGate title="Sign in to open this chat" body="Only the two people in a chat can read it.">
+        <AuthGate
+          title="Sign in to open this chat"
+          body="Only the two people in a chat can read it."
+        >
           <Thread conversationId={conversationId} />
         </AuthGate>
       </div>
@@ -75,7 +91,10 @@ function Thread({ conversationId }: { conversationId: string }) {
   const [draft, setDraft] = useState("");
   const endRef = useRef<HTMLDivElement>(null);
 
-  const { data, isPending } = useQuery(messagesQuery(conversationId));
+  const query = useInfiniteQuery(messagesQuery(conversationId));
+  const { isPending } = query;
+  // Pages come newest-first; flip them so the latest message sits at the bottom.
+  const data = query.data ? [...query.data.pages.flat()].reverse() : undefined;
 
   // Live updates: new rows push straight into the cache, no polling.
   useEffect(() => {
@@ -99,13 +118,15 @@ function Thread({ conversationId }: { conversationId: string }) {
     };
   }, [conversationId, queryClient]);
 
+  // Only jump to the bottom for new messages — loading older pages must keep
+  // the reader where they are.
+  const latestId = data?.[data.length - 1]?.id;
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: "end" });
-  }, [data?.length]);
+  }, [latestId]);
 
   const send = useMutation({
-    mutationFn: async (body: string) =>
-      sendMessage({ conversationId, senderId: user!.id, body }),
+    mutationFn: async (body: string) => sendMessage({ conversationId, senderId: user!.id, body }),
     onSuccess: () => {
       setDraft("");
       void queryClient.invalidateQueries({ queryKey: ["messages", conversationId] });
@@ -117,6 +138,16 @@ function Thread({ conversationId }: { conversationId: string }) {
   return (
     <div className="flex min-h-[calc(100dvh-4.5rem)] flex-col">
       <ul className="flex-1 space-y-3 px-5 py-6">
+        {!isPending && query.hasNextPage ? (
+          <li>
+            <LoadMore
+              hasMore
+              loading={query.isFetchingNextPage}
+              onLoad={() => void query.fetchNextPage()}
+              label="Load earlier messages"
+            />
+          </li>
+        ) : null}
         {isPending ? (
           <li>
             <CardSkeleton rows={2} />

@@ -1,19 +1,13 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  BadgeCheck,
-  Bell,
-  Briefcase,
-  CheckCheck,
-  MessageCircle,
-  Star,
-} from "lucide-react";
+import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { BadgeCheck, Bell, Briefcase, CheckCheck, MessageCircle, Star } from "lucide-react";
 import { useEffect } from "react";
 import { toast } from "sonner";
 
 import { AppShell, ScreenHeader } from "@/components/layout/AppShell";
 import { AuthGate } from "@/components/hl/AuthGate";
 import { CardSkeleton, EmptyState, ErrorState } from "@/components/hl/primitives";
+import { LoadMore } from "@/components/hl/LoadMore";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -64,7 +58,9 @@ function NotificationList() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { data, isPending, isError, refetch } = useQuery(notificationsQuery(user?.id));
+  const query = useInfiniteQuery(notificationsQuery(user?.id));
+  const { isPending, isError, refetch } = query;
+  const data = query.data?.pages.flat();
 
   // Live updates for new notifications.
   useEffect(() => {
@@ -181,6 +177,15 @@ function NotificationList() {
             </li>
           );
         })}
+        <li>
+          <LoadMore
+            hasMore={Boolean(query.hasNextPage)}
+            loading={query.isFetchingNextPage}
+            onLoad={() => void query.fetchNextPage()}
+            label="Show older notifications"
+            endLabel={items.length > 8 ? "You're all caught up" : undefined}
+          />
+        </li>
       </ul>
     </>
   );

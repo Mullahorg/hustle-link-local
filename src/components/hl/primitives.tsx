@@ -121,9 +121,7 @@ export function JobCard({ job }: { job: JobRow }) {
         </span>
         <span className="inline-flex items-center gap-1.5">
           <Users className="size-[1.15em]" aria-hidden="true" />
-          {job.applicants_count === 0
-            ? "Be the first to apply"
-            : `${job.applicants_count} applied`}
+          {job.applicants_count === 0 ? "Be the first to apply" : `${job.applicants_count} applied`}
         </span>
       </div>
     </Link>
@@ -204,7 +202,13 @@ export function ErrorState({ onRetry }: { onRetry?: () => void }) {
   );
 }
 
-export function CardSkeleton({ rows = 3, kind = "job" }: { rows?: number; kind?: "job" | "worker" }) {
+export function CardSkeleton({
+  rows = 3,
+  kind = "job",
+}: {
+  rows?: number;
+  kind?: "job" | "worker";
+}) {
   return (
     <div className="space-y-3" aria-hidden="true">
       {Array.from({ length: rows }).map((_, index) => (

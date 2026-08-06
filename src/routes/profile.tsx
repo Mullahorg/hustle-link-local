@@ -52,9 +52,7 @@ function ProfileScreen() {
       <AppShell>
         <section className="flex flex-col items-center px-5 pt-16 text-center">
           <Avatar name={null} size="lg" />
-          <h1 className="mt-6 text-2xl font-extrabold text-balance">
-            Your hustle, in one profile
-          </h1>
+          <h1 className="mt-6 text-2xl font-extrabold text-balance">Your hustle, in one profile</h1>
           <p className="mt-2 max-w-[30ch] text-base font-medium text-muted-foreground">
             Sign in to post jobs, apply for work and keep your reviews in one place.
           </p>
