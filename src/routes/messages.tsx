@@ -81,7 +81,11 @@ function Inbox() {
       {data.map((conversation) => {
         const other =
           conversation.user_a === user?.id
-            ? (conversation.b as unknown as { id: string; full_name: string; avatar_url: string | null } | null)
+            ? (conversation.b as unknown as {
+                id: string;
+                full_name: string;
+                avatar_url: string | null;
+              } | null)
             : (conversation.a as unknown as {
                 id: string;
                 full_name: string;

@@ -121,7 +121,11 @@ function PostJobFlow() {
 
   const canContinue =
     (step === 0 && draft.trade !== null) ||
-    (step === 1 && !titleError && !areaError && draft.title.trim().length >= 5 && draft.area.trim().length >= 2) ||
+    (step === 1 &&
+      !titleError &&
+      !areaError &&
+      draft.title.trim().length >= 5 &&
+      draft.area.trim().length >= 2) ||
     (step === 2 && !budgetError);
 
   const post = useMutation({
@@ -232,7 +236,9 @@ function PostJobFlow() {
           </>
         ) : step === 1 ? (
           <>
-            <h1 className="text-[1.75rem] font-extrabold text-balance">Tell workers what you need</h1>
+            <h1 className="text-[1.75rem] font-extrabold text-balance">
+              Tell workers what you need
+            </h1>
             <div className="mt-6 space-y-6">
               <div>
                 <label htmlFor="job-title" className="mb-1.5 block text-base font-bold">
@@ -367,7 +373,9 @@ function PostJobFlow() {
                 <li key={min}>
                   <button
                     type="button"
-                    onClick={() => setDraft((prev) => ({ ...prev, budgetMin: min!, budgetMax: max! }))}
+                    onClick={() =>
+                      setDraft((prev) => ({ ...prev, budgetMin: min!, budgetMax: max! }))
+                    }
                     className="min-h-11 rounded-full border-2 border-border bg-card px-4 text-[0.9375rem] font-bold"
                   >
                     KSh {min} – {max}

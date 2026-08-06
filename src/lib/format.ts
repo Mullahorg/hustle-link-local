@@ -4,11 +4,7 @@ export function initialsOf(name: string | null | undefined): string {
   return parts.map((p) => p.charAt(0).toUpperCase()).join("") || "?";
 }
 
-export function formatBudget(
-  min: number | null,
-  max: number | null,
-  note?: string | null,
-): string {
+export function formatBudget(min: number | null, max: number | null, note?: string | null): string {
   const ksh = (n: number) => `KSh ${n.toLocaleString("en-KE")}`;
   let base: string;
   if (min && max && min !== max) base = `${ksh(min)} – ${ksh(max)}`;

@@ -151,12 +151,7 @@ export function ReportDialog({
         </Button>
 
         {allowBlock && subjectUserId ? (
-          <Button
-            variant="outline"
-            block
-            disabled={block.isPending}
-            onClick={() => block.mutate()}
-          >
+          <Button variant="outline" block disabled={block.isPending} onClick={() => block.mutate()}>
             {blocked.data ? (
               <>
                 <ShieldCheck aria-hidden="true" /> Unblock this person

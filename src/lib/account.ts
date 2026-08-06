@@ -111,7 +111,7 @@ export const messagesQuery = (conversationId: string | undefined) =>
     queryKey: ["messages", conversationId],
     enabled: Boolean(conversationId),
     initialPageParam: 0,
-    getNextPageParam: <T,>(lastPage: T[], allPages: T[][]) =>
+    getNextPageParam: <T>(lastPage: T[], allPages: T[][]) =>
       lastPage.length < MESSAGE_PAGE ? undefined : allPages.length * MESSAGE_PAGE,
     queryFn: async ({ pageParam }) => {
       const { data, error } = await supabase
@@ -145,7 +145,14 @@ export const conversationPeerQuery = (conversationId: string, userId: string | u
         .select("id, full_name, avatar_url, last_seen_at")
         .eq("id", otherId)
         .maybeSingle();
-      return person ?? { id: otherId, full_name: "HustlerLink user", avatar_url: null, last_seen_at: null };
+      return (
+        person ?? {
+          id: otherId,
+          full_name: "HustlerLink user",
+          avatar_url: null,
+          last_seen_at: null,
+        }
+      );
     },
   });
 

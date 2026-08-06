@@ -1,13 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  BadgeCheck,
-  Bell,
-  Briefcase,
-  CheckCheck,
-  MessageCircle,
-  Star,
-} from "lucide-react";
+import { BadgeCheck, Bell, Briefcase, CheckCheck, MessageCircle, Star } from "lucide-react";
 import { useEffect } from "react";
 import { toast } from "sonner";
 

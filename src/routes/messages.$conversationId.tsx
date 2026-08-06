@@ -66,13 +66,14 @@ function ChatScreen() {
             </p>
           ) : null}
         </div>
-        {peer?.id ? (
-          <ReportDialog subjectUserId={peer.id} label="Report" allowBlock />
-        ) : null}
+        {peer?.id ? <ReportDialog subjectUserId={peer.id} label="Report" allowBlock /> : null}
       </header>
 
       <div className="mx-auto w-full max-w-screen-sm flex-1">
-        <AuthGate title="Sign in to open this chat" body="Only the two people in a chat can read it.">
+        <AuthGate
+          title="Sign in to open this chat"
+          body="Only the two people in a chat can read it."
+        >
           <Thread conversationId={conversationId} />
         </AuthGate>
       </div>
@@ -83,7 +84,6 @@ function ChatScreen() {
     </div>
   );
 }
-
 
 function Thread({ conversationId }: { conversationId: string }) {
   const { user } = useAuth();
@@ -126,8 +126,7 @@ function Thread({ conversationId }: { conversationId: string }) {
   }, [latestId]);
 
   const send = useMutation({
-    mutationFn: async (body: string) =>
-      sendMessage({ conversationId, senderId: user!.id, body }),
+    mutationFn: async (body: string) => sendMessage({ conversationId, senderId: user!.id, body }),
     onSuccess: () => {
       setDraft("");
       void queryClient.invalidateQueries({ queryKey: ["messages", conversationId] });

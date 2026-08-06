@@ -34,7 +34,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
-import { applyToJob, myApplicationForJobQuery, openConversation, toggleSaveJob } from "@/lib/account";
+import {
+  applyToJob,
+  myApplicationForJobQuery,
+  openConversation,
+  toggleSaveJob,
+} from "@/lib/account";
 import { formatBudget, timeAgo } from "@/lib/format";
 import { jobDetailQuery } from "@/lib/queries";
 import {
@@ -49,7 +54,8 @@ import {
 } from "@/lib/workflow";
 
 export const Route = createFileRoute("/jobs/$jobId")({
-  loader: ({ context, params }) => context.queryClient.ensureQueryData(jobDetailQuery(params.jobId)),
+  loader: ({ context, params }) =>
+    context.queryClient.ensureQueryData(jobDetailQuery(params.jobId)),
   head: ({ loaderData }) => {
     const job = loaderData as { title?: string; area?: string; description?: string } | null;
     if (!job?.title) {
@@ -153,7 +159,8 @@ function JobDetailScreen() {
   });
 
   const status = useMutation({
-    mutationFn: (next: "in_progress" | "completed" | "closed" | "open") => setJobStatus(jobId, next),
+    mutationFn: (next: "in_progress" | "completed" | "closed" | "open") =>
+      setJobStatus(jobId, next),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["job", jobId] });
       await queryClient.invalidateQueries({ queryKey: ["my-jobs"] });
@@ -222,7 +229,9 @@ function JobDetailScreen() {
           <div className="flex flex-wrap gap-2">
             <Chip tone="primary">{job.category_slug}</Chip>
             {job.urgent ? <Chip tone="accent">Urgent</Chip> : null}
-            {job.status !== "open" ? <Chip tone="muted">{job.status.replace("_", " ")}</Chip> : null}
+            {job.status !== "open" ? (
+              <Chip tone="muted">{job.status.replace("_", " ")}</Chip>
+            ) : null}
           </div>
           <h1 className="mt-3 text-[1.75rem] leading-tight font-extrabold text-balance">
             {job.title}
@@ -303,7 +312,8 @@ function JobDetailScreen() {
                 jobId={jobId}
                 subjectId={hired.data}
                 subjectName={
-                  applicants.data?.find((a) => a.worker_id === hired.data)?.full_name ?? "the worker"
+                  applicants.data?.find((a) => a.worker_id === hired.data)?.full_name ??
+                  "the worker"
                 }
               />
             </section>
@@ -530,7 +540,12 @@ function EmployerPanel({
             Close job
           </Button>
         ) : jobStatus === "closed" ? (
-          <Button variant="ghost" size="sm" disabled={statusPending} onClick={() => onStatus("open")}>
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={statusPending}
+            onClick={() => onStatus("open")}
+          >
             Reopen job
           </Button>
         ) : null}
@@ -578,7 +593,11 @@ function EmployerPanel({
               ) : null}
 
               <div className="mt-3 flex flex-wrap gap-2">
-                <Button size="sm" variant="outline" onClick={() => void onMessage(person.worker_id)}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => void onMessage(person.worker_id)}
+                >
                   <MessageCircle aria-hidden="true" /> Chat
                 </Button>
                 {person.status !== "accepted" ? (

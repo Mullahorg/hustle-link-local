@@ -1,9 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import {
-  keepPreviousData,
-  useInfiniteQuery,
-  useSuspenseQuery,
-} from "@tanstack/react-query";
+import { keepPreviousData, useInfiniteQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { Search, SearchX, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
