@@ -111,7 +111,7 @@ export const messagesQuery = (conversationId: string | undefined) =>
     queryKey: ["messages", conversationId],
     enabled: Boolean(conversationId),
     initialPageParam: 0,
-    getNextPageParam: (lastPage, allPages) =>
+    getNextPageParam: <T,>(lastPage: T[], allPages: T[][]) =>
       lastPage.length < MESSAGE_PAGE ? undefined : allPages.length * MESSAGE_PAGE,
     queryFn: async ({ pageParam }) => {
       const { data, error } = await supabase

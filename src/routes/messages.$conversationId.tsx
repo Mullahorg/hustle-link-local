@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { SendHorizonal } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -7,7 +7,10 @@ import { toast } from "sonner";
 import { AuthGate } from "@/components/hl/AuthGate";
 import { CardSkeleton } from "@/components/hl/primitives";
 import { useAuth } from "@/hooks/useAuth";
-import { messagesQuery, sendMessage } from "@/lib/account";
+import { conversationPeerQuery, messagesQuery, sendMessage } from "@/lib/account";
+import { LoadMore } from "@/components/hl/LoadMore";
+import { ReportDialog } from "@/components/hl/ReportDialog";
+import { presenceLabel } from "@/lib/workflow";
 import { supabase } from "@/integrations/supabase/client";
 import { shortTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -75,7 +78,10 @@ function Thread({ conversationId }: { conversationId: string }) {
   const [draft, setDraft] = useState("");
   const endRef = useRef<HTMLDivElement>(null);
 
-  const { data, isPending } = useQuery(messagesQuery(conversationId));
+  const query = useInfiniteQuery(messagesQuery(conversationId));
+  const { isPending } = query;
+  // Pages come newest-first; flip them so the latest message sits at the bottom.
+  const data = query.data ? [...query.data.pages.flat()].reverse() : undefined;
 
   // Live updates: new rows push straight into the cache, no polling.
   useEffect(() => {
@@ -117,6 +123,16 @@ function Thread({ conversationId }: { conversationId: string }) {
   return (
     <div className="flex min-h-[calc(100dvh-4.5rem)] flex-col">
       <ul className="flex-1 space-y-3 px-5 py-6">
+        {!isPending && query.hasNextPage ? (
+          <li>
+            <LoadMore
+              hasMore
+              loading={query.isFetchingNextPage}
+              onLoad={() => void query.fetchNextPage()}
+              label="Load earlier messages"
+            />
+          </li>
+        ) : null}
         {isPending ? (
           <li>
             <CardSkeleton rows={2} />
