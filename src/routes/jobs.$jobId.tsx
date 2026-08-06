@@ -320,9 +320,16 @@ function JobDetailScreen() {
             </section>
           ) : null}
 
-          <div className="mt-8">
-            <ReportDialog jobId={jobId} subjectUserId={job.employer_id} label="Report this job" />
-          </div>
+          {!isOwner ? (
+            <div className="mt-8">
+              <ReportDialog
+                jobId={jobId}
+                subjectUserId={job.employer_id}
+                label="Report this job or block the employer"
+                allowBlock
+              />
+            </div>
+          ) : null}
         </div>
       </div>
 
