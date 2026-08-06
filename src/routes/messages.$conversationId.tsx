@@ -118,9 +118,12 @@ function Thread({ conversationId }: { conversationId: string }) {
     };
   }, [conversationId, queryClient]);
 
+  // Only jump to the bottom for new messages — loading older pages must keep
+  // the reader where they are.
+  const latestId = data?.[data.length - 1]?.id;
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: "end" });
-  }, [data?.length]);
+  }, [latestId]);
 
   const send = useMutation({
     mutationFn: async (body: string) =>
