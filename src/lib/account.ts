@@ -24,8 +24,9 @@ export const myProfileQuery = (userId: string | undefined) =>
 /** One page size for every personal list, so paging feels identical everywhere. */
 export const LIST_PAGE = 15;
 
-const nextOffset = (lastPage: unknown[], allPages: unknown[][]) =>
-  lastPage.length < LIST_PAGE ? undefined : allPages.length * LIST_PAGE;
+function nextOffset<T>(lastPage: T[], allPages: T[][]): number | undefined {
+  return lastPage.length < LIST_PAGE ? undefined : allPages.length * LIST_PAGE;
+}
 
 export const myApplicationsQuery = (userId: string | undefined) =>
   infiniteQueryOptions({

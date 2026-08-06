@@ -1,10 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { MessagesSquare } from "lucide-react";
 
 import { AppShell, ScreenHeader } from "@/components/layout/AppShell";
 import { AuthGate } from "@/components/hl/AuthGate";
 import { Avatar, CardSkeleton, EmptyState } from "@/components/hl/primitives";
+import { LoadMore } from "@/components/hl/LoadMore";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { conversationsQuery } from "@/lib/account";
@@ -44,7 +45,9 @@ function MessagesScreen() {
 
 function Inbox() {
   const { user } = useAuth();
-  const { data, isPending } = useQuery(conversationsQuery(user?.id));
+  const query = useInfiniteQuery(conversationsQuery(user?.id));
+  const { isPending } = query;
+  const data = query.data?.pages.flat();
 
   if (isPending) {
     return (
@@ -111,6 +114,14 @@ function Inbox() {
           </li>
         );
       })}
+      <li>
+        <LoadMore
+          hasMore={Boolean(query.hasNextPage)}
+          loading={query.isFetchingNextPage}
+          onLoad={() => void query.fetchNextPage()}
+          label="Show older chats"
+        />
+      </li>
     </ul>
   );
 }
