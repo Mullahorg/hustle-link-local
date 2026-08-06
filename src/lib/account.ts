@@ -1,4 +1,4 @@
-import { queryOptions } from "@tanstack/react-query";
+import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
@@ -21,95 +21,145 @@ export const myProfileQuery = (userId: string | undefined) =>
     },
   });
 
+/** One page size for every personal list, so paging feels identical everywhere. */
+export const LIST_PAGE = 15;
+
+const nextOffset = (lastPage: unknown[], allPages: unknown[][]) =>
+  lastPage.length < LIST_PAGE ? undefined : allPages.length * LIST_PAGE;
+
 export const myApplicationsQuery = (userId: string | undefined) =>
-  queryOptions({
+  infiniteQueryOptions({
     queryKey: ["my-applications", userId],
     enabled: Boolean(userId),
-    queryFn: async () => {
+    initialPageParam: 0,
+    getNextPageParam: nextOffset,
+    queryFn: async ({ pageParam }) => {
       const { data, error } = await supabase
         .from("job_applications")
         .select("id, status, created_at, message, jobs (id, title, area, status)")
         .eq("worker_id", userId!)
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .range(pageParam, pageParam + LIST_PAGE - 1);
       if (error) throw new Error(error.message);
       return data ?? [];
     },
   });
 
 export const savedJobsQuery = (userId: string | undefined) =>
-  queryOptions({
+  infiniteQueryOptions({
     queryKey: ["saved-jobs", userId],
     enabled: Boolean(userId),
-    queryFn: async () => {
+    initialPageParam: 0,
+    getNextPageParam: nextOffset,
+    queryFn: async ({ pageParam }) => {
       const { data, error } = await supabase
         .from("saved_jobs")
         .select(
           "job_id, jobs (id, title, area, budget_min, budget_max, budget_note, urgent, applicants_count, created_at)",
         )
         .eq("user_id", userId!)
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .range(pageParam, pageParam + LIST_PAGE - 1);
       if (error) throw new Error(error.message);
       return data ?? [];
     },
   });
 
 export const myJobsQuery = (userId: string | undefined) =>
-  queryOptions({
+  infiniteQueryOptions({
     queryKey: ["my-jobs", userId],
     enabled: Boolean(userId),
-    queryFn: async () => {
+    initialPageParam: 0,
+    getNextPageParam: nextOffset,
+    queryFn: async ({ pageParam }) => {
       const { data, error } = await supabase
         .from("jobs")
         .select("id, title, area, status, applicants_count, created_at")
         .eq("employer_id", userId!)
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .range(pageParam, pageParam + LIST_PAGE - 1);
       if (error) throw new Error(error.message);
       return data ?? [];
     },
   });
 
 export const conversationsQuery = (userId: string | undefined) =>
-  queryOptions({
+  infiniteQueryOptions({
     queryKey: ["conversations", userId],
     enabled: Boolean(userId),
-    queryFn: async () => {
+    initialPageParam: 0,
+    getNextPageParam: nextOffset,
+    queryFn: async ({ pageParam }) => {
       const { data, error } = await supabase
         .from("conversations")
         .select(
           "id, user_a, user_b, last_message, last_message_at, a:profiles!conversations_user_a_fkey (id, full_name, avatar_url), b:profiles!conversations_user_b_fkey (id, full_name, avatar_url)",
         )
-        .order("last_message_at", { ascending: false });
+        .order("last_message_at", { ascending: false })
+        .range(pageParam, pageParam + LIST_PAGE - 1);
       if (error) throw new Error(error.message);
       return data ?? [];
     },
   });
 
+/** Newest page first; the thread reverses it so the latest sits at the bottom. */
+export const MESSAGE_PAGE = 30;
+
 export const messagesQuery = (conversationId: string | undefined) =>
-  queryOptions({
+  infiniteQueryOptions({
     queryKey: ["messages", conversationId],
     enabled: Boolean(conversationId),
-    queryFn: async () => {
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.length < MESSAGE_PAGE ? undefined : allPages.length * MESSAGE_PAGE,
+    queryFn: async ({ pageParam }) => {
       const { data, error } = await supabase
         .from("messages")
         .select("id, body, sender_id, created_at")
         .eq("conversation_id", conversationId!)
-        .order("created_at", { ascending: true })
-        .limit(200);
+        .order("created_at", { ascending: false })
+        .range(pageParam, pageParam + MESSAGE_PAGE - 1);
       if (error) throw new Error(error.message);
       return data ?? [];
     },
   });
 
-export const notificationsQuery = (userId: string | undefined) =>
+/** The other person in a conversation — used for report/block in the chat header. */
+export const conversationPeerQuery = (conversationId: string, userId: string | undefined) =>
   queryOptions({
+    queryKey: ["conversation-peer", conversationId, userId],
+    enabled: Boolean(userId),
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("conversations")
+        .select("user_a, user_b")
+        .eq("id", conversationId)
+        .maybeSingle();
+      if (error) throw new Error(error.message);
+      if (!data) return null;
+      const otherId = data.user_a === userId ? data.user_b : data.user_a;
+      const { data: person } = await supabase
+        .from("profiles")
+        .select("id, full_name, avatar_url, last_seen_at")
+        .eq("id", otherId)
+        .maybeSingle();
+      return person ?? { id: otherId, full_name: "HustlerLink user", avatar_url: null, last_seen_at: null };
+    },
+  });
+
+export const notificationsQuery = (userId: string | undefined) =>
+  infiniteQueryOptions({
     queryKey: ["notifications", userId],
     enabled: Boolean(userId),
-    queryFn: async () => {
+    initialPageParam: 0,
+    getNextPageParam: nextOffset,
+    queryFn: async ({ pageParam }) => {
       const { data, error } = await supabase
         .from("notifications")
         .select("id, kind, title, body, link, read, created_at")
         .order("created_at", { ascending: false })
-        .limit(50);
+        .range(pageParam, pageParam + LIST_PAGE - 1);
       if (error) throw new Error(error.message);
       return data ?? [];
     },
