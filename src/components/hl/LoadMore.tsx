@@ -17,8 +17,8 @@ export function LoadMore({
   hasMore: boolean;
   loading: boolean;
   onLoad: () => void;
-  label?: string;
-  endLabel?: string;
+  label?: string | undefined;
+  endLabel?: string | undefined;
 }) {
   if (!hasMore) {
     return endLabel ? (
