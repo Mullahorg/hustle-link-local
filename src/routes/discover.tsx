@@ -1,10 +1,15 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { keepPreviousData, useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useInfiniteQuery,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import { Search, SearchX, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { AppShell, ScreenHeader } from "@/components/layout/AppShell";
 import { CardSkeleton, EmptyState, JobCard, WorkerCard } from "@/components/hl/primitives";
+import { LoadMore } from "@/components/hl/LoadMore";
 import { homeFeedQuery, jobsQuery, workersQuery } from "@/lib/queries";
 import { cn } from "@/lib/utils";
 
@@ -55,7 +60,12 @@ function DiscoverScreen() {
     const id = setTimeout(() => {
       if ((q ?? "") === draft) return;
       void navigate({
-        search: (prev: DiscoverSearch) => ({ ...prev, ...(draft ? { q: draft } : { q: undefined }) }),
+        search: (prev: DiscoverSearch) => {
+          const next: DiscoverSearch = { tab: prev.tab };
+          if (prev.category) next.category = prev.category;
+          if (draft) next.q = draft;
+          return next;
+        },
         replace: true,
       });
     }, 250);
@@ -63,12 +73,12 @@ function DiscoverScreen() {
   }, [draft, q, navigate]);
 
   const args = { ...(q ? { q } : {}), ...(category ? { category } : {}) };
-  const jobs = useQuery({
+  const jobs = useInfiniteQuery({
     ...jobsQuery(args),
     enabled: tab === "jobs",
     placeholderData: keepPreviousData,
   });
-  const workers = useQuery({
+  const workers = useInfiniteQuery({
     ...workersQuery(args),
     enabled: tab === "workers",
     placeholderData: keepPreviousData,
@@ -78,10 +88,20 @@ function DiscoverScreen() {
     void navigate({ search: (prev: DiscoverSearch) => ({ ...prev, tab: next }), replace: true });
 
   const setCategory = (slug: string | undefined) =>
-    void navigate({ search: (prev: DiscoverSearch) => ({ ...prev, category: slug }), replace: true });
+    void navigate({
+      search: (prev: DiscoverSearch) => {
+        const next: DiscoverSearch = { tab: prev.tab };
+        if (slug) next.category = slug;
+        if (prev.q) next.q = prev.q;
+        return next;
+      },
+      replace: true,
+    });
 
   const active = tab === "jobs" ? jobs : workers;
-  const results = tab === "jobs" ? (jobs.data ?? []) : (workers.data ?? []);
+  const jobResults = jobs.data?.pages.flat() ?? [];
+  const workerResults = workers.data?.pages.flat() ?? [];
+  const count = tab === "jobs" ? jobResults.length : workerResults.length;
 
   return (
     <AppShell>
@@ -171,7 +191,7 @@ function DiscoverScreen() {
       <div className="mt-6 space-y-3 px-5">
         {active.isPending ? (
           <CardSkeleton kind={tab === "jobs" ? "job" : "worker"} />
-        ) : results.length === 0 ? (
+        ) : count === 0 ? (
           <EmptyState
             icon={<SearchX className="size-7" aria-hidden="true" />}
             title="Nothing matches yet"
@@ -181,10 +201,19 @@ function DiscoverScreen() {
                 : "New posts show up here as soon as people add them."
             }
           />
-        ) : tab === "jobs" ? (
-          jobs.data?.map((job) => <JobCard key={job.id} job={job} />)
         ) : (
-          workers.data?.map((worker) => <WorkerCard key={worker.id} worker={worker} />)
+          <>
+            {tab === "jobs"
+              ? jobResults.map((job) => <JobCard key={job.id} job={job} />)
+              : workerResults.map((worker) => <WorkerCard key={worker.id} worker={worker} />)}
+            <LoadMore
+              hasMore={Boolean(active.hasNextPage)}
+              loading={active.isFetchingNextPage}
+              onLoad={() => void active.fetchNextPage()}
+              label={tab === "jobs" ? "Show more jobs" : "Show more workers"}
+              endLabel={count > 6 ? "That's everything for now" : undefined}
+            />
+          </>
         )}
       </div>
     </AppShell>
