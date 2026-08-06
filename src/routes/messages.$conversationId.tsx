@@ -33,6 +33,8 @@ export const Route = createFileRoute("/messages/$conversationId")({
 function ChatScreen() {
   const { conversationId } = Route.useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { data: peer } = useQuery(conversationPeerQuery(conversationId, user?.id));
 
   return (
     <div className="flex min-h-dvh flex-col bg-background">
@@ -56,7 +58,17 @@ function ChatScreen() {
             <path d="m15 18-6-6 6-6" />
           </svg>
         </button>
-        <h1 className="min-w-0 truncate text-xl font-extrabold">Chat</h1>
+        <div className="min-w-0 flex-1">
+          <h1 className="truncate text-xl font-extrabold">{peer?.full_name ?? "Chat"}</h1>
+          {peer?.last_seen_at ? (
+            <p className="truncate text-[0.8125rem] font-bold text-muted-foreground">
+              {presenceLabel(peer.last_seen_at)}
+            </p>
+          ) : null}
+        </div>
+        {peer?.id ? (
+          <ReportDialog subjectUserId={peer.id} label="Report" allowBlock />
+        ) : null}
       </header>
 
       <div className="mx-auto w-full max-w-screen-sm flex-1">
@@ -71,6 +83,7 @@ function ChatScreen() {
     </div>
   );
 }
+
 
 function Thread({ conversationId }: { conversationId: string }) {
   const { user } = useAuth();
