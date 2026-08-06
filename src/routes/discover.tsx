@@ -8,7 +8,15 @@ import { Search, SearchX, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { AppShell, ScreenHeader } from "@/components/layout/AppShell";
-import { CardSkeleton, EmptyState, JobCard, WorkerCard } from "@/components/hl/primitives";
+import {
+  CardSkeleton,
+  EmptyState,
+  ErrorState,
+  JobCard,
+  WorkerCard,
+} from "@/components/hl/primitives";
+import { Button } from "@/components/ui/button";
+import { Link } from "@tanstack/react-router";
 import { LoadMore } from "@/components/hl/LoadMore";
 import { homeFeedQuery, jobsQuery, workersQuery } from "@/lib/queries";
 import { cn } from "@/lib/utils";
@@ -191,6 +199,8 @@ function DiscoverScreen() {
       <div className="mt-6 space-y-3 px-5">
         {active.isPending ? (
           <CardSkeleton kind={tab === "jobs" ? "job" : "worker"} />
+        ) : active.isError ? (
+          <ErrorState onRetry={() => void active.refetch()} />
         ) : count === 0 ? (
           <EmptyState
             icon={<SearchX className="size-7" aria-hidden="true" />}
@@ -198,7 +208,14 @@ function DiscoverScreen() {
             body={
               q || category
                 ? "Try a different word, or clear the filter to see everything."
-                : "New posts show up here as soon as people add them."
+                : tab === "jobs"
+                  ? "No open jobs right now. Post one and workers will see it today."
+                  : "No workers here yet. Check back soon, or post the job you need done."
+            }
+            action={
+              <Button asChild block>
+                <Link to="/post-job">Post a job</Link>
+              </Button>
             }
           />
         ) : (
