@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { keepPreviousData, useInfiniteQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { Search, SearchX, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { AppShell, ScreenHeader } from "@/components/layout/AppShell";
 import {
@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 
 type Tab = "jobs" | "workers";
 
-type DiscoverSearch = { tab: Tab; category?: string; q?: string };
+type DiscoverSearch = { tab: Tab; category?: string; q?: string; focus?: boolean };
 
 export const Route = createFileRoute("/discover")({
   head: () => ({
@@ -41,10 +41,12 @@ export const Route = createFileRoute("/discover")({
     const tab = search["tab"] === "workers" ? "workers" : "jobs";
     const category = typeof search["category"] === "string" ? search["category"] : undefined;
     const q = typeof search["q"] === "string" ? search["q"] : undefined;
+    const focus = search["focus"] === true || search["focus"] === "true";
     return {
       tab,
       ...(category ? { category } : {}),
       ...(q ? { q } : {}),
+      ...(focus ? { focus: true } : {}),
     };
   },
   loaderDeps: ({ search }) => search,
@@ -53,11 +55,18 @@ export const Route = createFileRoute("/discover")({
 });
 
 function DiscoverScreen() {
-  const { tab, category, q } = Route.useSearch();
+  const { tab, category, q, focus } = Route.useSearch();
   const navigate = useNavigate({ from: "/discover" });
   const { data: feed } = useSuspenseQuery(homeFeedQuery());
 
   const [draft, setDraft] = useState(q ?? "");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Arriving from the home search bar should open the keyboard straight away.
+  useEffect(() => {
+    if (focus) inputRef.current?.focus();
+  }, [focus]);
+
 
   // Debounce typing into the URL so the query layer caches per search term.
   useEffect(() => {
@@ -102,6 +111,11 @@ function DiscoverScreen() {
       replace: true,
     });
 
+  const clearFilters = () => {
+    setDraft("");
+    void navigate({ search: (prev: DiscoverSearch) => ({ tab: prev.tab }), replace: true });
+  };
+
   const active = tab === "jobs" ? jobs : workers;
   const jobResults = jobs.data?.pages.flat() ?? [];
   const workerResults = workers.data?.pages.flat() ?? [];
@@ -115,6 +129,7 @@ function DiscoverScreen() {
         <div className="flex items-center gap-3 rounded-2xl border-2 border-border-strong bg-card px-4">
           <Search className="size-6 shrink-0 text-muted-foreground" aria-hidden="true" />
           <input
+            ref={inputRef}
             value={draft}
             onChange={(event) => setDraft(event.target.value)}
             type="search"
@@ -200,18 +215,28 @@ function DiscoverScreen() {
         ) : count === 0 ? (
           <EmptyState
             icon={<SearchX className="size-7" aria-hidden="true" />}
-            title="Nothing matches yet"
+            title={q || category ? "Nothing matches that" : "Nothing here yet"}
             body={
               q || category
                 ? "Try a different word, or clear the filter to see everything."
                 : tab === "jobs"
                   ? "No open jobs right now. Post one and workers will see it today."
-                  : "No workers here yet. Check back soon, or post the job you need done."
+                  : "No workers listed yet. List your own skills and be one of the first."
             }
             action={
-              <Button asChild block>
-                <Link to="/post-job">Post a job</Link>
-              </Button>
+              q || category ? (
+                <Button block variant="outline" onClick={clearFilters}>
+                  Clear filters
+                </Button>
+              ) : tab === "jobs" ? (
+                <Button asChild block>
+                  <Link to="/post-job">Post a job</Link>
+                </Button>
+              ) : (
+                <Button asChild block>
+                  <Link to="/settings">List my skills</Link>
+                </Button>
+              )
             }
           />
         ) : (
@@ -224,7 +249,7 @@ function DiscoverScreen() {
               loading={active.isFetchingNextPage}
               onLoad={() => void active.fetchNextPage()}
               label={tab === "jobs" ? "Show more jobs" : "Show more workers"}
-              endLabel={count > 6 ? "That's everything for now" : undefined}
+              endLabel="That's everything for now"
             />
           </>
         )}

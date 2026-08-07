@@ -185,7 +185,7 @@ function JobDetailScreen() {
 
   async function messagePerson(otherId: string) {
     if (!user) {
-      void navigate({ to: "/auth" });
+      void navigate({ to: "/auth", search: { redirect: window.location.pathname } });
       return;
     }
     try {
@@ -348,7 +348,9 @@ function JobDetailScreen() {
           <div className="mx-auto max-w-screen-sm px-5 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
             {!user ? (
               <Button asChild block size="lg">
-                <Link to="/auth">Sign in to apply</Link>
+                <Link to="/auth" search={{ redirect: `/jobs/${jobId}` }}>
+                  Sign in to apply
+                </Link>
               </Button>
             ) : application.isPending ? (
               <Button block size="lg" disabled>

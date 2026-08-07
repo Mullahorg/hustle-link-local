@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Bell, ChevronRight, Flag, LogOut, Settings, ShieldCheck, Star } from "lucide-react";
+import { Bell, ChevronRight, LogOut, Settings, ShieldCheck, Star } from "lucide-react";
 
 import { AppShell } from "@/components/layout/AppShell";
 import { Avatar, CardSkeleton, Chip, Rating, VerifiedMark } from "@/components/hl/primitives";
@@ -27,10 +27,9 @@ export const Route = createFileRoute("/profile")({
 });
 
 const rows = [
-  { icon: ShieldCheck, label: "Verification", to: "/settings" },
+  { icon: ShieldCheck, label: "Verify my ID", to: "/settings" },
   { icon: Bell, label: "Notifications", to: "/notifications" },
-  { icon: Settings, label: "Settings", to: "/settings" },
-  { icon: Flag, label: "Report a problem", to: "/settings" },
+  { icon: Settings, label: "Settings & privacy", to: "/settings" },
 ] as const;
 
 function ProfileScreen() {
@@ -57,7 +56,9 @@ function ProfileScreen() {
             Sign in to post jobs, apply for work and keep your reviews in one place.
           </p>
           <Button asChild block size="lg" className="mt-8 max-w-xs">
-            <Link to="/auth">Sign in or create account</Link>
+            <Link to="/auth" search={{ redirect: "/profile" }}>
+              Sign in or create account
+            </Link>
           </Button>
         </section>
       </AppShell>

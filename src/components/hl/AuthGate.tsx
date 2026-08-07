@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { Lock } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -8,7 +8,8 @@ import { useAuth } from "@/hooks/useAuth";
 
 /**
  * Wraps any screen that needs a signed-in account.
- * Shows a calm, single-action prompt instead of an error.
+ * Shows a calm, single-action prompt instead of an error, and remembers
+ * where the person was so sign-in returns them to it.
  */
 export function AuthGate({
   title,
@@ -20,6 +21,7 @@ export function AuthGate({
   children: ReactNode;
 }) {
   const { user, loading } = useAuth();
+  const href = useRouterState({ select: (s) => s.location.href });
 
   if (loading) {
     return (
@@ -38,7 +40,9 @@ export function AuthGate({
           body={body}
           action={
             <Button asChild block size="lg">
-              <Link to="/auth">Sign in</Link>
+              <Link to="/auth" search={{ redirect: href }}>
+                Sign in
+              </Link>
             </Button>
           }
         />

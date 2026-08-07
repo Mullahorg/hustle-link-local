@@ -70,7 +70,7 @@ function WorkerScreen() {
 
   async function handleMessage() {
     if (!user) {
-      void navigate({ to: "/auth" });
+      void navigate({ to: "/auth", search: { redirect: `/workers/${workerId}` } });
       return;
     }
     try {
