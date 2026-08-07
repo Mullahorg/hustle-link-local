@@ -21,6 +21,23 @@ export const myProfileQuery = (userId: string | undefined) =>
     },
   });
 
+/** Unread notification count — drives the badge on the home bell. */
+export const unreadCountQuery = (userId: string | undefined) =>
+  queryOptions({
+    queryKey: ["unread-notifications", userId],
+    enabled: Boolean(userId),
+    staleTime: 30_000,
+    refetchInterval: 60_000,
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("notifications")
+        .select("id", { count: "exact", head: true })
+        .eq("read", false);
+      if (error) throw new Error(error.message);
+      return count ?? 0;
+    },
+  });
+
 /** One page size for every personal list, so paging feels identical everywhere. */
 export const LIST_PAGE = 15;
 

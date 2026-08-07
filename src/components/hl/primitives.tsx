@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { BadgeCheck, MapPin, Star, Clock, Users } from "lucide-react";
+import { BadgeCheck, MapPin, Star, Clock, Users, UserRound } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
@@ -77,7 +77,11 @@ export function Avatar({
         box,
       )}
     >
-      {initialsOf(name)}
+      {name ? (
+        initialsOf(name)
+      ) : (
+        <UserRound className={size === "lg" ? "size-10" : "size-6"} aria-hidden="true" />
+      )}
     </span>
   );
 }
