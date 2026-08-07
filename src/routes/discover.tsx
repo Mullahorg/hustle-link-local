@@ -249,7 +249,7 @@ function DiscoverScreen() {
               loading={active.isFetchingNextPage}
               onLoad={() => void active.fetchNextPage()}
               label={tab === "jobs" ? "Show more jobs" : "Show more workers"}
-              endLabel={count > 6 ? "That's everything for now" : undefined}
+              endLabel="That's everything for now"
             />
           </>
         )}
