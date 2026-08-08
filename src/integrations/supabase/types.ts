@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_audit_logs: {
+        Row: {
+          action: string
+          actor_email: string | null
+          actor_id: string | null
+          created_at: string
+          details: Json
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+        }
+        Insert: {
+          action: string
+          actor_email?: string | null
+          actor_id?: string | null
+          created_at?: string
+          details?: Json
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+        }
+        Update: {
+          action?: string
+          actor_email?: string | null
+          actor_id?: string | null
+          created_at?: string
+          details?: Json
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
+      app_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
       blocked_users: {
         Row: {
           blocked_id: string
@@ -158,6 +212,8 @@ export type Database = {
           created_at: string
           description: string
           employer_id: string
+          hidden_at: string | null
+          hidden_reason: string | null
           id: string
           search_vector: unknown
           status: Database["public"]["Enums"]["job_status"]
@@ -175,6 +231,8 @@ export type Database = {
           created_at?: string
           description?: string
           employer_id: string
+          hidden_at?: string | null
+          hidden_reason?: string | null
           id?: string
           search_vector?: unknown
           status?: Database["public"]["Enums"]["job_status"]
@@ -192,6 +250,8 @@ export type Database = {
           created_at?: string
           description?: string
           employer_id?: string
+          hidden_at?: string | null
+          hidden_reason?: string | null
           id?: string
           search_vector?: unknown
           status?: Database["public"]["Enums"]["job_status"]
@@ -277,6 +337,99 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_transactions: {
+        Row: {
+          amount_cents: number
+          attempts: number
+          created_at: string
+          currency: string
+          entity_id: string | null
+          entity_type: string | null
+          failure_reason: string | null
+          id: string
+          idempotency_key: string | null
+          metadata: Json
+          provider: string
+          provider_reference: string | null
+          purpose: string
+          reference: string
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          amount_cents: number
+          attempts?: number
+          created_at?: string
+          currency?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          failure_reason?: string | null
+          id?: string
+          idempotency_key?: string | null
+          metadata?: Json
+          provider?: string
+          provider_reference?: string | null
+          purpose: string
+          reference: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount_cents?: number
+          attempts?: number
+          created_at?: string
+          currency?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          failure_reason?: string | null
+          id?: string
+          idempotency_key?: string | null
+          metadata?: Json
+          provider?: string
+          provider_reference?: string | null
+          purpose?: string
+          reference?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      payment_webhook_events: {
+        Row: {
+          created_at: string
+          error: string | null
+          event_id: string
+          id: string
+          payload: Json
+          processed_at: string | null
+          provider: string
+          signature_valid: boolean
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          event_id: string
+          id?: string
+          payload?: Json
+          processed_at?: string | null
+          provider?: string
+          signature_valid?: boolean
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          event_id?: string
+          id?: string
+          payload?: Json
+          processed_at?: string | null
+          provider?: string
+          signature_valid?: boolean
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           area: string | null
@@ -296,6 +449,8 @@ export type Database = {
           rating_count: number
           search_vector: unknown
           skills: string[]
+          suspended_at: string | null
+          suspension_reason: string | null
           updated_at: string
           verification: Database["public"]["Enums"]["verification_status"]
         }
@@ -317,6 +472,8 @@ export type Database = {
           rating_count?: number
           search_vector?: unknown
           skills?: string[]
+          suspended_at?: string | null
+          suspension_reason?: string | null
           updated_at?: string
           verification?: Database["public"]["Enums"]["verification_status"]
         }
@@ -338,6 +495,8 @@ export type Database = {
           rating_count?: number
           search_vector?: unknown
           skills?: string[]
+          suspended_at?: string | null
+          suspension_reason?: string | null
           updated_at?: string
           verification?: Database["public"]["Enums"]["verification_status"]
         }
@@ -430,6 +589,24 @@ export type Database = {
           },
         ]
       }
+      role_permissions: {
+        Row: {
+          created_at: string
+          permission: Database["public"]["Enums"]["app_permission"]
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Insert: {
+          created_at?: string
+          permission: Database["public"]["Enums"]["app_permission"]
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Update: {
+          created_at?: string
+          permission?: Database["public"]["Enums"]["app_permission"]
+          role?: Database["public"]["Enums"]["app_role"]
+        }
+        Relationships: []
+      }
       saved_jobs: {
         Row: {
           created_at: string
@@ -483,7 +660,9 @@ export type Database = {
           document_path: string | null
           id: string
           id_number_last4: string | null
+          review_notes: string | null
           reviewed_at: string | null
+          reviewed_by: string | null
           status: Database["public"]["Enums"]["verification_status"]
           user_id: string
         }
@@ -492,7 +671,9 @@ export type Database = {
           document_path?: string | null
           id?: string
           id_number_last4?: string | null
+          review_notes?: string | null
           reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: Database["public"]["Enums"]["verification_status"]
           user_id: string
         }
@@ -501,7 +682,9 @@ export type Database = {
           document_path?: string | null
           id?: string
           id_number_last4?: string | null
+          review_notes?: string | null
           reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: Database["public"]["Enums"]["verification_status"]
           user_id?: string
         }
@@ -512,6 +695,79 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_delete_category: { Args: { _slug: string }; Returns: Json }
+      admin_delete_review: {
+        Args: { _id: string; _reason?: string }
+        Returns: Json
+      }
+      admin_review_verification: {
+        Args: {
+          _id: string
+          _notes?: string
+          _status: Database["public"]["Enums"]["verification_status"]
+        }
+        Returns: Json
+      }
+      admin_send_notification: {
+        Args: {
+          _body: string
+          _link?: string
+          _title: string
+          _user_id: string
+        }
+        Returns: Json
+      }
+      admin_set_job_hidden: {
+        Args: { _hidden: boolean; _job_id: string; _reason?: string }
+        Returns: Json
+      }
+      admin_set_role: {
+        Args: {
+          _grant: boolean
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: Json
+      }
+      admin_set_role_permission: {
+        Args: {
+          _enabled: boolean
+          _permission: Database["public"]["Enums"]["app_permission"]
+          _role: Database["public"]["Enums"]["app_role"]
+        }
+        Returns: Json
+      }
+      admin_set_setting: { Args: { _key: string; _value: Json }; Returns: Json }
+      admin_set_suspension: {
+        Args: { _reason?: string; _suspended: boolean; _user_id: string }
+        Returns: Json
+      }
+      admin_stats: { Args: never; Returns: Json }
+      admin_update_report: {
+        Args: {
+          _id: string
+          _notes?: string
+          _status: Database["public"]["Enums"]["report_status"]
+        }
+        Returns: Json
+      }
+      admin_upsert_category: {
+        Args: {
+          _icon: string
+          _name: string
+          _slug: string
+          _sort_order: number
+        }
+        Returns: Json
+      }
+      claim_super_admin: { Args: never; Returns: Json }
+      has_permission: {
+        Args: {
+          _permission: Database["public"]["Enums"]["app_permission"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -523,6 +779,13 @@ export type Database = {
       is_conversation_participant: {
         Args: { _conversation_id: string; _user_id: string }
         Returns: boolean
+      }
+      is_staff: { Args: { _user_id: string }; Returns: boolean }
+      my_permissions: {
+        Args: never
+        Returns: {
+          permission: Database["public"]["Enums"]["app_permission"]
+        }[]
       }
       profile_search_doc: {
         Args: {
@@ -541,6 +804,10 @@ export type Database = {
           _title: string
           _user_id: string
         }
+        Returns: undefined
+      }
+      require_permission: {
+        Args: { _permission: Database["public"]["Enums"]["app_permission"] }
         Returns: undefined
       }
       search_jobs: {
@@ -589,9 +856,58 @@ export type Database = {
           verification: Database["public"]["Enums"]["verification_status"]
         }[]
       }
+      super_admin_exists: { Args: never; Returns: boolean }
+      write_audit: {
+        Args: {
+          _action: string
+          _details: Json
+          _entity_id: string
+          _entity_type: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
-      app_role: "user" | "moderator" | "admin"
+      app_permission:
+        | "users.read"
+        | "users.write"
+        | "roles.read"
+        | "roles.write"
+        | "verification.read"
+        | "verification.write"
+        | "jobs.read"
+        | "jobs.write"
+        | "applications.read"
+        | "applications.write"
+        | "workers.read"
+        | "workers.write"
+        | "employers.read"
+        | "employers.write"
+        | "messages.read"
+        | "messages.moderate"
+        | "reports.read"
+        | "reports.write"
+        | "reviews.read"
+        | "reviews.write"
+        | "notifications.read"
+        | "notifications.write"
+        | "categories.read"
+        | "categories.write"
+        | "settings.read"
+        | "settings.write"
+        | "payments.read"
+        | "payments.write"
+        | "analytics.read"
+        | "audit.read"
+      app_role:
+        | "user"
+        | "moderator"
+        | "admin"
+        | "super_admin"
+        | "support_agent"
+        | "verification_officer"
+        | "content_moderator"
+        | "analyst"
       application_status:
         | "sent"
         | "shortlisted"
@@ -728,7 +1044,48 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["user", "moderator", "admin"],
+      app_permission: [
+        "users.read",
+        "users.write",
+        "roles.read",
+        "roles.write",
+        "verification.read",
+        "verification.write",
+        "jobs.read",
+        "jobs.write",
+        "applications.read",
+        "applications.write",
+        "workers.read",
+        "workers.write",
+        "employers.read",
+        "employers.write",
+        "messages.read",
+        "messages.moderate",
+        "reports.read",
+        "reports.write",
+        "reviews.read",
+        "reviews.write",
+        "notifications.read",
+        "notifications.write",
+        "categories.read",
+        "categories.write",
+        "settings.read",
+        "settings.write",
+        "payments.read",
+        "payments.write",
+        "analytics.read",
+        "audit.read",
+      ],
+      app_role: [
+        "user",
+        "moderator",
+        "admin",
+        "super_admin",
+        "support_agent",
+        "verification_officer",
+        "content_moderator",
+        "analyst",
+      ],
       application_status: [
         "sent",
         "shortlisted",
