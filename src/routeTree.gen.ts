@@ -20,6 +20,7 @@ import { Route as PostJobRouteImport } from './routes/post-job'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminJobsRouteImport } from './routes/admin.jobs'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as JobsJobIdRouteImport } from './routes/jobs.$jobId'
 import { Route as MessagesConversationIdRouteImport } from './routes/messages.$conversationId'
@@ -80,6 +81,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminJobsRoute = AdminJobsRouteImport.update({
+  id: '/jobs',
+  path: '/jobs',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -112,6 +118,7 @@ export interface FileRoutesByFullPath {
   '/post-job': typeof PostJobRoute
   '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
+  '/admin/jobs': typeof AdminJobsRoute
   '/admin/users': typeof AdminUsersRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/messages/$conversationId': typeof MessagesConversationIdRoute
@@ -128,6 +135,7 @@ export interface FileRoutesByTo {
   '/post-job': typeof PostJobRoute
   '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
+  '/admin/jobs': typeof AdminJobsRoute
   '/admin/users': typeof AdminUsersRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/messages/$conversationId': typeof MessagesConversationIdRoute
@@ -146,6 +154,7 @@ export interface FileRoutesById {
   '/post-job': typeof PostJobRoute
   '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
+  '/admin/jobs': typeof AdminJobsRoute
   '/admin/users': typeof AdminUsersRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/messages/$conversationId': typeof MessagesConversationIdRoute
@@ -165,6 +174,7 @@ export interface FileRouteTypes {
     | '/post-job'
     | '/profile'
     | '/settings'
+    | '/admin/jobs'
     | '/admin/users'
     | '/jobs/$jobId'
     | '/messages/$conversationId'
@@ -181,6 +191,7 @@ export interface FileRouteTypes {
     | '/post-job'
     | '/profile'
     | '/settings'
+    | '/admin/jobs'
     | '/admin/users'
     | '/jobs/$jobId'
     | '/messages/$conversationId'
@@ -198,6 +209,7 @@ export interface FileRouteTypes {
     | '/post-job'
     | '/profile'
     | '/settings'
+    | '/admin/jobs'
     | '/admin/users'
     | '/jobs/$jobId'
     | '/messages/$conversationId'
@@ -299,6 +311,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/jobs': {
+      id: '/admin/jobs'
+      path: '/jobs'
+      fullPath: '/admin/jobs'
+      preLoaderRoute: typeof AdminJobsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/users': {
       id: '/admin/users'
       path: '/users'
@@ -331,11 +350,13 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminJobsRoute: typeof AdminJobsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminJobsRoute: AdminJobsRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
