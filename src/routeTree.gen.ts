@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ActivityRouteImport } from './routes/activity'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as MessagesRouteImport } from './routes/messages'
@@ -30,6 +31,11 @@ const IndexRoute = IndexRouteImport.update({
 const ActivityRoute = ActivityRouteImport.update({
   id: '/activity',
   path: '/activity',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -86,6 +92,7 @@ const WorkersWorkerIdRoute = WorkersWorkerIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/activity': typeof ActivityRoute
+  '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/discover': typeof DiscoverRoute
   '/messages': typeof MessagesRouteWithChildren
@@ -100,6 +107,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/activity': typeof ActivityRoute
+  '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/discover': typeof DiscoverRoute
   '/messages': typeof MessagesRouteWithChildren
@@ -115,6 +123,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/activity': typeof ActivityRoute
+  '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/discover': typeof DiscoverRoute
   '/messages': typeof MessagesRouteWithChildren
@@ -131,6 +140,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/activity'
+    | '/admin'
     | '/auth'
     | '/discover'
     | '/messages'
@@ -145,6 +155,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/activity'
+    | '/admin'
     | '/auth'
     | '/discover'
     | '/messages'
@@ -159,6 +170,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/activity'
+    | '/admin'
     | '/auth'
     | '/discover'
     | '/messages'
@@ -174,6 +186,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ActivityRoute: typeof ActivityRoute
+  AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
   DiscoverRoute: typeof DiscoverRoute
   MessagesRoute: typeof MessagesRouteWithChildren
@@ -199,6 +212,13 @@ declare module '@tanstack/react-router' {
       path: '/activity'
       fullPath: '/activity'
       preLoaderRoute: typeof ActivityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -289,6 +309,7 @@ const MessagesRouteWithChildren = MessagesRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ActivityRoute: ActivityRoute,
+  AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
   DiscoverRoute: DiscoverRoute,
   MessagesRoute: MessagesRouteWithChildren,
