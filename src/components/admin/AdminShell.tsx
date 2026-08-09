@@ -1,17 +1,53 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { ClipboardList, Gauge, ShieldCheck, Users, type LucideIcon } from "lucide-react";
+import {
+  BadgeCheck,
+  ClipboardList,
+  CreditCard,
+  Flag,
+  Gauge,
+  ScrollText,
+  Settings,
+  ShieldCheck,
+  Star,
+  Tags,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { usePermissions } from "@/hooks/usePermissions";
 import type { Permission } from "@/lib/admin";
 
-type NavItem = { to: "/admin" | "/admin/users" | "/admin/jobs"; label: string; icon: LucideIcon; needs?: Permission };
+type NavItem = {
+  to:
+    | "/admin"
+    | "/admin/users"
+    | "/admin/jobs"
+    | "/admin/verification"
+    | "/admin/reports"
+    | "/admin/reviews"
+    | "/admin/categories"
+    | "/admin/payments"
+    | "/admin/audit"
+    | "/admin/settings";
+  label: string;
+  icon: LucideIcon;
+  needs?: Permission;
+};
 
 export const ADMIN_NAV: NavItem[] = [
   { to: "/admin", label: "Dashboard", icon: Gauge },
   { to: "/admin/users", label: "Users", icon: Users, needs: "users.read" },
   { to: "/admin/jobs", label: "Jobs", icon: ClipboardList, needs: "jobs.read" },
+  { to: "/admin/verification", label: "Verification", icon: BadgeCheck, needs: "verification.read" },
+  { to: "/admin/reports", label: "Reports", icon: Flag, needs: "reports.read" },
+  { to: "/admin/reviews", label: "Reviews", icon: Star, needs: "reviews.read" },
+  { to: "/admin/categories", label: "Trades", icon: Tags, needs: "categories.read" },
+  { to: "/admin/payments", label: "Payments", icon: CreditCard, needs: "payments.read" },
+  { to: "/admin/audit", label: "Audit log", icon: ScrollText, needs: "audit.read" },
+  { to: "/admin/settings", label: "Settings", icon: Settings, needs: "settings.read" },
 ];
+
 
 
 export function AdminShell({ children }: { children?: React.ReactNode }) {
