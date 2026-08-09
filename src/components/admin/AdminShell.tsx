@@ -1,18 +1,57 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { ClipboardList, Gauge, ShieldCheck, Users, type LucideIcon } from "lucide-react";
+import {
+  BadgeCheck,
+  ClipboardList,
+  CreditCard,
+  Flag,
+  Gauge,
+  ScrollText,
+  Settings,
+  ShieldCheck,
+  Star,
+  Tags,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { usePermissions } from "@/hooks/usePermissions";
 import type { Permission } from "@/lib/admin";
 
-type NavItem = { to: "/admin" | "/admin/users" | "/admin/jobs"; label: string; icon: LucideIcon; needs?: Permission };
+type NavItem = {
+  to:
+    | "/admin"
+    | "/admin/users"
+    | "/admin/jobs"
+    | "/admin/verification"
+    | "/admin/reports"
+    | "/admin/reviews"
+    | "/admin/categories"
+    | "/admin/payments"
+    | "/admin/audit"
+    | "/admin/settings";
+  label: string;
+  icon: LucideIcon;
+  needs?: Permission;
+};
 
 export const ADMIN_NAV: NavItem[] = [
   { to: "/admin", label: "Dashboard", icon: Gauge },
   { to: "/admin/users", label: "Users", icon: Users, needs: "users.read" },
   { to: "/admin/jobs", label: "Jobs", icon: ClipboardList, needs: "jobs.read" },
+  {
+    to: "/admin/verification",
+    label: "Verification",
+    icon: BadgeCheck,
+    needs: "verification.read",
+  },
+  { to: "/admin/reports", label: "Reports", icon: Flag, needs: "reports.read" },
+  { to: "/admin/reviews", label: "Reviews", icon: Star, needs: "reviews.read" },
+  { to: "/admin/categories", label: "Trades", icon: Tags, needs: "categories.read" },
+  { to: "/admin/payments", label: "Payments", icon: CreditCard, needs: "payments.read" },
+  { to: "/admin/audit", label: "Audit log", icon: ScrollText, needs: "audit.read" },
+  { to: "/admin/settings", label: "Settings", icon: Settings, needs: "settings.read" },
 ];
-
 
 export function AdminShell({ children }: { children?: React.ReactNode }) {
   const { can } = usePermissions();
@@ -31,7 +70,10 @@ export function AdminShell({ children }: { children?: React.ReactNode }) {
             <Link to="/">Back to app</Link>
           </Button>
         </div>
-        <nav aria-label="Admin sections" className="no-scrollbar overflow-x-auto border-t border-border lg:hidden">
+        <nav
+          aria-label="Admin sections"
+          className="no-scrollbar overflow-x-auto border-t border-border lg:hidden"
+        >
           <ul className="flex gap-1 px-3 py-2">
             {items.map((item) => (
               <li key={item.to}>
@@ -97,7 +139,9 @@ export function AdminPage({
       <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-black tracking-tight text-foreground">{title}</h1>
-          {description ? <p className="mt-1 text-[0.9375rem] text-muted-foreground">{description}</p> : null}
+          {description ? (
+            <p className="mt-1 text-[0.9375rem] text-muted-foreground">{description}</p>
+          ) : null}
         </div>
         {actions}
       </div>

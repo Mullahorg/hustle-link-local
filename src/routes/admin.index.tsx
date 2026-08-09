@@ -36,7 +36,9 @@ function Stat({
         <span className="text-[0.8125rem] font-black tracking-wide uppercase">{label}</span>
       </div>
       <p className="mt-2 text-3xl font-black text-foreground">{value}</p>
-      {hint ? <p className="mt-1 text-[0.875rem] font-semibold text-muted-foreground">{hint}</p> : null}
+      {hint ? (
+        <p className="mt-1 text-[0.875rem] font-semibold text-muted-foreground">{hint}</p>
+      ) : null}
     </div>
   );
 }
@@ -94,11 +96,36 @@ function AdminDashboard() {
   return (
     <AdminPage title="Dashboard" description="Live health of HustlerLink.">
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <Stat label="Users" value={s.total_users} hint={`${s.new_users_7d} joined this week`} icon={Users} />
-        <Stat label="Active today" value={s.dau} hint={`${s.mau} active this month`} icon={TrendingUp} />
-        <Stat label="Workers" value={s.workers} hint={`${s.verified_users} verified`} icon={HardHat} />
-        <Stat label="Employers" value={s.employers} hint={`${s.suspended_users} suspended accounts`} icon={Briefcase} />
-        <Stat label="Jobs" value={s.jobs_posted} hint={`${s.jobs_open} open · ${s.jobs_completed} completed`} icon={ClipboardList} />
+        <Stat
+          label="Users"
+          value={s.total_users}
+          hint={`${s.new_users_7d} joined this week`}
+          icon={Users}
+        />
+        <Stat
+          label="Active today"
+          value={s.dau}
+          hint={`${s.mau} active this month`}
+          icon={TrendingUp}
+        />
+        <Stat
+          label="Workers"
+          value={s.workers}
+          hint={`${s.verified_users} verified`}
+          icon={HardHat}
+        />
+        <Stat
+          label="Employers"
+          value={s.employers}
+          hint={`${s.suspended_users} suspended accounts`}
+          icon={Briefcase}
+        />
+        <Stat
+          label="Jobs"
+          value={s.jobs_posted}
+          hint={`${s.jobs_open} open · ${s.jobs_completed} completed`}
+          icon={ClipboardList}
+        />
         <Stat label="Applications" value={s.applications} icon={ClipboardList} />
         <Stat label="Messages" value={s.messages} icon={MessageSquare} />
         <Stat label="Reviews" value={s.reviews} icon={Star} />

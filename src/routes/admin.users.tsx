@@ -44,7 +44,13 @@ type UserRow = {
 };
 
 const date = (value: string | null) =>
-  value ? new Date(value).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" }) : "—";
+  value
+    ? new Date(value).toLocaleDateString(undefined, {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })
+    : "—";
 
 function RolesDialog({ userId, name }: { userId: string; name: string }) {
   const queryClient = useQueryClient();
@@ -53,7 +59,10 @@ function RolesDialog({ userId, name }: { userId: string; name: string }) {
     queryKey: ["admin-user-roles", userId],
     enabled: open,
     queryFn: async () => {
-      const { data, error } = await supabase.from("user_roles").select("role").eq("user_id", userId);
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId);
       if (error) throw new Error(error.message);
       return (data ?? []).map((r) => r.role as AppRole);
     },
@@ -70,7 +79,8 @@ function RolesDialog({ userId, name }: { userId: string; name: string }) {
         <DialogHeader>
           <DialogTitle>Staff roles for {name}</DialogTitle>
           <DialogDescription>
-            Roles decide what this person can reach in the console. Changes are recorded in the audit log.
+            Roles decide what this person can reach in the console. Changes are recorded in the
+            audit log.
           </DialogDescription>
         </DialogHeader>
         <ul className="space-y-2">
@@ -93,7 +103,9 @@ function RolesDialog({ userId, name }: { userId: string; name: string }) {
                     try {
                       await setRole(userId, entry.role, checked);
                       toast.success(checked ? `${entry.label} granted` : `${entry.label} removed`);
-                      await queryClient.invalidateQueries({ queryKey: ["admin-user-roles", userId] });
+                      await queryClient.invalidateQueries({
+                        queryKey: ["admin-user-roles", userId],
+                      });
                       await queryClient.invalidateQueries({ queryKey: ["admin-list"] });
                     } catch (error) {
                       toast.error(friendlyAuthError(error));
@@ -119,13 +131,16 @@ function AdminUsers() {
   const query = useQuery(
     adminListQuery<UserRow>({
       table: "profiles",
-      columns: "id, full_name, area, phone, is_worker, verification, suspended_at, rating_avg, created_at",
+      columns:
+        "id, full_name, area, phone, is_worker, verification, suspended_at, rating_avg, created_at",
       page: list.page,
       sort: list.sort,
       ascending: list.ascending,
       q: list.q,
       searchColumns: ["full_name", "area", "phone", "headline"],
-      nullish: { suspended_at: status === "all" ? undefined : status === "active" ? "null" : "notnull" },
+      nullish: {
+        suspended_at: status === "all" ? undefined : status === "active" ? "null" : "notnull",
+      },
     }),
   );
 
@@ -147,7 +162,9 @@ function AdminUsers() {
       key: "is_worker",
       header: "Type",
       render: (row) => (
-        <Badge variant={row.is_worker ? "default" : "secondary"}>{row.is_worker ? "Worker" : "Client"}</Badge>
+        <Badge variant={row.is_worker ? "default" : "secondary"}>
+          {row.is_worker ? "Worker" : "Client"}
+        </Badge>
       ),
     },
     {
@@ -155,7 +172,12 @@ function AdminUsers() {
       header: "Verification",
       render: (row) => <span className="font-semibold capitalize">{row.verification}</span>,
     },
-    { key: "rating_avg", header: "Rating", sortable: true, render: (row) => (row.rating_avg > 0 ? row.rating_avg.toFixed(1) : "—") },
+    {
+      key: "rating_avg",
+      header: "Rating",
+      sortable: true,
+      render: (row) => (row.rating_avg > 0 ? row.rating_avg.toFixed(1) : "—"),
+    },
     { key: "created_at", header: "Joined", sortable: true, render: (row) => date(row.created_at) },
     {
       key: "status",
@@ -201,7 +223,10 @@ function AdminUsers() {
   ];
 
   return (
-    <AdminPage title="Users" description="Every member of HustlerLink, with moderation and role tools.">
+    <AdminPage
+      title="Users"
+      description="Every member of HustlerLink, with moderation and role tools."
+    >
       <AdminToolbar q={list.q} onSearch={list.setQ} placeholder="Search name, area or phone">
         <div className="flex gap-2">
           {(["all", "active", "suspended"] as const).map((value) => (
