@@ -21,7 +21,11 @@ type Row = {
 };
 
 const date = (value: string) =>
-  new Date(value).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+  new Date(value).toLocaleDateString(undefined, {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 
 function AdminReviews() {
   const list = useAdminList("created_at");
@@ -40,7 +44,9 @@ function AdminReviews() {
     }),
   );
 
-  const ids = Array.from(new Set((query.data?.rows ?? []).flatMap((r) => [r.reviewer_id, r.subject_id])));
+  const ids = Array.from(
+    new Set((query.data?.rows ?? []).flatMap((r) => [r.reviewer_id, r.subject_id])),
+  );
   const names = useQuery({
     queryKey: ["admin-names", ids.join(",")],
     enabled: ids.length > 0,
@@ -58,7 +64,10 @@ function AdminReviews() {
       header: "Review",
       render: (row) => (
         <div className="max-w-md">
-          <p className="font-bold text-foreground">{"★".repeat(row.rating)}{"☆".repeat(5 - row.rating)}</p>
+          <p className="font-bold text-foreground">
+            {"★".repeat(row.rating)}
+            {"☆".repeat(5 - row.rating)}
+          </p>
           <p className="text-[0.875rem] text-muted-foreground">{row.body || "No comment"}</p>
         </div>
       ),

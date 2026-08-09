@@ -111,7 +111,8 @@ export function DataTable<T>({
   const selectable = Boolean(getRowId && selected && onSelectedChange);
   const pageCount = Math.max(1, Math.ceil(total / pageSize));
   const allIds = getRowId ? rows.map(getRowId) : [];
-  const allSelected = selectable && allIds.length > 0 && allIds.every((id) => selected!.includes(id));
+  const allSelected =
+    selectable && allIds.length > 0 && allIds.every((id) => selected!.includes(id));
 
   if (error) {
     return (
@@ -154,7 +155,11 @@ export function DataTable<T>({
                     checked={allSelected}
                     aria-label="Select all rows on this page"
                     onCheckedChange={(checked) =>
-                      onSelectedChange!(checked ? Array.from(new Set([...selected!, ...allIds])) : selected!.filter((id) => !allIds.includes(id)))
+                      onSelectedChange!(
+                        checked
+                          ? Array.from(new Set([...selected!, ...allIds]))
+                          : selected!.filter((id) => !allIds.includes(id)),
+                      )
                     }
                   />
                 </th>
@@ -217,7 +222,10 @@ export function DataTable<T>({
                         </td>
                       ) : null}
                       {columns.map((column) => (
-                        <td key={column.key} className={`px-3 py-3 text-[0.9375rem] text-foreground ${column.className ?? ""}`}>
+                        <td
+                          key={column.key}
+                          className={`px-3 py-3 text-[0.9375rem] text-foreground ${column.className ?? ""}`}
+                        >
                           {column.render(row)}
                         </td>
                       ))}
@@ -238,10 +246,17 @@ export function DataTable<T>({
 
       <div className="mt-3 flex items-center justify-between gap-3">
         <p className="text-[0.875rem] font-semibold text-muted-foreground">
-          {total === 0 ? "No records" : `${total} record${total === 1 ? "" : "s"} · page ${page + 1} of ${pageCount}`}
+          {total === 0
+            ? "No records"
+            : `${total} record${total === 1 ? "" : "s"} · page ${page + 1} of ${pageCount}`}
         </p>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" disabled={page === 0} onClick={() => onPage(page - 1)}>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={page === 0}
+            onClick={() => onPage(page - 1)}
+          >
             <ChevronLeft className="size-4" aria-hidden="true" /> Prev
           </Button>
           <Button

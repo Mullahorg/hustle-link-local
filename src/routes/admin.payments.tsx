@@ -28,7 +28,12 @@ const money = (cents: number, currency: string) =>
   `${currency === "KES" ? "KSh" : currency} ${(cents / 100).toLocaleString(undefined, { minimumFractionDigits: 0 })}`;
 
 const when = (value: string) =>
-  new Date(value).toLocaleString(undefined, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+  new Date(value).toLocaleString(undefined, {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 
 const tone = (status: string) =>
   status === "succeeded" ? "default" : status === "failed" ? "destructive" : "secondary";
@@ -58,11 +63,17 @@ function AdminPayments() {
       render: (row) => (
         <div>
           <p className="font-bold text-foreground">{row.purpose.replace(/_/g, " ")}</p>
-          <p className="text-[0.875rem] text-muted-foreground">{row.provider_reference ?? row.reference}</p>
+          <p className="text-[0.875rem] text-muted-foreground">
+            {row.provider_reference ?? row.reference}
+          </p>
         </div>
       ),
     },
-    { key: "provider", header: "Provider", render: (row) => <span className="font-semibold capitalize">{row.provider}</span> },
+    {
+      key: "provider",
+      header: "Provider",
+      render: (row) => <span className="font-semibold capitalize">{row.provider}</span>,
+    },
     {
       key: "amount_cents",
       header: "Amount",
@@ -85,7 +96,10 @@ function AdminPayments() {
   ];
 
   return (
-    <AdminPage title="Payments" description="Every charge attempt, ready for PayHero and other providers.">
+    <AdminPage
+      title="Payments"
+      description="Every charge attempt, ready for PayHero and other providers."
+    >
       <AdminToolbar q={list.q} onSearch={list.setQ} placeholder="Search reference or purpose">
         <div className="flex flex-wrap gap-2">
           {(["all", "pending", "succeeded", "failed"] as const).map((value) => (

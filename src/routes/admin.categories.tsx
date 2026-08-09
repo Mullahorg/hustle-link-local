@@ -43,16 +43,27 @@ function CategoryDialog({ row, onSaved }: { row?: Row; onSaved: () => void }) {
         <DialogHeader>
           <DialogTitle>{row ? `Edit ${row.name}` : "Add a trade"}</DialogTitle>
           <DialogDescription>
-            Trades are what members browse on the home screen. Use a Lucide icon name for the picture.
+            Trades are what members browse on the home screen. Use a Lucide icon name for the
+            picture.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-3">
           <div>
-            <label className="mb-1 block text-[0.875rem] font-bold" htmlFor="cat-name">Name</label>
-            <Input id="cat-name" value={name} maxLength={60} onChange={(e) => setName(e.target.value)} placeholder="Electrician" />
+            <label className="mb-1 block text-[0.875rem] font-bold" htmlFor="cat-name">
+              Name
+            </label>
+            <Input
+              id="cat-name"
+              value={name}
+              maxLength={60}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Electrician"
+            />
           </div>
           <div>
-            <label className="mb-1 block text-[0.875rem] font-bold" htmlFor="cat-slug">Slug</label>
+            <label className="mb-1 block text-[0.875rem] font-bold" htmlFor="cat-slug">
+              Slug
+            </label>
             <Input
               id="cat-slug"
               value={slug}
@@ -64,12 +75,26 @@ function CategoryDialog({ row, onSaved }: { row?: Row; onSaved: () => void }) {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1 block text-[0.875rem] font-bold" htmlFor="cat-icon">Icon</label>
-              <Input id="cat-icon" value={icon} maxLength={40} onChange={(e) => setIcon(e.target.value)} />
+              <label className="mb-1 block text-[0.875rem] font-bold" htmlFor="cat-icon">
+                Icon
+              </label>
+              <Input
+                id="cat-icon"
+                value={icon}
+                maxLength={40}
+                onChange={(e) => setIcon(e.target.value)}
+              />
             </div>
             <div>
-              <label className="mb-1 block text-[0.875rem] font-bold" htmlFor="cat-order">Sort order</label>
-              <Input id="cat-order" value={order} inputMode="numeric" onChange={(e) => setOrder(e.target.value)} />
+              <label className="mb-1 block text-[0.875rem] font-bold" htmlFor="cat-order">
+                Sort order
+              </label>
+              <Input
+                id="cat-order"
+                value={order}
+                inputMode="numeric"
+                onChange={(e) => setOrder(e.target.value)}
+              />
             </div>
           </div>
           <Button
@@ -79,7 +104,12 @@ function CategoryDialog({ row, onSaved }: { row?: Row; onSaved: () => void }) {
             onClick={async () => {
               setBusy(true);
               try {
-                await upsertCategory(slug.trim(), name.trim(), icon.trim() || "Wrench", Number(order) || 0);
+                await upsertCategory(
+                  slug.trim(),
+                  name.trim(),
+                  icon.trim() || "Wrench",
+                  Number(order) || 0,
+                );
                 toast.success("Trade saved");
                 setOpen(false);
                 onSaved();
@@ -117,8 +147,17 @@ function AdminCategories() {
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["admin-list"] });
 
   const columns: Column<Row>[] = [
-    { key: "name", header: "Trade", sortable: true, render: (row) => <span className="font-bold text-foreground">{row.name}</span> },
-    { key: "slug", header: "Slug", render: (row) => <code className="text-[0.875rem]">{row.slug}</code> },
+    {
+      key: "name",
+      header: "Trade",
+      sortable: true,
+      render: (row) => <span className="font-bold text-foreground">{row.name}</span>,
+    },
+    {
+      key: "slug",
+      header: "Slug",
+      render: (row) => <code className="text-[0.875rem]">{row.slug}</code>,
+    },
     { key: "icon", header: "Icon", render: (row) => row.icon },
     { key: "sort_order", header: "Order", sortable: true, render: (row) => row.sort_order },
     {
@@ -129,7 +168,11 @@ function AdminCategories() {
           <div className="flex gap-2">
             <CategoryDialog row={row} onSaved={refresh} />
             <ConfirmAction
-              trigger={<Button variant="destructive" size="sm">Delete</Button>}
+              trigger={
+                <Button variant="destructive" size="sm">
+                  Delete
+                </Button>
+              }
               title={`Delete ${row.name}?`}
               description="Jobs already using this trade must be moved first, otherwise the delete will fail."
               confirmLabel="Delete"

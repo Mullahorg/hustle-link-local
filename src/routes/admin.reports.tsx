@@ -25,7 +25,11 @@ type Row = {
 };
 
 const date = (value: string) =>
-  new Date(value).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+  new Date(value).toLocaleDateString(undefined, {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 
 const tone: Record<ReportStatus, "default" | "secondary" | "destructive"> = {
   open: "destructive",
@@ -54,13 +58,20 @@ function AdminReports() {
   );
 
   const ids = Array.from(
-    new Set((query.data?.rows ?? []).flatMap((r) => [r.reporter_id, r.subject_user_id].filter(Boolean) as string[])),
+    new Set(
+      (query.data?.rows ?? []).flatMap(
+        (r) => [r.reporter_id, r.subject_user_id].filter(Boolean) as string[],
+      ),
+    ),
   );
   const names = useQuery({
     queryKey: ["admin-names", ids.join(",")],
     enabled: ids.length > 0,
     queryFn: async () => {
-      const { data, error } = await supabase.from("profiles").select("id, full_name, area").in("id", ids);
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, full_name, area")
+        .in("id", ids);
       if (error) throw new Error(error.message);
       return Object.fromEntries((data ?? []).map((p) => [p.id, p]));
     },
@@ -76,7 +87,9 @@ function AdminReports() {
       render: (row) => (
         <div className="max-w-sm">
           <p className="font-bold text-foreground">{row.reason}</p>
-          {row.details ? <p className="text-[0.875rem] text-muted-foreground">{row.details}</p> : null}
+          {row.details ? (
+            <p className="text-[0.875rem] text-muted-foreground">{row.details}</p>
+          ) : null}
         </div>
       ),
     },
@@ -86,8 +99,17 @@ function AdminReports() {
       header: "About",
       render: (row) => (row.job_id ? "A job post" : nameOf(row.subject_user_id)),
     },
-    { key: "created_at", header: "Received", sortable: true, render: (row) => date(row.created_at) },
-    { key: "status", header: "Status", render: (row) => <Badge variant={tone[row.status]}>{row.status}</Badge> },
+    {
+      key: "created_at",
+      header: "Received",
+      sortable: true,
+      render: (row) => date(row.created_at),
+    },
+    {
+      key: "status",
+      header: "Status",
+      render: (row) => <Badge variant={tone[row.status]}>{row.status}</Badge>,
+    },
     {
       key: "actions",
       header: "Actions",
@@ -101,7 +123,11 @@ function AdminReports() {
                   key={s}
                   trigger={
                     <Button variant={s === "dismissed" ? "outline" : "default"} size="sm">
-                      {s === "reviewing" ? "Start review" : s === "resolved" ? "Resolve" : "Dismiss"}
+                      {s === "reviewing"
+                        ? "Start review"
+                        : s === "resolved"
+                          ? "Resolve"
+                          : "Dismiss"}
                     </Button>
                   }
                   title={`Mark this report ${s}?`}

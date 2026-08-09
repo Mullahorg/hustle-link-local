@@ -52,7 +52,10 @@ export function ConfirmAction({
         </AlertDialogHeader>
         {withReason ? (
           <div>
-            <label className="mb-1 block text-[0.875rem] font-bold text-foreground" htmlFor="confirm-reason">
+            <label
+              className="mb-1 block text-[0.875rem] font-bold text-foreground"
+              htmlFor="confirm-reason"
+            >
               {reasonLabel}
             </label>
             <Textarea
@@ -68,7 +71,11 @@ export function ConfirmAction({
           <AlertDialogCancel disabled={busy}>Cancel</AlertDialogCancel>
           <AlertDialogAction
             disabled={busy}
-            className={destructive ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" : ""}
+            className={
+              destructive
+                ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                : ""
+            }
             onClick={async (event) => {
               event.preventDefault();
               setBusy(true);

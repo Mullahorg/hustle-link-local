@@ -18,7 +18,12 @@ type Row = {
 };
 
 const when = (value: string) =>
-  new Date(value).toLocaleString(undefined, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+  new Date(value).toLocaleString(undefined, {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 
 function AdminAudit() {
   const list = useAdminList("created_at");
@@ -41,7 +46,9 @@ function AdminAudit() {
     {
       key: "action",
       header: "Action",
-      render: (row) => <span className="font-bold text-foreground">{row.action.replace(/[._]/g, " ")}</span>,
+      render: (row) => (
+        <span className="font-bold text-foreground">{row.action.replace(/[._]/g, " ")}</span>
+      ),
     },
     {
       key: "entity",
@@ -56,15 +63,27 @@ function AdminAudit() {
       key: "details",
       header: "Details",
       render: (row) => {
-        const detail = row.details && Object.keys(row.details).length > 0 ? JSON.stringify(row.details) : "—";
-        return <span className="block max-w-sm truncate text-[0.875rem] text-muted-foreground">{detail}</span>;
+        const detail =
+          row.details && Object.keys(row.details).length > 0 ? JSON.stringify(row.details) : "—";
+        return (
+          <span className="block max-w-sm truncate text-[0.875rem] text-muted-foreground">
+            {detail}
+          </span>
+        );
       },
     },
   ];
 
   return (
-    <AdminPage title="Audit log" description="Every staff action, kept permanently and never editable.">
-      <AdminToolbar q={list.q} onSearch={list.setQ} placeholder="Search action, staff email or ID" />
+    <AdminPage
+      title="Audit log"
+      description="Every staff action, kept permanently and never editable."
+    >
+      <AdminToolbar
+        q={list.q}
+        onSearch={list.setQ}
+        placeholder="Search action, staff email or ID"
+      />
       <DataTable
         columns={columns}
         rows={query.data?.rows ?? []}

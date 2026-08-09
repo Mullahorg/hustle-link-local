@@ -45,7 +45,8 @@ function PermissionMatrix() {
     <section className="rounded-2xl border-2 border-border bg-card p-4">
       <h2 className="text-lg font-black text-foreground">What each staff role can do</h2>
       <p className="mt-1 text-[0.9375rem] text-muted-foreground">
-        Only a super admin can change this. The database enforces it too — turning something off here really blocks it.
+        Only a super admin can change this. The database enforces it too — turning something off
+        here really blocks it.
       </p>
 
       <div className="mt-4 flex flex-wrap gap-2">
@@ -71,7 +72,9 @@ function PermissionMatrix() {
               <ul className="mt-2 space-y-2">
                 {group.permissions.map((permission) => (
                   <li key={permission} className="flex items-center justify-between gap-3">
-                    <span className="text-[0.9375rem] font-semibold text-foreground">{permission}</span>
+                    <span className="text-[0.9375rem] font-semibold text-foreground">
+                      {permission}
+                    </span>
                     <Switch
                       checked={fixed || active.has(permission)}
                       disabled={fixed}
@@ -106,7 +109,10 @@ function AppSettings() {
   const { data, isLoading } = useQuery({
     queryKey: ["app-settings"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("app_settings").select("key, value, updated_at").order("key");
+      const { data, error } = await supabase
+        .from("app_settings")
+        .select("key, value, updated_at")
+        .order("key");
       if (error) throw new Error(error.message);
       return data ?? [];
     },
@@ -135,7 +141,8 @@ function AppSettings() {
     <section className="mt-4 rounded-2xl border-2 border-border bg-card p-4">
       <h2 className="text-lg font-black text-foreground">System settings</h2>
       <p className="mt-1 text-[0.9375rem] text-muted-foreground">
-        Values used across the app — fees, support contact, feature switches. Text or JSON both work.
+        Values used across the app — fees, support contact, feature switches. Text or JSON both
+        work.
       </p>
 
       {isLoading ? (
@@ -143,7 +150,13 @@ function AppSettings() {
       ) : (
         <ul className="mt-4 space-y-3">
           {(data ?? []).map((row) => (
-            <SettingRow key={row.key} settingKey={row.key} value={row.value} onSave={save} busy={busy} />
+            <SettingRow
+              key={row.key}
+              settingKey={row.key}
+              value={row.value}
+              onSave={save}
+              busy={busy}
+            />
           ))}
           {(data ?? []).length === 0 ? (
             <li className="text-[0.9375rem] text-muted-foreground">No settings saved yet.</li>
@@ -154,8 +167,18 @@ function AppSettings() {
       <div className="mt-5 rounded-xl border-2 border-dashed border-border p-3">
         <p className="font-black text-foreground">Add a setting</p>
         <div className="mt-2 grid gap-2 sm:grid-cols-[1fr_2fr_auto]">
-          <Input value={key} onChange={(e) => setKey(e.target.value)} placeholder="verification_fee_cents" aria-label="Setting key" />
-          <Input value={value} onChange={(e) => setValue(e.target.value)} placeholder="20000" aria-label="Setting value" />
+          <Input
+            value={key}
+            onChange={(e) => setKey(e.target.value)}
+            placeholder="verification_fee_cents"
+            aria-label="Setting key"
+          />
+          <Input
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            placeholder="20000"
+            aria-label="Setting value"
+          />
           <Button
             disabled={busy || !key.trim()}
             onClick={async () => {
@@ -190,7 +213,12 @@ function SettingRow({
         {settingKey}
       </label>
       <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
-        <Textarea id={`setting-${settingKey}`} value={draft} rows={2} onChange={(e) => setDraft(e.target.value)} />
+        <Textarea
+          id={`setting-${settingKey}`}
+          value={draft}
+          rows={2}
+          onChange={(e) => setDraft(e.target.value)}
+        />
         <Button disabled={busy} onClick={() => onSave(settingKey, draft)}>
           Save
         </Button>

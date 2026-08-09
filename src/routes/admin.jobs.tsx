@@ -39,7 +39,9 @@ function AdminJobs() {
       ascending: list.ascending,
       q: list.q,
       searchColumns: ["title", "description", "area"],
-      nullish: { hidden_at: visibility === "all" ? undefined : visibility === "visible" ? "null" : "notnull" },
+      nullish: {
+        hidden_at: visibility === "all" ? undefined : visibility === "visible" ? "null" : "notnull",
+      },
     }),
   );
 
@@ -59,19 +61,35 @@ function AdminJobs() {
         </div>
       ),
     },
-    { key: "status", header: "Status", render: (row) => <span className="font-semibold capitalize">{row.status.replace("_", " ")}</span> },
-    { key: "applicants_count", header: "Applicants", sortable: true, render: (row) => row.applicants_count },
+    {
+      key: "status",
+      header: "Status",
+      render: (row) => (
+        <span className="font-semibold capitalize">{row.status.replace("_", " ")}</span>
+      ),
+    },
+    {
+      key: "applicants_count",
+      header: "Applicants",
+      sortable: true,
+      render: (row) => row.applicants_count,
+    },
     {
       key: "created_at",
       header: "Posted",
       sortable: true,
-      render: (row) => new Date(row.created_at).toLocaleDateString(undefined, { day: "numeric", month: "short" }),
+      render: (row) =>
+        new Date(row.created_at).toLocaleDateString(undefined, { day: "numeric", month: "short" }),
     },
     {
       key: "hidden_at",
       header: "Visibility",
       render: (row) =>
-        row.hidden_at ? <Badge variant="destructive">Hidden</Badge> : <span className="font-semibold text-primary">Live</span>,
+        row.hidden_at ? (
+          <Badge variant="destructive">Hidden</Badge>
+        ) : (
+          <span className="font-semibold text-primary">Live</span>
+        ),
     },
     {
       key: "actions",

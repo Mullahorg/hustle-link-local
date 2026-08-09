@@ -9,7 +9,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { usePermissions } from "@/hooks/usePermissions";
 import { supabase } from "@/integrations/supabase/client";
-import { ADMIN_PAGE, adminListQuery, reviewVerification, type VerificationStatus } from "@/lib/admin";
+import {
+  ADMIN_PAGE,
+  adminListQuery,
+  reviewVerification,
+  type VerificationStatus,
+} from "@/lib/admin";
 
 export const Route = createFileRoute("/admin/verification")({ component: AdminVerification });
 
@@ -25,7 +30,13 @@ type Row = {
 };
 
 const date = (value: string | null) =>
-  value ? new Date(value).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" }) : "—";
+  value
+    ? new Date(value).toLocaleDateString(undefined, {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })
+    : "—";
 
 const tone: Record<string, "default" | "secondary" | "destructive"> = {
   verified: "default",
@@ -43,7 +54,8 @@ function AdminVerification() {
   const query = useQuery(
     adminListQuery<Row>({
       table: "verification_requests",
-      columns: "id, user_id, id_number_last4, document_path, status, review_notes, created_at, reviewed_at",
+      columns:
+        "id, user_id, id_number_last4, document_path, status, review_notes, created_at, reviewed_at",
       page: list.page,
       sort: list.sort,
       ascending: list.ascending,
@@ -56,7 +68,10 @@ function AdminVerification() {
     queryKey: ["admin-names", ids.join(",")],
     enabled: ids.length > 0,
     queryFn: async () => {
-      const { data, error } = await supabase.from("profiles").select("id, full_name, area").in("id", ids);
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, full_name, area")
+        .in("id", ids);
       if (error) throw new Error(error.message);
       return Object.fromEntries((data ?? []).map((p) => [p.id, p]));
     },
@@ -81,9 +96,18 @@ function AdminVerification() {
     {
       key: "id_number_last4",
       header: "ID ends with",
-      render: (row) => <span className="font-semibold">{row.id_number_last4 ? `••••${row.id_number_last4}` : "—"}</span>,
+      render: (row) => (
+        <span className="font-semibold">
+          {row.id_number_last4 ? `••••${row.id_number_last4}` : "—"}
+        </span>
+      ),
     },
-    { key: "created_at", header: "Submitted", sortable: true, render: (row) => date(row.created_at) },
+    {
+      key: "created_at",
+      header: "Submitted",
+      sortable: true,
+      render: (row) => date(row.created_at),
+    },
     {
       key: "status",
       header: "Status",
@@ -136,7 +160,10 @@ function AdminVerification() {
   ];
 
   return (
-    <AdminPage title="Verification" description="Review ID checks so members can trust who they hire.">
+    <AdminPage
+      title="Verification"
+      description="Review ID checks so members can trust who they hire."
+    >
       <AdminToolbar>
         <div className="flex flex-wrap gap-2">
           {(["pending", "verified", "rejected", "all"] as const).map((value) => (
