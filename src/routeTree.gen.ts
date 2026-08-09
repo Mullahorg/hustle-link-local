@@ -22,6 +22,7 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminJobsRouteImport } from './routes/admin.jobs'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminVerificationRouteImport } from './routes/admin.verification'
 import { Route as JobsJobIdRouteImport } from './routes/jobs.$jobId'
 import { Route as MessagesConversationIdRouteImport } from './routes/messages.$conversationId'
 import { Route as WorkersWorkerIdRouteImport } from './routes/workers.$workerId'
@@ -91,6 +92,11 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminVerificationRoute = AdminVerificationRouteImport.update({
+  id: '/verification',
+  path: '/verification',
+  getParentRoute: () => AdminRoute,
+} as any)
 const JobsJobIdRoute = JobsJobIdRouteImport.update({
   id: '/jobs/$jobId',
   path: '/jobs/$jobId',
@@ -120,6 +126,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/admin/jobs': typeof AdminJobsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/verification': typeof AdminVerificationRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/messages/$conversationId': typeof MessagesConversationIdRoute
   '/workers/$workerId': typeof WorkersWorkerIdRoute
@@ -137,6 +144,7 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/admin/jobs': typeof AdminJobsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/verification': typeof AdminVerificationRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/messages/$conversationId': typeof MessagesConversationIdRoute
   '/workers/$workerId': typeof WorkersWorkerIdRoute
@@ -156,6 +164,7 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/admin/jobs': typeof AdminJobsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/verification': typeof AdminVerificationRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/messages/$conversationId': typeof MessagesConversationIdRoute
   '/workers/$workerId': typeof WorkersWorkerIdRoute
@@ -176,6 +185,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/admin/jobs'
     | '/admin/users'
+    | '/admin/verification'
     | '/jobs/$jobId'
     | '/messages/$conversationId'
     | '/workers/$workerId'
@@ -193,6 +203,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/admin/jobs'
     | '/admin/users'
+    | '/admin/verification'
     | '/jobs/$jobId'
     | '/messages/$conversationId'
     | '/workers/$workerId'
@@ -211,6 +222,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/admin/jobs'
     | '/admin/users'
+    | '/admin/verification'
     | '/jobs/$jobId'
     | '/messages/$conversationId'
     | '/workers/$workerId'
@@ -325,6 +337,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/verification': {
+      id: '/admin/verification'
+      path: '/verification'
+      fullPath: '/admin/verification'
+      preLoaderRoute: typeof AdminVerificationRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/jobs/$jobId': {
       id: '/jobs/$jobId'
       path: '/jobs/$jobId'
@@ -352,12 +371,14 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminJobsRoute: typeof AdminJobsRoute
   AdminUsersRoute: typeof AdminUsersRoute
+  AdminVerificationRoute: typeof AdminVerificationRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminJobsRoute: AdminJobsRoute,
   AdminUsersRoute: AdminUsersRoute,
+  AdminVerificationRoute: AdminVerificationRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
