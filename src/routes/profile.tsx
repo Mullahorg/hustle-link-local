@@ -1,6 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Bell, ChevronRight, LogOut, Settings, ShieldCheck, Star } from "lucide-react";
+import {
+  Bell,
+  ChevronRight,
+  HelpCircle,
+  LogOut,
+  Settings,
+  ShieldCheck,
+  ShieldEllipsis,
+  Star,
+} from "lucide-react";
 
 import { AppShell } from "@/components/layout/AppShell";
 import { Avatar, CardSkeleton, Chip, Rating, VerifiedMark } from "@/components/hl/primitives";
@@ -144,6 +153,37 @@ function ProfileScreen() {
               <ChevronRight className="size-6 shrink-0 text-muted-foreground" aria-hidden="true" />
             </Link>
           </li>
+          <li>
+            <Link
+              to="/about"
+              className="flex min-h-16 items-center gap-4 px-4 py-3 transition-colors hover:bg-muted"
+            >
+              <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-primary-soft text-primary-ink">
+                <HelpCircle className="size-6" aria-hidden="true" />
+              </span>
+              <span className="min-w-0 flex-1 truncate text-base font-bold">
+                How HustlerLink works
+              </span>
+              <ChevronRight className="size-6 shrink-0 text-muted-foreground" aria-hidden="true" />
+            </Link>
+          </li>
+          {isStaff ? (
+            <li>
+              <Link
+                to="/admin"
+                className="flex min-h-16 items-center gap-4 px-4 py-3 transition-colors hover:bg-muted"
+              >
+                <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-accent-soft text-accent-foreground">
+                  <ShieldEllipsis className="size-6" aria-hidden="true" />
+                </span>
+                <span className="min-w-0 flex-1 truncate text-base font-bold">Admin console</span>
+                <ChevronRight
+                  className="size-6 shrink-0 text-muted-foreground"
+                  aria-hidden="true"
+                />
+              </Link>
+            </li>
+          ) : null}
         </ul>
 
         <Button
