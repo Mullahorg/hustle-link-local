@@ -55,11 +55,26 @@ function ProfileScreen() {
           <p className="mt-2 max-w-[30ch] text-base font-medium text-muted-foreground">
             Sign in to post jobs, apply for work and keep your reviews in one place.
           </p>
-          <Button asChild block size="lg" className="mt-8 max-w-xs">
-            <Link to="/auth" search={{ redirect: "/profile" }}>
-              Sign in or create account
-            </Link>
-          </Button>
+          <div className="mt-8 w-full max-w-xs space-y-2">
+            <Button asChild block size="lg">
+              <Link to="/auth" search={{ redirect: "/profile" }}>
+                Sign in or create account
+              </Link>
+            </Button>
+            <Button asChild block size="lg" variant="outline">
+              <Link to="/discover" search={{ tab: "jobs" }}>
+                Browse jobs
+              </Link>
+            </Button>
+            <Button asChild block size="lg" variant="outline">
+              <Link to="/discover" search={{ tab: "workers" }}>
+                Browse workers
+              </Link>
+            </Button>
+            <Button asChild block size="lg" variant="ghost">
+              <Link to="/about">How HustlerLink works</Link>
+            </Button>
+          </div>
         </section>
       </AppShell>
     );
