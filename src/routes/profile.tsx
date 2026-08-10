@@ -15,6 +15,7 @@ import { AppShell } from "@/components/layout/AppShell";
 import { Avatar, CardSkeleton, Chip, Rating, VerifiedMark } from "@/components/hl/primitives";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { usePermissions } from "@/hooks/usePermissions";
 import { myProfileQuery } from "@/lib/account";
 
 export const Route = createFileRoute("/profile")({
@@ -43,6 +44,7 @@ const rows = [
 
 function ProfileScreen() {
   const { user, loading, signOut } = useAuth();
+  const { isStaff } = usePermissions();
   const { data: profile, isPending } = useQuery(myProfileQuery(user?.id));
 
   if (loading) {
