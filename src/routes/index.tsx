@@ -132,6 +132,13 @@ function HomeScreen() {
               Looking for work? Find jobs
               <ChevronRight className="size-5" aria-hidden="true" />
             </Link>
+            <Link
+              to="/about"
+              className="tap mt-1 flex items-center justify-center gap-1 text-base font-bold text-muted-foreground"
+            >
+              How HustlerLink works
+              <ChevronRight className="size-5" aria-hidden="true" />
+            </Link>
           </div>
         </div>
       </section>

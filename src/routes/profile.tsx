@@ -1,11 +1,21 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Bell, ChevronRight, LogOut, Settings, ShieldCheck, Star } from "lucide-react";
+import {
+  Bell,
+  ChevronRight,
+  HelpCircle,
+  LogOut,
+  Settings,
+  ShieldCheck,
+  ShieldEllipsis,
+  Star,
+} from "lucide-react";
 
 import { AppShell } from "@/components/layout/AppShell";
 import { Avatar, CardSkeleton, Chip, Rating, VerifiedMark } from "@/components/hl/primitives";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { usePermissions } from "@/hooks/usePermissions";
 import { myProfileQuery } from "@/lib/account";
 
 export const Route = createFileRoute("/profile")({
@@ -34,6 +44,7 @@ const rows = [
 
 function ProfileScreen() {
   const { user, loading, signOut } = useAuth();
+  const { isStaff } = usePermissions();
   const { data: profile, isPending } = useQuery(myProfileQuery(user?.id));
 
   if (loading) {
@@ -55,11 +66,26 @@ function ProfileScreen() {
           <p className="mt-2 max-w-[30ch] text-base font-medium text-muted-foreground">
             Sign in to post jobs, apply for work and keep your reviews in one place.
           </p>
-          <Button asChild block size="lg" className="mt-8 max-w-xs">
-            <Link to="/auth" search={{ redirect: "/profile" }}>
-              Sign in or create account
-            </Link>
-          </Button>
+          <div className="mt-8 w-full max-w-xs space-y-2">
+            <Button asChild block size="lg">
+              <Link to="/auth" search={{ redirect: "/profile" }}>
+                Sign in or create account
+              </Link>
+            </Button>
+            <Button asChild block size="lg" variant="outline">
+              <Link to="/discover" search={{ tab: "jobs" }}>
+                Browse jobs
+              </Link>
+            </Button>
+            <Button asChild block size="lg" variant="outline">
+              <Link to="/discover" search={{ tab: "workers" }}>
+                Browse workers
+              </Link>
+            </Button>
+            <Button asChild block size="lg" variant="ghost">
+              <Link to="/about">How HustlerLink works</Link>
+            </Button>
+          </div>
         </section>
       </AppShell>
     );
@@ -129,6 +155,37 @@ function ProfileScreen() {
               <ChevronRight className="size-6 shrink-0 text-muted-foreground" aria-hidden="true" />
             </Link>
           </li>
+          <li>
+            <Link
+              to="/about"
+              className="flex min-h-16 items-center gap-4 px-4 py-3 transition-colors hover:bg-muted"
+            >
+              <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-primary-soft text-primary-ink">
+                <HelpCircle className="size-6" aria-hidden="true" />
+              </span>
+              <span className="min-w-0 flex-1 truncate text-base font-bold">
+                How HustlerLink works
+              </span>
+              <ChevronRight className="size-6 shrink-0 text-muted-foreground" aria-hidden="true" />
+            </Link>
+          </li>
+          {isStaff ? (
+            <li>
+              <Link
+                to="/admin"
+                className="flex min-h-16 items-center gap-4 px-4 py-3 transition-colors hover:bg-muted"
+              >
+                <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-accent-soft text-accent-foreground">
+                  <ShieldEllipsis className="size-6" aria-hidden="true" />
+                </span>
+                <span className="min-w-0 flex-1 truncate text-base font-bold">Admin console</span>
+                <ChevronRight
+                  className="size-6 shrink-0 text-muted-foreground"
+                  aria-hidden="true"
+                />
+              </Link>
+            </li>
+          ) : null}
         </ul>
 
         <Button
