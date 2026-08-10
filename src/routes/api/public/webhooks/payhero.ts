@@ -59,11 +59,13 @@ export const Route = createFileRoute("/api/public/webhooks/payhero")({
         const { error } = await supabaseAdmin.rpc("payment_apply_result", {
           _reference: reference,
           _status: status,
-          _provider_reference: providerReference,
-          _failure_reason:
-            status === "succeeded"
-              ? null
-              : ((response["ResultDesc"] as string | undefined) ?? "Payment was not completed"),
+          ...(providerReference ? { _provider_reference: providerReference } : {}),
+          ...(status === "succeeded"
+            ? {}
+            : {
+                _failure_reason:
+                  (response["ResultDesc"] as string | undefined) ?? "Payment was not completed",
+              }),
         });
         if (error) console.error("payment_apply_result failed", error.message);
 
