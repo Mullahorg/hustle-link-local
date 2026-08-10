@@ -201,6 +201,56 @@ export type Database = {
           },
         ]
       }
+      job_escrows: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          currency: string
+          employer_id: string
+          funded_at: string | null
+          id: string
+          job_id: string
+          released_at: string | null
+          status: Database["public"]["Enums"]["escrow_status"]
+          updated_at: string
+          worker_id: string | null
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string
+          currency?: string
+          employer_id: string
+          funded_at?: string | null
+          id?: string
+          job_id: string
+          released_at?: string | null
+          status?: Database["public"]["Enums"]["escrow_status"]
+          updated_at?: string
+          worker_id?: string | null
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          currency?: string
+          employer_id?: string
+          funded_at?: string | null
+          id?: string
+          job_id?: string
+          released_at?: string | null
+          status?: Database["public"]["Enums"]["escrow_status"]
+          updated_at?: string
+          worker_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_escrows_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: true
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       jobs: {
         Row: {
           applicants_count: number
@@ -690,6 +740,72 @@ export type Database = {
         }
         Relationships: []
       }
+      wallet_ledger: {
+        Row: {
+          amount_cents: number
+          counterparty_id: string | null
+          created_at: string
+          currency: string
+          description: string
+          direction: Database["public"]["Enums"]["ledger_direction"]
+          entry_type: string
+          id: string
+          job_id: string | null
+          metadata: Json
+          status: Database["public"]["Enums"]["ledger_status"]
+          transaction_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_cents: number
+          counterparty_id?: string | null
+          created_at?: string
+          currency?: string
+          description: string
+          direction: Database["public"]["Enums"]["ledger_direction"]
+          entry_type: string
+          id?: string
+          job_id?: string | null
+          metadata?: Json
+          status?: Database["public"]["Enums"]["ledger_status"]
+          transaction_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_cents?: number
+          counterparty_id?: string | null
+          created_at?: string
+          currency?: string
+          description?: string
+          direction?: Database["public"]["Enums"]["ledger_direction"]
+          entry_type?: string
+          id?: string
+          job_id?: string | null
+          metadata?: Json
+          status?: Database["public"]["Enums"]["ledger_status"]
+          transaction_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wallet_ledger_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wallet_ledger_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "payment_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -761,6 +877,22 @@ export type Database = {
         Returns: Json
       }
       claim_super_admin: { Args: never; Returns: Json }
+      escrow_fund_job: {
+        Args: { _amount_cents: number; _job_id: string }
+        Returns: Json
+      }
+      escrow_refund: {
+        Args: { _job_id: string; _reason?: string }
+        Returns: Json
+      }
+      escrow_release: { Args: { _job_id: string }; Returns: Json }
+      escrow_set_status: {
+        Args: {
+          _job_id: string
+          _status: Database["public"]["Enums"]["escrow_status"]
+        }
+        Returns: Json
+      }
       has_permission: {
         Args: {
           _permission: Database["public"]["Enums"]["app_permission"]
@@ -786,6 +918,29 @@ export type Database = {
         Returns: {
           permission: Database["public"]["Enums"]["app_permission"]
         }[]
+      }
+      payment_apply_result: {
+        Args: {
+          _failure_reason?: string
+          _provider_reference?: string
+          _reference: string
+          _status: string
+        }
+        Returns: Json
+      }
+      post_ledger: {
+        Args: {
+          _amount_cents: number
+          _counterparty?: string
+          _description: string
+          _direction: Database["public"]["Enums"]["ledger_direction"]
+          _job_id?: string
+          _status: Database["public"]["Enums"]["ledger_status"]
+          _transaction_id?: string
+          _type: string
+          _user_id: string
+        }
+        Returns: string
       }
       profile_search_doc: {
         Args: {
@@ -857,6 +1012,17 @@ export type Database = {
         }[]
       }
       super_admin_exists: { Args: never; Returns: boolean }
+      wallet_available_cents: { Args: { _user_id: string }; Returns: number }
+      wallet_cancel_topup: { Args: { _reference: string }; Returns: Json }
+      wallet_request_withdrawal: {
+        Args: { _amount_cents: number; _phone: string }
+        Returns: Json
+      }
+      wallet_start_topup: {
+        Args: { _amount_cents: number; _phone: string; _provider?: string }
+        Returns: Json
+      }
+      wallet_summary: { Args: { _user_id?: string }; Returns: Json }
       write_audit: {
         Args: {
           _action: string
@@ -914,7 +1080,17 @@ export type Database = {
         | "accepted"
         | "rejected"
         | "withdrawn"
+      escrow_status:
+        | "awaiting_funding"
+        | "secured"
+        | "in_progress"
+        | "awaiting_confirmation"
+        | "released"
+        | "refunded"
+        | "cancelled"
       job_status: "open" | "in_progress" | "completed" | "closed"
+      ledger_direction: "credit" | "debit"
+      ledger_status: "pending" | "settled" | "held" | "failed" | "cancelled"
       report_status: "open" | "reviewing" | "resolved" | "dismissed"
       verification_status: "unverified" | "pending" | "verified" | "rejected"
     }
@@ -1093,7 +1269,18 @@ export const Constants = {
         "rejected",
         "withdrawn",
       ],
+      escrow_status: [
+        "awaiting_funding",
+        "secured",
+        "in_progress",
+        "awaiting_confirmation",
+        "released",
+        "refunded",
+        "cancelled",
+      ],
       job_status: ["open", "in_progress", "completed", "closed"],
+      ledger_direction: ["credit", "debit"],
+      ledger_status: ["pending", "settled", "held", "failed", "cancelled"],
       report_status: ["open", "reviewing", "resolved", "dismissed"],
       verification_status: ["unverified", "pending", "verified", "rejected"],
     },

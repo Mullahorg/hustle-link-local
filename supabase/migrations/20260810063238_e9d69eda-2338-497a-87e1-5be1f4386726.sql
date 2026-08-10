@@ -1,0 +1,17 @@
+REVOKE EXECUTE ON FUNCTION public.wallet_summary(uuid) FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.wallet_available_cents(uuid) FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.wallet_start_topup(integer,text,text) FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.wallet_cancel_topup(text) FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.wallet_request_withdrawal(integer,text) FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.escrow_fund_job(uuid,integer) FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.escrow_set_status(uuid,public.escrow_status) FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.escrow_release(uuid) FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.escrow_refund(uuid,text) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.wallet_summary(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.wallet_start_topup(integer,text,text) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.wallet_cancel_topup(text) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.wallet_request_withdrawal(integer,text) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.escrow_fund_job(uuid,integer) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.escrow_set_status(uuid,public.escrow_status) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.escrow_release(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.escrow_refund(uuid,text) TO authenticated;

@@ -9,6 +9,7 @@ import {
   ShieldCheck,
   ShieldEllipsis,
   Star,
+  Wallet,
 } from "lucide-react";
 
 import { AppShell } from "@/components/layout/AppShell";
@@ -37,6 +38,7 @@ export const Route = createFileRoute("/profile")({
 });
 
 const rows = [
+  { icon: Wallet, label: "Wallet & payments", to: "/wallet" },
   { icon: ShieldCheck, label: "Verify my ID", to: "/settings" },
   { icon: Bell, label: "Notifications", to: "/notifications" },
   { icon: Settings, label: "Settings & privacy", to: "/settings" },

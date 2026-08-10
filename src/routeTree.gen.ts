@@ -20,6 +20,7 @@ import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as PostJobRouteImport } from './routes/post-job'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
@@ -33,6 +34,7 @@ import { Route as AdminVerificationRouteImport } from './routes/admin.verificati
 import { Route as JobsJobIdRouteImport } from './routes/jobs.$jobId'
 import { Route as MessagesConversationIdRouteImport } from './routes/messages.$conversationId'
 import { Route as WorkersWorkerIdRouteImport } from './routes/workers.$workerId'
+import { Route as ApiPublicWebhooksPayheroRouteImport } from './routes/api/public/webhooks/payhero'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -87,6 +89,11 @@ const ProfileRoute = ProfileRouteImport.update({
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WalletRoute = WalletRouteImport.update({
+  id: '/wallet',
+  path: '/wallet',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -154,6 +161,12 @@ const WorkersWorkerIdRoute = WorkersWorkerIdRouteImport.update({
   path: '/workers/$workerId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicWebhooksPayheroRoute =
+  ApiPublicWebhooksPayheroRouteImport.update({
+    id: '/api/public/webhooks/payhero',
+    path: '/api/public/webhooks/payhero',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -167,6 +180,7 @@ export interface FileRoutesByFullPath {
   '/post-job': typeof PostJobRoute
   '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
+  '/wallet': typeof WalletRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/jobs': typeof AdminJobsRoute
@@ -180,6 +194,7 @@ export interface FileRoutesByFullPath {
   '/messages/$conversationId': typeof MessagesConversationIdRoute
   '/workers/$workerId': typeof WorkersWorkerIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/api/public/webhooks/payhero': typeof ApiPublicWebhooksPayheroRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -192,6 +207,7 @@ export interface FileRoutesByTo {
   '/post-job': typeof PostJobRoute
   '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
+  '/wallet': typeof WalletRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/jobs': typeof AdminJobsRoute
@@ -205,6 +221,7 @@ export interface FileRoutesByTo {
   '/messages/$conversationId': typeof MessagesConversationIdRoute
   '/workers/$workerId': typeof WorkersWorkerIdRoute
   '/admin': typeof AdminIndexRoute
+  '/api/public/webhooks/payhero': typeof ApiPublicWebhooksPayheroRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -219,6 +236,7 @@ export interface FileRoutesById {
   '/post-job': typeof PostJobRoute
   '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
+  '/wallet': typeof WalletRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/jobs': typeof AdminJobsRoute
@@ -232,6 +250,7 @@ export interface FileRoutesById {
   '/messages/$conversationId': typeof MessagesConversationIdRoute
   '/workers/$workerId': typeof WorkersWorkerIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/api/public/webhooks/payhero': typeof ApiPublicWebhooksPayheroRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -247,6 +266,7 @@ export interface FileRouteTypes {
     | '/post-job'
     | '/profile'
     | '/settings'
+    | '/wallet'
     | '/admin/audit'
     | '/admin/categories'
     | '/admin/jobs'
@@ -260,6 +280,7 @@ export interface FileRouteTypes {
     | '/messages/$conversationId'
     | '/workers/$workerId'
     | '/admin/'
+    | '/api/public/webhooks/payhero'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -272,6 +293,7 @@ export interface FileRouteTypes {
     | '/post-job'
     | '/profile'
     | '/settings'
+    | '/wallet'
     | '/admin/audit'
     | '/admin/categories'
     | '/admin/jobs'
@@ -285,6 +307,7 @@ export interface FileRouteTypes {
     | '/messages/$conversationId'
     | '/workers/$workerId'
     | '/admin'
+    | '/api/public/webhooks/payhero'
   id:
     | '__root__'
     | '/'
@@ -298,6 +321,7 @@ export interface FileRouteTypes {
     | '/post-job'
     | '/profile'
     | '/settings'
+    | '/wallet'
     | '/admin/audit'
     | '/admin/categories'
     | '/admin/jobs'
@@ -311,6 +335,7 @@ export interface FileRouteTypes {
     | '/messages/$conversationId'
     | '/workers/$workerId'
     | '/admin/'
+    | '/api/public/webhooks/payhero'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -325,8 +350,10 @@ export interface RootRouteChildren {
   PostJobRoute: typeof PostJobRoute
   ProfileRoute: typeof ProfileRoute
   SettingsRoute: typeof SettingsRoute
+  WalletRoute: typeof WalletRoute
   JobsJobIdRoute: typeof JobsJobIdRoute
   WorkersWorkerIdRoute: typeof WorkersWorkerIdRoute
+  ApiPublicWebhooksPayheroRoute: typeof ApiPublicWebhooksPayheroRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -406,6 +433,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wallet': {
+      id: '/wallet'
+      path: '/wallet'
+      fullPath: '/wallet'
+      preLoaderRoute: typeof WalletRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -499,6 +533,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkersWorkerIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/webhooks/payhero': {
+      id: '/api/public/webhooks/payhero'
+      path: '/api/public/webhooks/payhero'
+      fullPath: '/api/public/webhooks/payhero'
+      preLoaderRoute: typeof ApiPublicWebhooksPayheroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -554,8 +595,10 @@ const rootRouteChildren: RootRouteChildren = {
   PostJobRoute: PostJobRoute,
   ProfileRoute: ProfileRoute,
   SettingsRoute: SettingsRoute,
+  WalletRoute: WalletRoute,
   JobsJobIdRoute: JobsJobIdRoute,
   WorkersWorkerIdRoute: WorkersWorkerIdRoute,
+  ApiPublicWebhooksPayheroRoute: ApiPublicWebhooksPayheroRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
