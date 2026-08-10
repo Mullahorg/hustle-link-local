@@ -229,7 +229,14 @@ function AuthScreen() {
           Continue with Google
         </Button>
 
-        <p className="mt-7 text-center text-[0.875rem] font-semibold text-muted-foreground">
+        <Link
+          to="/about"
+          className="tap mt-4 flex items-center justify-center text-base font-bold text-primary-ink underline underline-offset-4"
+        >
+          Learn how HustlerLink works
+        </Link>
+
+        <p className="mt-5 text-center text-[0.875rem] font-semibold text-muted-foreground">
           By continuing you agree to keep payments and agreements between you and the other person.
           HustlerLink never asks for money to connect you.
         </p>
