@@ -127,7 +127,9 @@ function VerifyFlow() {
         <div className="flex items-center gap-3">
           <ShieldCheck className="size-7 text-primary" aria-hidden="true" />
           <h1 className="text-xl font-extrabold text-foreground">{copy.title}</h1>
-          <Chip tone={status === "verified" ? "success" : status === "pending" ? "accent" : "muted"}>
+          <Chip
+            tone={status === "verified" ? "success" : status === "pending" ? "accent" : "muted"}
+          >
             {status}
           </Chip>
         </div>
@@ -339,7 +341,13 @@ function PhotoSlot({
           event.target.value = "";
         }}
       />
-      <Button variant="outline" block size="lg" className="mt-4" onClick={() => input.current?.click()}>
+      <Button
+        variant="outline"
+        block
+        size="lg"
+        className="mt-4"
+        onClick={() => input.current?.click()}
+      >
         <Upload aria-hidden="true" />
         {shot ? "Retake" : "Add photo"}
       </Button>
