@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { LogOut, ShieldCheck, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -387,35 +387,23 @@ function SettingsBody() {
               {profile?.verification ?? "unverified"}
             </Chip>
           </div>
-          {profile?.verification === "verified" ? (
-            <p className="mt-2 text-[0.9375rem] font-medium text-muted-foreground">
-              Your identity is verified. The badge shows on your profile.
-            </p>
-          ) : profile?.verification === "pending" ? (
-            <p className="mt-2 text-[0.9375rem] font-medium text-muted-foreground">
-              We're reviewing your request. This usually takes a day.
-            </p>
-          ) : (
-            <>
-              <p className="mt-2 text-[0.9375rem] font-medium text-muted-foreground">
-                Verified members get hired more often. Enter the last 4 digits of your ID.
-              </p>
-              <div className="mt-3 flex gap-3">
-                <Input
-                  inputMode="numeric"
-                  maxLength={4}
-                  value={last4}
-                  onChange={(event) => setLast4(event.target.value.replace(/\D/g, ""))}
-                  placeholder="1234"
-                  aria-label="Last 4 digits of your ID"
-                  className="h-14 flex-1 text-base"
-                />
-                <Button size="lg" disabled={verify.isPending} onClick={() => verify.mutate()}>
-                  {verify.isPending ? "Sending…" : "Verify"}
-                </Button>
-              </div>
-            </>
-          )}
+          <p className="mt-2 text-[0.9375rem] font-medium text-muted-foreground">
+            {profile?.verification === "verified"
+              ? "Your identity is verified. The badge shows on your profile."
+              : profile?.verification === "pending"
+                ? "We're reviewing your documents. This usually takes a day."
+                : "Send your ID and a live selfie. Verified members get hired far more often."}
+          </p>
+          <Button asChild block size="lg" className="mt-4">
+            <Link to="/verify">
+              {profile?.verification === "verified"
+                ? "Manage verification"
+                : profile?.verification === "pending"
+                  ? "Check progress"
+                  : "Verify my identity"}
+            </Link>
+          </Button>
+
         </div>
       </Section>
 

@@ -100,16 +100,58 @@ export async function fetchJobDetail(id: string) {
   return { ...data, employer: employer ?? null };
 }
 
+export type PublicProfile = {
+  profile: {
+    id: string;
+    full_name: string;
+    headline: string | null;
+    bio: string | null;
+    area: string | null;
+    avatar_url: string | null;
+    cover_url: string | null;
+    skills: string[];
+    trades: string[];
+    languages: string[];
+    years_experience: number | null;
+    rate_label: string | null;
+    verification: string;
+    rating_avg: number;
+    rating_count: number;
+    available: boolean;
+    last_seen_at: string;
+    category_slug: string | null;
+  };
+  stats: {
+    trust_score: number;
+    completed_jobs: number;
+    response_rate: number | null;
+    response_minutes: number;
+    conversations: number;
+  };
+  portfolio: { id: string; image_path: string; caption: string | null; url?: string | null }[];
+  certificates: { id: string; title: string; issuer: string | null; year: number | null }[];
+  recent_work: { id: string; title: string; category_slug: string; area: string; created_at: string }[];
+};
+
+/** Sign private gallery photos so guests can see public work samples. */
+async function signGallery(paths: string[]): Promise<Record<string, string>> {
+  if (paths.length === 0) return {};
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data } = await supabaseAdmin.storage.from("portfolio").createSignedUrls(paths, 3600);
+    return Object.fromEntries(
+      (data ?? []).flatMap((row) => (row.signedUrl ? [[row.path ?? "", row.signedUrl]] : [])),
+    );
+  } catch (cause) {
+    console.error("could not sign gallery photos", cause);
+    return {};
+  }
+}
+
 export async function fetchWorkerDetail(id: string) {
   const supabase = publicClient();
-  const [profile, reviews] = await Promise.all([
-    supabase
-      .from("profiles")
-      .select(
-        "id, full_name, headline, bio, area, avatar_url, is_worker, category_slug, skills, rate_label, verification, rating_avg, rating_count",
-      )
-      .eq("id", id)
-      .maybeSingle(),
+  const [summary, reviews] = await Promise.all([
+    supabase.rpc("public_profile", { _id: id }),
     supabase
       .from("reviews")
       .select("id, rating, body, created_at, reviewer:reviewer_id (full_name)")
@@ -117,6 +159,18 @@ export async function fetchWorkerDetail(id: string) {
       .order("created_at", { ascending: false })
       .limit(REVIEW_PAGE),
   ]);
-  if (profile.error) throw new Error(profile.error.message);
-  return { profile: profile.data, reviews: reviews.data ?? [] };
+  if (summary.error) throw new Error(summary.error.message);
+
+  const data = summary.data as unknown as PublicProfile | null;
+  if (!data) return { profile: null, stats: null, portfolio: [], certificates: [], recentWork: [], reviews: [] };
+
+  const urls = await signGallery(data.portfolio.map((item) => item.image_path));
+  return {
+    profile: data.profile,
+    stats: data.stats,
+    portfolio: data.portfolio.map((item) => ({ ...item, url: urls[item.image_path] ?? null })),
+    certificates: data.certificates,
+    recentWork: data.recent_work,
+    reviews: reviews.data ?? [],
+  };
 }

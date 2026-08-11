@@ -20,6 +20,7 @@ import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as PostJobRouteImport } from './routes/post-job'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as VerifyRouteImport } from './routes/verify'
 import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
@@ -89,6 +90,11 @@ const ProfileRoute = ProfileRouteImport.update({
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerifyRoute = VerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
   getParentRoute: () => rootRouteImport,
 } as any)
 const WalletRoute = WalletRouteImport.update({
@@ -180,6 +186,7 @@ export interface FileRoutesByFullPath {
   '/post-job': typeof PostJobRoute
   '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
+  '/verify': typeof VerifyRoute
   '/wallet': typeof WalletRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/categories': typeof AdminCategoriesRoute
@@ -207,6 +214,7 @@ export interface FileRoutesByTo {
   '/post-job': typeof PostJobRoute
   '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
+  '/verify': typeof VerifyRoute
   '/wallet': typeof WalletRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/categories': typeof AdminCategoriesRoute
@@ -236,6 +244,7 @@ export interface FileRoutesById {
   '/post-job': typeof PostJobRoute
   '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
+  '/verify': typeof VerifyRoute
   '/wallet': typeof WalletRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/categories': typeof AdminCategoriesRoute
@@ -266,6 +275,7 @@ export interface FileRouteTypes {
     | '/post-job'
     | '/profile'
     | '/settings'
+    | '/verify'
     | '/wallet'
     | '/admin/audit'
     | '/admin/categories'
@@ -293,6 +303,7 @@ export interface FileRouteTypes {
     | '/post-job'
     | '/profile'
     | '/settings'
+    | '/verify'
     | '/wallet'
     | '/admin/audit'
     | '/admin/categories'
@@ -321,6 +332,7 @@ export interface FileRouteTypes {
     | '/post-job'
     | '/profile'
     | '/settings'
+    | '/verify'
     | '/wallet'
     | '/admin/audit'
     | '/admin/categories'
@@ -350,6 +362,7 @@ export interface RootRouteChildren {
   PostJobRoute: typeof PostJobRoute
   ProfileRoute: typeof ProfileRoute
   SettingsRoute: typeof SettingsRoute
+  VerifyRoute: typeof VerifyRoute
   WalletRoute: typeof WalletRoute
   JobsJobIdRoute: typeof JobsJobIdRoute
   WorkersWorkerIdRoute: typeof WorkersWorkerIdRoute
@@ -433,6 +446,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verify': {
+      id: '/verify'
+      path: '/verify'
+      fullPath: '/verify'
+      preLoaderRoute: typeof VerifyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/wallet': {
@@ -595,6 +615,7 @@ const rootRouteChildren: RootRouteChildren = {
   PostJobRoute: PostJobRoute,
   ProfileRoute: ProfileRoute,
   SettingsRoute: SettingsRoute,
+  VerifyRoute: VerifyRoute,
   WalletRoute: WalletRoute,
   JobsJobIdRoute: JobsJobIdRoute,
   WorkersWorkerIdRoute: WorkersWorkerIdRoute,
