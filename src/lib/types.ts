@@ -19,6 +19,11 @@ export type JobRow = {
   applicants_count: number;
   created_at: string;
   employer_name: string | null;
+  employer_id: string;
+  employer_verification: string | null;
+  employer_avatar: string | null;
+  skills: string[];
+  payment_secured: boolean;
 };
 
 export type WorkerRow = {
@@ -33,6 +38,9 @@ export type WorkerRow = {
   rating_count: number;
   verification: string;
   avatar_url: string | null;
+  available: boolean;
+  last_seen_at: string;
+  completed_jobs: number;
 };
 
 export type HomeFeed = {

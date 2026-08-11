@@ -107,6 +107,33 @@ export type Database = {
         }
         Relationships: []
       }
+      certificates: {
+        Row: {
+          created_at: string
+          id: string
+          issuer: string | null
+          title: string
+          user_id: string
+          year: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          issuer?: string | null
+          title: string
+          user_id: string
+          year?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          issuer?: string | null
+          title?: string
+          user_id?: string
+          year?: number | null
+        }
+        Relationships: []
+      }
       conversations: {
         Row: {
           created_at: string
@@ -266,6 +293,7 @@ export type Database = {
           hidden_reason: string | null
           id: string
           search_vector: unknown
+          skills: string[]
           status: Database["public"]["Enums"]["job_status"]
           title: string
           updated_at: string
@@ -285,6 +313,7 @@ export type Database = {
           hidden_reason?: string | null
           id?: string
           search_vector?: unknown
+          skills?: string[]
           status?: Database["public"]["Enums"]["job_status"]
           title: string
           updated_at?: string
@@ -304,6 +333,7 @@ export type Database = {
           hidden_reason?: string | null
           id?: string
           search_vector?: unknown
+          skills?: string[]
           status?: Database["public"]["Enums"]["job_status"]
           title?: string
           updated_at?: string
@@ -480,6 +510,30 @@ export type Database = {
         }
         Relationships: []
       }
+      portfolio_items: {
+        Row: {
+          caption: string | null
+          created_at: string
+          id: string
+          image_path: string
+          user_id: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          id?: string
+          image_path: string
+          user_id: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          id?: string
+          image_path?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           area: string | null
@@ -487,11 +541,13 @@ export type Database = {
           avatar_url: string | null
           bio: string | null
           category_slug: string | null
+          cover_url: string | null
           created_at: string
           full_name: string
           headline: string | null
           id: string
           is_worker: boolean
+          languages: string[]
           last_seen_at: string
           phone: string | null
           rate_label: string | null
@@ -501,8 +557,10 @@ export type Database = {
           skills: string[]
           suspended_at: string | null
           suspension_reason: string | null
+          trades: string[]
           updated_at: string
           verification: Database["public"]["Enums"]["verification_status"]
+          years_experience: number | null
         }
         Insert: {
           area?: string | null
@@ -510,11 +568,13 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           category_slug?: string | null
+          cover_url?: string | null
           created_at?: string
           full_name?: string
           headline?: string | null
           id: string
           is_worker?: boolean
+          languages?: string[]
           last_seen_at?: string
           phone?: string | null
           rate_label?: string | null
@@ -524,8 +584,10 @@ export type Database = {
           skills?: string[]
           suspended_at?: string | null
           suspension_reason?: string | null
+          trades?: string[]
           updated_at?: string
           verification?: Database["public"]["Enums"]["verification_status"]
+          years_experience?: number | null
         }
         Update: {
           area?: string | null
@@ -533,11 +595,13 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           category_slug?: string | null
+          cover_url?: string | null
           created_at?: string
           full_name?: string
           headline?: string | null
           id?: string
           is_worker?: boolean
+          languages?: string[]
           last_seen_at?: string
           phone?: string | null
           rate_label?: string | null
@@ -547,8 +611,10 @@ export type Database = {
           skills?: string[]
           suspended_at?: string | null
           suspension_reason?: string | null
+          trades?: string[]
           updated_at?: string
           verification?: Database["public"]["Enums"]["verification_status"]
+          years_experience?: number | null
         }
         Relationships: [
           {
@@ -704,38 +770,97 @@ export type Database = {
         }
         Relationships: []
       }
+      verification_events: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          request_id: string | null
+          status: Database["public"]["Enums"]["verification_status"] | null
+          user_id: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          request_id?: string | null
+          status?: Database["public"]["Enums"]["verification_status"] | null
+          user_id: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          request_id?: string | null
+          status?: Database["public"]["Enums"]["verification_status"] | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "verification_events_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "verification_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       verification_requests: {
         Row: {
+          attempt: number
+          back_path: string | null
           created_at: string
+          doc_type: Database["public"]["Enums"]["id_document_type"]
           document_path: string | null
+          front_path: string | null
           id: string
           id_number_last4: string | null
           review_notes: string | null
           reviewed_at: string | null
           reviewed_by: string | null
+          selfie_path: string | null
           status: Database["public"]["Enums"]["verification_status"]
+          updated_at: string
           user_id: string
         }
         Insert: {
+          attempt?: number
+          back_path?: string | null
           created_at?: string
+          doc_type?: Database["public"]["Enums"]["id_document_type"]
           document_path?: string | null
+          front_path?: string | null
           id?: string
           id_number_last4?: string | null
           review_notes?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          selfie_path?: string | null
           status?: Database["public"]["Enums"]["verification_status"]
+          updated_at?: string
           user_id: string
         }
         Update: {
+          attempt?: number
+          back_path?: string | null
           created_at?: string
+          doc_type?: Database["public"]["Enums"]["id_document_type"]
           document_path?: string | null
+          front_path?: string | null
           id?: string
           id_number_last4?: string | null
           review_notes?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          selfie_path?: string | null
           status?: Database["public"]["Enums"]["verification_status"]
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -951,6 +1076,7 @@ export type Database = {
         }
         Returns: unknown
       }
+      public_profile: { Args: { _id: string }; Returns: Json }
       push_notification: {
         Args: {
           _body: string
@@ -982,8 +1108,13 @@ export type Database = {
           category_slug: string
           created_at: string
           description: string
+          employer_avatar: string
+          employer_id: string
           employer_name: string
+          employer_verification: Database["public"]["Enums"]["verification_status"]
           id: string
+          payment_secured: boolean
+          skills: string[]
           title: string
           urgent: boolean
         }[]
@@ -1000,6 +1131,7 @@ export type Database = {
           available: boolean
           avatar_url: string
           category_slug: string
+          completed_jobs: number
           full_name: string
           headline: string
           id: string
@@ -1010,6 +1142,16 @@ export type Database = {
           skills: string[]
           verification: Database["public"]["Enums"]["verification_status"]
         }[]
+      }
+      submit_verification: {
+        Args: {
+          _back_path: string
+          _doc_type: Database["public"]["Enums"]["id_document_type"]
+          _front_path: string
+          _last4: string
+          _selfie_path: string
+        }
+        Returns: Json
       }
       super_admin_exists: { Args: never; Returns: boolean }
       wallet_available_cents: { Args: { _user_id: string }; Returns: number }
@@ -1088,6 +1230,7 @@ export type Database = {
         | "released"
         | "refunded"
         | "cancelled"
+      id_document_type: "national_id" | "passport" | "driving_licence"
       job_status: "open" | "in_progress" | "completed" | "closed"
       ledger_direction: "credit" | "debit"
       ledger_status: "pending" | "settled" | "held" | "failed" | "cancelled"
@@ -1278,6 +1421,7 @@ export const Constants = {
         "refunded",
         "cancelled",
       ],
+      id_document_type: ["national_id", "passport", "driving_licence"],
       job_status: ["open", "in_progress", "completed", "closed"],
       ledger_direction: ["credit", "debit"],
       ledger_status: ["pending", "settled", "held", "failed", "cancelled"],

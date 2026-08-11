@@ -54,6 +54,9 @@ import {
 } from "@/lib/workflow";
 
 export const Route = createFileRoute("/jobs/$jobId")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    apply: search["apply"] === true || search["apply"] === "true" ? true : undefined,
+  }),
   loader: ({ context, params }) =>
     context.queryClient.ensureQueryData(jobDetailQuery(params.jobId)),
   head: ({ loaderData }) => {
@@ -391,7 +394,8 @@ function JobDetailScreen() {
 function ApplyDialog({ jobId, title }: { jobId: string; title: string }) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [open, setOpen] = useState(false);
+  const { apply: autoOpen } = Route.useSearch();
+  const [open, setOpen] = useState(Boolean(autoOpen) && Boolean(user));
   const [message, setMessage] = useState("");
 
   const suggestions = [

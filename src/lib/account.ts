@@ -333,3 +333,51 @@ export async function requestVerification(userId: string, last4: string) {
   if (error) throw new Error(error.message);
   await updateMyProfile(userId, { verification: "pending" });
 }
+
+/* ------------------------------------------------- saved jobs & favourites */
+
+/** Ids of every job the member saved — powers the save toggle on cards. */
+export const savedJobIdsQuery = (userId: string | undefined) =>
+  queryOptions({
+    queryKey: ["saved-job-ids", userId],
+    enabled: Boolean(userId),
+    staleTime: 60_000,
+    queryFn: async (): Promise<string[]> => {
+      const { data, error } = await supabase.from("saved_jobs").select("job_id");
+      if (error) throw new Error(error.message);
+      return (data ?? []).map((row) => row.job_id);
+    },
+  });
+
+export const favouriteWorkerIdsQuery = (userId: string | undefined) =>
+  queryOptions({
+    queryKey: ["favourite-worker-ids", userId],
+    enabled: Boolean(userId),
+    staleTime: 60_000,
+    queryFn: async (): Promise<string[]> => {
+      const { data, error } = await supabase.from("favorite_workers").select("worker_id");
+      if (error) throw new Error(error.message);
+      return (data ?? []).map((row) => row.worker_id);
+    },
+  });
+
+export async function toggleFavouriteWorker(input: {
+  userId: string;
+  workerId: string;
+  saved: boolean;
+}) {
+  if (input.saved) {
+    const { error } = await supabase
+      .from("favorite_workers")
+      .delete()
+      .eq("user_id", input.userId)
+      .eq("worker_id", input.workerId);
+    if (error) throw new Error(error.message);
+    return false;
+  }
+  const { error } = await supabase
+    .from("favorite_workers")
+    .insert({ user_id: input.userId, worker_id: input.workerId });
+  if (error) throw new Error(error.message);
+  return true;
+}

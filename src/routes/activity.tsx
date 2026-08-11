@@ -198,6 +198,11 @@ function Saved() {
                 applicants_count: job.applicants_count ?? 0,
                 created_at: job.created_at ?? new Date().toISOString(),
                 employer_name: null,
+                employer_id: "",
+                employer_verification: null,
+                employer_avatar: null,
+                skills: job.skills ?? [],
+                payment_secured: job.payment_secured ?? false,
               }}
             />
           </li>
