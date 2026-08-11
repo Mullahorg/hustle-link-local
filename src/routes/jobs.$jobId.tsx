@@ -54,9 +54,8 @@ import {
 } from "@/lib/workflow";
 
 export const Route = createFileRoute("/jobs/$jobId")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    apply: search["apply"] === true || search["apply"] === "true" ? true : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): { apply?: boolean } =>
+    search["apply"] === true || search["apply"] === "true" ? { apply: true } : {},
   loader: ({ context, params }) =>
     context.queryClient.ensureQueryData(jobDetailQuery(params.jobId)),
   head: ({ loaderData }) => {
