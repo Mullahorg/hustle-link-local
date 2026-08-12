@@ -126,7 +126,8 @@ function AdminVerification() {
     adminListQuery<Row>({
       table: "verification_requests",
       columns:
-        "id, user_id, id_number_last4, document_path, status, review_notes, created_at, reviewed_at",
+        "id, user_id, id_number_last4, doc_type, front_path, back_path, selfie_path, attempt, status, review_notes, created_at, reviewed_at",
+
       page: list.page,
       sort: list.sort,
       ascending: list.ascending,
@@ -174,11 +175,17 @@ function AdminVerification() {
       ),
     },
     {
+      key: "documents",
+      header: "Documents",
+      render: (row) => <DocumentViewer row={row} />,
+    },
+    {
       key: "created_at",
       header: "Submitted",
       sortable: true,
       render: (row) => date(row.created_at),
     },
+
     {
       key: "status",
       header: "Status",
