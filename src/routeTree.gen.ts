@@ -16,6 +16,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as MessagesRouteImport } from './routes/messages'
+import { Route as MyWorkRouteImport } from './routes/my-work'
 import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as PostJobRouteImport } from './routes/post-job'
 import { Route as ProfileRouteImport } from './routes/profile'
@@ -70,6 +71,11 @@ const DiscoverRoute = DiscoverRouteImport.update({
 const MessagesRoute = MessagesRouteImport.update({
   id: '/messages',
   path: '/messages',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MyWorkRoute = MyWorkRouteImport.update({
+  id: '/my-work',
+  path: '/my-work',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NotificationsRoute = NotificationsRouteImport.update({
@@ -182,6 +188,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/discover': typeof DiscoverRoute
   '/messages': typeof MessagesRouteWithChildren
+  '/my-work': typeof MyWorkRoute
   '/notifications': typeof NotificationsRoute
   '/post-job': typeof PostJobRoute
   '/profile': typeof ProfileRoute
@@ -210,6 +217,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/discover': typeof DiscoverRoute
   '/messages': typeof MessagesRouteWithChildren
+  '/my-work': typeof MyWorkRoute
   '/notifications': typeof NotificationsRoute
   '/post-job': typeof PostJobRoute
   '/profile': typeof ProfileRoute
@@ -240,6 +248,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/discover': typeof DiscoverRoute
   '/messages': typeof MessagesRouteWithChildren
+  '/my-work': typeof MyWorkRoute
   '/notifications': typeof NotificationsRoute
   '/post-job': typeof PostJobRoute
   '/profile': typeof ProfileRoute
@@ -271,6 +280,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/discover'
     | '/messages'
+    | '/my-work'
     | '/notifications'
     | '/post-job'
     | '/profile'
@@ -299,6 +309,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/discover'
     | '/messages'
+    | '/my-work'
     | '/notifications'
     | '/post-job'
     | '/profile'
@@ -328,6 +339,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/discover'
     | '/messages'
+    | '/my-work'
     | '/notifications'
     | '/post-job'
     | '/profile'
@@ -358,6 +370,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   DiscoverRoute: typeof DiscoverRoute
   MessagesRoute: typeof MessagesRouteWithChildren
+  MyWorkRoute: typeof MyWorkRoute
   NotificationsRoute: typeof NotificationsRoute
   PostJobRoute: typeof PostJobRoute
   ProfileRoute: typeof ProfileRoute
@@ -418,6 +431,13 @@ declare module '@tanstack/react-router' {
       path: '/messages'
       fullPath: '/messages'
       preLoaderRoute: typeof MessagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/my-work': {
+      id: '/my-work'
+      path: '/my-work'
+      fullPath: '/my-work'
+      preLoaderRoute: typeof MyWorkRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/notifications': {
@@ -611,6 +631,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   DiscoverRoute: DiscoverRoute,
   MessagesRoute: MessagesRouteWithChildren,
+  MyWorkRoute: MyWorkRoute,
   NotificationsRoute: NotificationsRoute,
   PostJobRoute: PostJobRoute,
   ProfileRoute: ProfileRoute,

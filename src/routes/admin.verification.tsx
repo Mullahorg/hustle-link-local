@@ -7,8 +7,18 @@ import { ConfirmAction } from "@/components/admin/Confirm";
 import { AdminToolbar, DataTable, useAdminList, type Column } from "@/components/admin/DataTable";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
 import { usePermissions } from "@/hooks/usePermissions";
 import { supabase } from "@/integrations/supabase/client";
+import { signedUrls } from "@/lib/media";
 import {
   ADMIN_PAGE,
   adminListQuery,
@@ -22,7 +32,11 @@ type Row = {
   id: string;
   user_id: string;
   id_number_last4: string | null;
-  document_path: string | null;
+  doc_type: string;
+  front_path: string | null;
+  back_path: string | null;
+  selfie_path: string | null;
+  attempt: number;
   status: VerificationStatus;
   review_notes: string | null;
   created_at: string;
@@ -45,6 +59,62 @@ const tone: Record<string, "default" | "secondary" | "destructive"> = {
   rejected: "destructive",
 };
 
+/** Private ID photos, opened through short-lived signed links only. */
+function DocumentViewer({ row }: { row: Row }) {
+  const [open, setOpen] = useState(false);
+  const paths = [row.front_path, row.back_path, row.selfie_path].filter(Boolean) as string[];
+  const labels = ["Front", "Back", "Live selfie"];
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["verification-docs", row.id, open],
+    enabled: open && paths.length > 0,
+    staleTime: 60_000,
+    queryFn: () => signedUrls("verification", paths, 600),
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="sm" disabled={paths.length === 0}>
+          {paths.length === 0 ? "No documents" : "View documents"}
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-h-[85vh] max-w-[92vw] overflow-y-auto rounded-2xl sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>
+            {row.doc_type.replace(/_/g, " ")} · attempt {row.attempt}
+          </DialogTitle>
+          <DialogDescription>
+            These photos are private. Links expire in 10 minutes and are never shown publicly.
+          </DialogDescription>
+        </DialogHeader>
+        {isLoading ? (
+          <Skeleton className="h-64 w-full rounded-xl" />
+        ) : error ? (
+          <p className="font-bold text-destructive">Could not open the documents.</p>
+        ) : (
+          <ul className="space-y-3">
+            {paths.map((path, index) => (
+              <li key={path}>
+                <p className="mb-1 font-black text-foreground">{labels[index]}</p>
+                {data?.[path] ? (
+                  <img
+                    src={data[path]}
+                    alt={`${labels[index]} of the submitted document`}
+                    className="w-full rounded-xl border-2 border-border"
+                  />
+                ) : (
+                  <p className="text-muted-foreground">Not available</p>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 function AdminVerification() {
   const list = useAdminList("created_at");
   const queryClient = useQueryClient();
@@ -55,7 +125,8 @@ function AdminVerification() {
     adminListQuery<Row>({
       table: "verification_requests",
       columns:
-        "id, user_id, id_number_last4, document_path, status, review_notes, created_at, reviewed_at",
+        "id, user_id, id_number_last4, doc_type, front_path, back_path, selfie_path, attempt, status, review_notes, created_at, reviewed_at",
+
       page: list.page,
       sort: list.sort,
       ascending: list.ascending,
@@ -103,11 +174,17 @@ function AdminVerification() {
       ),
     },
     {
+      key: "documents",
+      header: "Documents",
+      render: (row) => <DocumentViewer row={row} />,
+    },
+    {
       key: "created_at",
       header: "Submitted",
       sortable: true,
       render: (row) => date(row.created_at),
     },
+
     {
       key: "status",
       header: "Status",
