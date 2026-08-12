@@ -100,7 +100,116 @@ function PermissionMatrix() {
   );
 }
 
+/** M-Pesa (PayHero) credentials, kept out of code and edited only here. */
+function PaymentKeys() {
+  const queryClient = useQueryClient();
+  const [busy, setBusy] = useState(false);
+  const [draft, setDraft] = useState<Record<string, string>>({});
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["payment-keys"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("app_settings")
+        .select("value")
+        .eq("key", "payments.payhero")
+        .maybeSingle();
+      if (error) throw new Error(error.message);
+      return (data?.value as Record<string, unknown> | null) ?? {};
+    },
+  });
+
+  const fields = [
+    { key: "api_username", label: "API username", secret: false },
+    { key: "api_password", label: "API password", secret: true },
+    { key: "channel_id", label: "Channel ID", secret: false },
+    { key: "callback_url", label: "Callback URL", secret: false },
+    { key: "webhook_secret", label: "Webhook secret", secret: true },
+  ] as const;
+
+  const saved = data ?? {};
+  const enabled = saved["enabled"] !== false;
+
+  const save = async (next: Record<string, unknown>) => {
+    setBusy(true);
+    try {
+      await setSetting("payments.payhero", { ...saved, ...next });
+      setDraft({});
+      await queryClient.invalidateQueries({ queryKey: ["payment-keys"] });
+      toast.success("Payment settings saved");
+    } catch (error) {
+      toast.error(friendlyAuthError(error));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <section className="mt-4 rounded-2xl border-2 border-border bg-card p-4">
+      <h2 className="text-lg font-black text-foreground">M-Pesa payments (PayHero)</h2>
+      <p className="mt-1 text-[0.9375rem] text-muted-foreground">
+        Keys live here, not in the code. Leave a field blank to keep what is already saved.
+      </p>
+
+      {isLoading ? (
+        <Skeleton className="mt-4 h-56 w-full rounded-xl" />
+      ) : (
+        <>
+          <div className="mt-4 flex items-center justify-between gap-3 rounded-xl border-2 border-border p-3">
+            <span className="font-black text-foreground">Accept payments</span>
+            <Switch
+              checked={enabled}
+              aria-label="Accept payments"
+              onCheckedChange={(checked) => void save({ enabled: checked })}
+            />
+          </div>
+
+          <ul className="mt-3 space-y-3">
+            {fields.map((field) => {
+              const current = typeof saved[field.key] === "string" ? (saved[field.key] as string) : "";
+              return (
+                <li key={field.key} className="rounded-xl border-2 border-border p-3">
+                  <label
+                    className="mb-1 block font-black text-foreground"
+                    htmlFor={`pay-${field.key}`}
+                  >
+                    {field.label}
+                  </label>
+                  <p className="mb-2 text-[0.875rem] text-muted-foreground">
+                    {current
+                      ? field.secret
+                        ? "Saved · hidden for safety"
+                        : `Saved · ${current}`
+                      : "Not set yet"}
+                  </p>
+                  <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
+                    <Input
+                      id={`pay-${field.key}`}
+                      type={field.secret ? "password" : "text"}
+                      autoComplete="off"
+                      value={draft[field.key] ?? ""}
+                      onChange={(e) => setDraft((prev) => ({ ...prev, [field.key]: e.target.value }))}
+                      placeholder={current ? "Enter a new value to replace it" : "Enter value"}
+                    />
+                    <Button
+                      disabled={busy || !(draft[field.key] ?? "").trim()}
+                      onClick={() => void save({ [field.key]: (draft[field.key] ?? "").trim() })}
+                    >
+                      Save
+                    </Button>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </>
+      )}
+    </section>
+  );
+}
+
 function AppSettings() {
+
   const queryClient = useQueryClient();
   const [key, setKey] = useState("");
   const [value, setValue] = useState("");
