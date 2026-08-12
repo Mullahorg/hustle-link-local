@@ -4,6 +4,7 @@ import {
   Bell,
   ChevronRight,
   HelpCircle,
+  Images,
   LogOut,
   Settings,
   ShieldCheck,
@@ -11,6 +12,7 @@ import {
   Star,
   Wallet,
 } from "lucide-react";
+
 
 import { AppShell } from "@/components/layout/AppShell";
 import { Avatar, CardSkeleton, Chip, Rating, VerifiedMark } from "@/components/hl/primitives";
@@ -39,10 +41,12 @@ export const Route = createFileRoute("/profile")({
 
 const rows = [
   { icon: Wallet, label: "Wallet & payments", to: "/wallet" },
-  { icon: ShieldCheck, label: "Verify my ID", to: "/settings" },
+  { icon: Images, label: "My work gallery", to: "/my-work" },
+  { icon: ShieldCheck, label: "Verify my ID", to: "/verify" },
   { icon: Bell, label: "Notifications", to: "/notifications" },
   { icon: Settings, label: "Settings & privacy", to: "/settings" },
 ] as const;
+
 
 function ProfileScreen() {
   const { user, loading, signOut } = useAuth();
