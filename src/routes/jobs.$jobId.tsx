@@ -21,7 +21,9 @@ import {
   Rating,
   VerifiedMark,
 } from "@/components/hl/primitives";
+import { EscrowPanel } from "@/components/hl/EscrowPanel";
 import { ReportDialog } from "@/components/hl/ReportDialog";
+
 import { ReviewDialog } from "@/components/hl/ReviewDialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -295,6 +297,13 @@ function JobDetailScreen() {
             </div>
           </section>
 
+          <EscrowPanel
+            jobId={jobId}
+            employerId={job.employer_id}
+            workerId={hired.data ?? null}
+            suggestedCents={job.budget_max ?? job.budget_min ?? null}
+          />
+
           {isOwner ? (
             <EmployerPanel
               jobId={jobId}
@@ -306,6 +315,7 @@ function JobDetailScreen() {
               onMessage={messagePerson}
             />
           ) : null}
+
 
           {canReviewWorker && hired.data ? (
             <section className="mt-8">
