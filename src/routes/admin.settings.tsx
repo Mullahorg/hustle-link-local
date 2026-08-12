@@ -348,7 +348,9 @@ function AdminSettings() {
           Only a super admin can change staff permissions.
         </p>
       )}
+      {can("settings.write") ? <PaymentKeys /> : null}
       {can("settings.read") || can("settings.write") ? <AppSettings /> : null}
+
     </AdminPage>
   );
 }
