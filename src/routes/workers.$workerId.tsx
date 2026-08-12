@@ -45,15 +45,7 @@ export const Route = createFileRoute("/workers/$workerId")({
   component: WorkerScreen,
 });
 
-function Stat({
-  icon,
-  label,
-  value,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-}) {
+function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
     <div className="rounded-2xl border-2 border-border bg-card p-3">
       <p className="flex items-center gap-1.5 text-[0.8125rem] font-extrabold tracking-wide text-muted-foreground uppercase">

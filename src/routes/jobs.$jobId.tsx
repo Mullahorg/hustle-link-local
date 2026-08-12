@@ -316,7 +316,6 @@ function JobDetailScreen() {
             />
           ) : null}
 
-
           {canReviewWorker && hired.data ? (
             <section className="mt-8">
               <h2 className="mb-3 text-xl font-extrabold">Leave a review</h2>

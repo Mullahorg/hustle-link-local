@@ -166,7 +166,8 @@ function PaymentKeys() {
 
           <ul className="mt-3 space-y-3">
             {fields.map((field) => {
-              const current = typeof saved[field.key] === "string" ? (saved[field.key] as string) : "";
+              const current =
+                typeof saved[field.key] === "string" ? (saved[field.key] as string) : "";
               return (
                 <li key={field.key} className="rounded-xl border-2 border-border p-3">
                   <label
@@ -188,7 +189,9 @@ function PaymentKeys() {
                       type={field.secret ? "password" : "text"}
                       autoComplete="off"
                       value={draft[field.key] ?? ""}
-                      onChange={(e) => setDraft((prev) => ({ ...prev, [field.key]: e.target.value }))}
+                      onChange={(e) =>
+                        setDraft((prev) => ({ ...prev, [field.key]: e.target.value }))
+                      }
                       placeholder={current ? "Enter a new value to replace it" : "Enter value"}
                     />
                     <Button
@@ -209,7 +212,6 @@ function PaymentKeys() {
 }
 
 function AppSettings() {
-
   const queryClient = useQueryClient();
   const [key, setKey] = useState("");
   const [value, setValue] = useState("");
@@ -350,7 +352,6 @@ function AdminSettings() {
       )}
       {can("settings.write") ? <PaymentKeys /> : null}
       {can("settings.read") || can("settings.write") ? <AppSettings /> : null}
-
     </AdminPage>
   );
 }

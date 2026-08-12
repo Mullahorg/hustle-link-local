@@ -115,7 +115,6 @@ function DocumentViewer({ row }: { row: Row }) {
   );
 }
 
-
 function AdminVerification() {
   const list = useAdminList("created_at");
   const queryClient = useQueryClient();

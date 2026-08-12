@@ -13,7 +13,6 @@ import {
   Wallet,
 } from "lucide-react";
 
-
 import { AppShell } from "@/components/layout/AppShell";
 import { Avatar, CardSkeleton, Chip, Rating, VerifiedMark } from "@/components/hl/primitives";
 import { Button } from "@/components/ui/button";
@@ -46,7 +45,6 @@ const rows = [
   { icon: Bell, label: "Notifications", to: "/notifications" },
   { icon: Settings, label: "Settings & privacy", to: "/settings" },
 ] as const;
-
 
 function ProfileScreen() {
   const { user, loading, signOut } = useAuth();

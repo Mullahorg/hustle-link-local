@@ -70,7 +70,8 @@ export function EscrowPanel({
       await refresh();
       toast.success("Payment updated");
     },
-    onError: (error: Error) => toast.error("Could not update payment", { description: error.message }),
+    onError: (error: Error) =>
+      toast.error("Could not update payment", { description: error.message }),
   });
 
   if (!user || (!isEmployer && !isWorker)) return null;
@@ -114,7 +115,11 @@ export function EscrowPanel({
                     !done && !active && "border-border bg-secondary text-muted-foreground",
                   )}
                 >
-                  {done ? <Check className="size-4" /> : <span className="text-xs font-black">{index + 1}</span>}
+                  {done ? (
+                    <Check className="size-4" />
+                  ) : (
+                    <span className="text-xs font-black">{index + 1}</span>
+                  )}
                 </span>
                 <div className="min-w-0">
                   <p
@@ -125,7 +130,9 @@ export function EscrowPanel({
                   >
                     {step.title}
                   </p>
-                  <p className="text-[0.9375rem] font-semibold text-muted-foreground">{step.body}</p>
+                  <p className="text-[0.9375rem] font-semibold text-muted-foreground">
+                    {step.body}
+                  </p>
                 </div>
               </li>
             );
@@ -177,7 +184,11 @@ export function EscrowPanel({
               </Button>
             ) : null}
             {isEmployer && row.status === "secured" ? (
-              <Button variant="outline" disabled={act.isPending} onClick={() => act.mutate("refund")}>
+              <Button
+                variant="outline"
+                disabled={act.isPending}
+                onClick={() => act.mutate("refund")}
+              >
                 Unlock funds
               </Button>
             ) : null}

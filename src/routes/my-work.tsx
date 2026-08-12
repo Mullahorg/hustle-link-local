@@ -85,7 +85,8 @@ function Gallery() {
       await queryClient.invalidateQueries({ queryKey: ["my-portfolio"] });
       toast.success("Photo removed");
     },
-    onError: (error: Error) => toast.error("Could not remove photo", { description: error.message }),
+    onError: (error: Error) =>
+      toast.error("Could not remove photo", { description: error.message }),
   });
 
   const items = data ?? [];
@@ -95,8 +96,7 @@ function Gallery() {
     <section className="px-5 pt-6">
       <h1 className="text-2xl font-extrabold">Work photos</h1>
       <p className="mt-1.5 text-base font-semibold text-muted-foreground">
-        Up to {MAX_PORTFOLIO} photos. We shrink each one on your phone, so it uses very little
-        data.
+        Up to {MAX_PORTFOLIO} photos. We shrink each one on your phone, so it uses very little data.
       </p>
 
       <div className="mt-4 rounded-3xl border-2 border-dashed border-border bg-card p-4">
@@ -148,7 +148,10 @@ function Gallery() {
       ) : (
         <ul className="mt-4 grid grid-cols-2 gap-3">
           {items.map((item) => (
-            <li key={item.id} className="overflow-hidden rounded-3xl border-2 border-border bg-card">
+            <li
+              key={item.id}
+              className="overflow-hidden rounded-3xl border-2 border-border bg-card"
+            >
               {item.url ? (
                 <img
                   src={item.url}
@@ -293,7 +296,13 @@ function Certificates() {
             className="text-base"
           />
         </div>
-        <Button block size="lg" className="mt-3" disabled={add.isPending} onClick={() => add.mutate()}>
+        <Button
+          block
+          size="lg"
+          className="mt-3"
+          disabled={add.isPending}
+          onClick={() => add.mutate()}
+        >
           {add.isPending ? "Saving…" : "Add certificate"}
         </Button>
       </div>
