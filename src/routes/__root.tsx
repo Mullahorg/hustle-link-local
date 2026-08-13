@@ -15,6 +15,7 @@ import { Toaster } from "../components/ui/sonner";
 import { OfflineBanner } from "../components/layout/OfflineBanner";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AuthProvider } from "../hooks/useAuth";
+import { registerServiceWorker } from "../lib/pwa";
 
 function NotFoundComponent() {
   return (
