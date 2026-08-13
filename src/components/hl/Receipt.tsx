@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 import {
   entryLabel,
   money,
-  paymentQuery,
+  paymentByIdQuery,
   signedMoney,
   statusLabel,
   type LedgerEntry,
@@ -111,7 +111,7 @@ export function ReceiptDialog({
   onOpenChange: (next: boolean) => void;
 }) {
   const payment = useQuery({
-    ...paymentQuery(entry?.transaction_id ?? ""),
+    ...paymentByIdQuery(entry?.transaction_id ?? ""),
     enabled: Boolean(open && entry?.transaction_id),
   });
   if (!entry) return null;
