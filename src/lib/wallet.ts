@@ -181,7 +181,26 @@ export const myPaymentsQuery = (userId: string | undefined) =>
     },
   });
 
+/** One payment looked up by its internal id — used by receipts. */
+export const paymentByIdQuery = (id: string) =>
+  queryOptions({
+    queryKey: ["payment-by-id", id],
+    staleTime: 30_000,
+    queryFn: async (): Promise<PaymentRow | null> => {
+      const { data, error } = await supabase
+        .from("payment_transactions")
+        .select(
+          "id, provider, purpose, reference, provider_reference, amount_cents, currency, status, failure_reason, attempts, metadata, created_at, updated_at",
+        )
+        .eq("id", id)
+        .maybeSingle();
+      if (error) throw new Error(error.message);
+      return (data ?? null) as PaymentRow | null;
+    },
+  });
+
 export const paymentQuery = (reference: string) =>
+
   queryOptions({
     queryKey: ["payment", reference],
     staleTime: 2_000,
