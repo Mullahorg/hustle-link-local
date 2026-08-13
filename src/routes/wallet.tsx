@@ -8,6 +8,7 @@ import { AppShell, ScreenHeader } from "@/components/layout/AppShell";
 import { AuthGate } from "@/components/hl/AuthGate";
 import { CardSkeleton, EmptyState, ErrorState } from "@/components/hl/primitives";
 import { LoadMore } from "@/components/hl/LoadMore";
+import { ReceiptDialog, useReceipt } from "@/components/hl/Receipt";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -76,6 +77,7 @@ function WalletBody() {
   const summary = useQuery(walletSummaryQuery(user?.id));
   const ledger = useInfiniteQuery(walletLedgerQuery(user?.id));
   const payments = useQuery(myPaymentsQuery(user?.id));
+  const receipt = useReceipt();
 
   const refresh = async () => {
     await Promise.all([
@@ -198,7 +200,13 @@ function WalletBody() {
           <>
             <ul className="divide-y-2 divide-border overflow-hidden rounded-3xl border-2 border-border bg-card">
               {entries.map((entry) => (
-                <li key={entry.id} className="flex items-center gap-4 px-4 py-4">
+                <li key={entry.id}>
+                  <button
+                    type="button"
+                    onClick={() => receipt.show(entry)}
+                    aria-label={`View receipt for ${entryLabel(entry.entry_type)}`}
+                    className="flex w-full items-center gap-4 px-4 py-4 text-left min-h-12 active:bg-secondary"
+                  >
                   <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-primary-soft text-primary-ink">
                     {entry.status === "held" ? (
                       <Lock className="size-6" aria-hidden="true" />
@@ -219,9 +227,10 @@ function WalletBody() {
                       {statusLabel(entry.status)} · {timeAgo(entry.created_at)}
                     </span>
                   </span>
-                  <span className="shrink-0 text-base font-extrabold text-foreground">
-                    {signedMoney(entry)}
-                  </span>
+                    <span className="shrink-0 text-base font-extrabold text-foreground">
+                      {signedMoney(entry)}
+                    </span>
+                  </button>
                 </li>
               ))}
             </ul>
@@ -234,6 +243,12 @@ function WalletBody() {
           </>
         )}
       </section>
+
+      <ReceiptDialog
+        entry={receipt.entry}
+        open={receipt.open}
+        onOpenChange={receipt.onOpenChange}
+      />
 
       <p className="text-center text-[0.9375rem] font-semibold text-muted-foreground">
         Money held for a job stays protected until the work is confirmed.{" "}
