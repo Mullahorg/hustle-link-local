@@ -20,6 +20,7 @@ import {
   type Permission,
 } from "@/lib/admin";
 import { friendlyAuthError } from "@/lib/auth-errors";
+import { paymentProviderStatus } from "@/lib/payments.functions";
 
 export const Route = createFileRoute("/admin/settings")({ component: AdminSettings });
 
@@ -120,15 +121,25 @@ function PaymentKeys() {
   });
 
   const fields = [
-    { key: "api_username", label: "API username", secret: false },
-    { key: "api_password", label: "API password", secret: true },
+    { key: "auth_token", label: "Basic Authorization token", secret: true },
     { key: "channel_id", label: "Channel ID", secret: false },
     { key: "callback_url", label: "Callback URL", secret: false },
     { key: "webhook_secret", label: "Webhook secret", secret: true },
+    { key: "api_username", label: "API username (only if you have no token)", secret: false },
+    { key: "api_password", label: "API password (only if you have no token)", secret: true },
   ] as const;
 
   const saved = data ?? {};
   const enabled = saved["enabled"] !== false;
+
+  const status = useQuery({
+    queryKey: ["payment-provider-status"],
+    queryFn: () => paymentProviderStatus({ data: undefined }),
+    staleTime: 30_000,
+  });
+
+  const callbackHint =
+    typeof window === "undefined" ? "/api/public/webhooks/payhero" : `${window.location.origin}/api/public/webhooks/payhero`;
 
   const save = async (next: Record<string, unknown>) => {
     setBusy(true);
@@ -148,8 +159,27 @@ function PaymentKeys() {
     <section className="mt-4 rounded-2xl border-2 border-border bg-card p-4">
       <h2 className="text-lg font-black text-foreground">M-Pesa payments (PayHero)</h2>
       <p className="mt-1 text-[0.9375rem] text-muted-foreground">
-        Keys live here, not in the code. Leave a field blank to keep what is already saved.
+        Keys live here, not in the code. Paste the Basic Authorization token from your PayHero API
+        Keys page and the Channel ID from My Payment Channels — payments start working right away.
+        Leave a field blank to keep what is already saved.
       </p>
+
+      <div className="mt-3 rounded-xl border-2 border-border p-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span className="font-black text-foreground">
+            {status.isFetching
+              ? "Checking the provider…"
+              : (status.data?.message ?? "Not checked yet")}
+          </span>
+          <Button size="sm" variant="outline" onClick={() => void status.refetch()}>
+            Test connection
+          </Button>
+        </div>
+        <p className="mt-2 text-[0.875rem] text-muted-foreground">
+          Callback URL to paste into PayHero: <span className="font-bold">{callbackHint}</span>
+        </p>
+      </div>
+
 
       {isLoading ? (
         <Skeleton className="mt-4 h-56 w-full rounded-xl" />

@@ -10,6 +10,8 @@
 export type ProviderConfig = {
   username: string | null;
   password: string | null;
+  /** Basic Authorization token copied straight from the PayHero API Keys page. */
+  authToken: string | null;
   channelId: string | null;
   callbackUrl: string | null;
   webhookSecret: string | null;
@@ -38,9 +40,26 @@ export async function getProviderConfig(): Promise<ProviderConfig> {
   return {
     username: pick(stored["api_username"], process.env["PAYHERO_API_USERNAME"]),
     password: pick(stored["api_password"], process.env["PAYHERO_API_PASSWORD"]),
+    authToken: pick(stored["auth_token"], process.env["PAYHERO_AUTH_TOKEN"]),
     channelId: pick(stored["channel_id"], process.env["PAYHERO_CHANNEL_ID"]),
     callbackUrl: pick(stored["callback_url"], process.env["PAYHERO_CALLBACK_URL"]),
     webhookSecret: pick(stored["webhook_secret"], process.env["PAYHERO_WEBHOOK_SECRET"]),
     enabled: stored["enabled"] !== false,
   };
+}
+
+/**
+ * PayHero accepts a ready-made Basic token from its API Keys page; we also
+ * accept a username/password pair and build the token ourselves.
+ */
+export function payheroAuthHeader(config: ProviderConfig): string | null {
+  if (config.authToken) {
+    return config.authToken.toLowerCase().startsWith("basic ")
+      ? config.authToken
+      : `Basic ${config.authToken}`;
+  }
+  if (config.username && config.password) {
+    return `Basic ${Buffer.from(`${config.username}:${config.password}`).toString("base64")}`;
+  }
+  return null;
 }
