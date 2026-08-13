@@ -9,7 +9,8 @@ export const Route = createFileRoute("/api/public/webhooks/payhero")({
     handlers: {
       POST: async ({ request }) => {
         const raw = await request.text();
-        const secret = process.env["PAYHERO_WEBHOOK_SECRET"];
+        const { getProviderConfig } = await import("@/lib/payments.server");
+        const secret = (await getProviderConfig()).webhookSecret;
         const provided =
           request.headers.get("x-payhero-signature") ?? new URL(request.url).searchParams.get("t");
 

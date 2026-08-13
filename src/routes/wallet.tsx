@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowDownLeft, ArrowUpRight, Lock, Receipt, Wallet as WalletIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell, ScreenHeader } from "@/components/layout/AppShell";
@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
 import { timeAgo } from "@/lib/format";
-import { requestStkPush } from "@/lib/payments.functions";
+import { checkPaymentStatus, requestStkPush } from "@/lib/payments.functions";
 import {
   cancelTopUp,
   entryLabel,
@@ -71,6 +71,44 @@ function WalletScreen() {
   );
 }
 
+/**
+ * Safety net: while a payment is waiting, we ask the provider what happened
+ * every few seconds so a delayed callback never leaves money in limbo.
+ */
+function PendingWatcher({
+  references,
+  onSettled,
+}: {
+  references: string[];
+  onSettled: () => Promise<void> | void;
+}) {
+  const key = references.join(",");
+  useEffect(() => {
+    if (!key) return;
+    let stopped = false;
+    const tick = async () => {
+      for (const reference of key.split(",")) {
+        try {
+          const result = await checkPaymentStatus({ data: { reference } });
+          if (!stopped && result.status !== "pending") {
+            await onSettled();
+            if (result.status === "succeeded") toast.success(result.message);
+            else toast.error(result.message);
+          }
+        } catch {
+          /* keep waiting quietly */
+        }
+      }
+    };
+    const timer = setInterval(() => void tick(), 8000);
+    return () => {
+      stopped = true;
+      clearInterval(timer);
+    };
+  }, [key, onSettled]);
+  return null;
+}
+
 function WalletBody() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -106,8 +144,10 @@ function WalletBody() {
   const entries = (ledger.data?.pages.flat() ?? []) as LedgerEntry[];
   const pendingPayments = (payments.data ?? []).filter((p) => p.status === "pending");
 
+
   return (
     <div className="space-y-8 px-5 pb-6">
+      <PendingWatcher references={pendingPayments.map((p) => p.reference)} onSettled={refresh} />
       <section className="rounded-3xl border-2 border-border bg-card p-5">
         <p className="text-sm font-extrabold tracking-wide text-muted-foreground uppercase">
           Available balance
