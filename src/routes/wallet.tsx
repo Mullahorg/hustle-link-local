@@ -126,7 +126,10 @@ function WalletBody() {
         </dl>
 
         <div className="mt-6 space-y-2">
-          <TopUpDialog onDone={refresh} />
+          <TopUpDialog
+            onDone={refresh}
+            pending={pendingPayments.some((p) => p.purpose === "wallet_topup")}
+          />
           <WithdrawDialog available={s.available_cents} onDone={refresh} />
         </div>
       </section>
@@ -272,7 +275,7 @@ function Stat({ label, value, hint }: { label: string; value: string; hint: stri
   );
 }
 
-function TopUpDialog({ onDone }: { onDone: () => Promise<void> }) {
+function TopUpDialog({ onDone, pending }: { onDone: () => Promise<void>; pending: boolean }) {
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState("500");
   const [phone, setPhone] = useState("");
@@ -295,9 +298,9 @@ function TopUpDialog({ onDone }: { onDone: () => Promise<void> }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button block size="lg">
+        <Button block size="lg" disabled={pending}>
           <WalletIcon aria-hidden="true" />
-          Top up with M-Pesa
+          {pending ? "Top up in progress…" : "Top up with M-Pesa"}
         </Button>
       </DialogTrigger>
       <DialogContent>
