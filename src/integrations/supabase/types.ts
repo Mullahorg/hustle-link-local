@@ -349,6 +349,101 @@ export type Database = {
           },
         ]
       }
+      market_categories: {
+        Row: {
+          icon: string
+          name: string
+          slug: string
+          sort_order: number
+        }
+        Insert: {
+          icon?: string
+          name: string
+          slug: string
+          sort_order?: number
+        }
+        Update: {
+          icon?: string
+          name?: string
+          slug?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      market_listings: {
+        Row: {
+          area: string
+          category_slug: string
+          condition: string
+          created_at: string
+          description: string
+          hidden_at: string | null
+          hidden_reason: string | null
+          id: string
+          images: string[]
+          phone: string | null
+          price_cents: number | null
+          price_note: string | null
+          search_vector: unknown
+          seller_id: string
+          status: string
+          title: string
+          unit_label: string | null
+          updated_at: string
+          views: number
+        }
+        Insert: {
+          area: string
+          category_slug: string
+          condition?: string
+          created_at?: string
+          description?: string
+          hidden_at?: string | null
+          hidden_reason?: string | null
+          id?: string
+          images?: string[]
+          phone?: string | null
+          price_cents?: number | null
+          price_note?: string | null
+          search_vector?: unknown
+          seller_id: string
+          status?: string
+          title: string
+          unit_label?: string | null
+          updated_at?: string
+          views?: number
+        }
+        Update: {
+          area?: string
+          category_slug?: string
+          condition?: string
+          created_at?: string
+          description?: string
+          hidden_at?: string | null
+          hidden_reason?: string | null
+          id?: string
+          images?: string[]
+          phone?: string | null
+          price_cents?: number | null
+          price_note?: string | null
+          search_vector?: unknown
+          seller_id?: string
+          status?: string
+          title?: string
+          unit_label?: string | null
+          updated_at?: string
+          views?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "market_listings_category_slug_fkey"
+            columns: ["category_slug"]
+            isOneToOne: false
+            referencedRelation: "market_categories"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
       messages: {
         Row: {
           body: string
@@ -749,6 +844,32 @@ export type Database = {
           },
         ]
       }
+      saved_listings: {
+        Row: {
+          created_at: string
+          listing_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          listing_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          listing_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_listings_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "market_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -962,6 +1083,10 @@ export type Database = {
         Args: { _hidden: boolean; _job_id: string; _reason?: string }
         Returns: Json
       }
+      admin_set_listing_hidden: {
+        Args: { _hidden: boolean; _listing_id: string; _reason?: string }
+        Returns: Json
+      }
       admin_set_role: {
         Args: {
           _grant: boolean
@@ -1038,6 +1163,8 @@ export type Database = {
         Returns: boolean
       }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      market_listing_detail: { Args: { _id: string }; Returns: Json }
+      market_listing_view: { Args: { _id: string }; Returns: undefined }
       my_permissions: {
         Args: never
         Returns: {
@@ -1117,6 +1244,34 @@ export type Database = {
           skills: string[]
           title: string
           urgent: boolean
+        }[]
+      }
+      search_listings: {
+        Args: {
+          _area?: string
+          _category?: string
+          _limit?: number
+          _offset?: number
+          _q?: string
+        }
+        Returns: {
+          area: string
+          category_slug: string
+          condition: string
+          created_at: string
+          description: string
+          id: string
+          images: string[]
+          price_cents: number
+          price_note: string
+          seller_avatar: string
+          seller_id: string
+          seller_name: string
+          seller_verification: Database["public"]["Enums"]["verification_status"]
+          status: string
+          title: string
+          unit_label: string
+          views: number
         }[]
       }
       search_workers: {
