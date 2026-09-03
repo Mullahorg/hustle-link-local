@@ -33,12 +33,12 @@ export async function compressImage(
 
 /** Upload a compressed photo into a private bucket, inside the user's folder. */
 export async function uploadPhoto(input: {
-  bucket: "verification" | "portfolio";
+  bucket: "verification" | "portfolio" | "market-photos";
   userId: string;
   file: File;
   label: string;
 }): Promise<string> {
-  const isGallery = input.bucket === "portfolio";
+  const isGallery = input.bucket !== "verification";
   const blob = await compressImage(input.file, {
     maxEdge: isGallery ? GALLERY_EDGE : MAX_EDGE,
     quality: isGallery ? 0.68 : 0.75,
@@ -55,7 +55,7 @@ export async function uploadPhoto(input: {
 
 /** Short-lived viewing links for private photos. */
 export async function signedUrls(
-  bucket: "verification" | "portfolio",
+  bucket: "verification" | "portfolio" | "market-photos",
   paths: string[],
   seconds = 3600,
 ): Promise<Record<string, string>> {
