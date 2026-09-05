@@ -34,6 +34,9 @@ import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminVerificationRouteImport } from './routes/admin.verification'
 import { Route as JobsJobIdRouteImport } from './routes/jobs.$jobId'
+import { Route as MarketIndexRouteImport } from './routes/market.index'
+import { Route as MarketListingIdRouteImport } from './routes/market.$listingId'
+import { Route as MarketNewRouteImport } from './routes/market.new'
 import { Route as MessagesConversationIdRouteImport } from './routes/messages.$conversationId'
 import { Route as WorkersWorkerIdRouteImport } from './routes/workers.$workerId'
 import { Route as ApiPublicWebhooksPayheroRouteImport } from './routes/api/public/webhooks/payhero'
@@ -163,6 +166,21 @@ const JobsJobIdRoute = JobsJobIdRouteImport.update({
   path: '/jobs/$jobId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MarketIndexRoute = MarketIndexRouteImport.update({
+  id: '/market/',
+  path: '/market/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketListingIdRoute = MarketListingIdRouteImport.update({
+  id: '/market/$listingId',
+  path: '/market/$listingId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketNewRoute = MarketNewRouteImport.update({
+  id: '/market/new',
+  path: '/market/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MessagesConversationIdRoute = MessagesConversationIdRouteImport.update({
   id: '/$conversationId',
   path: '/$conversationId',
@@ -205,9 +223,12 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AdminUsersRoute
   '/admin/verification': typeof AdminVerificationRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
+  '/market/$listingId': typeof MarketListingIdRoute
+  '/market/new': typeof MarketNewRoute
   '/messages/$conversationId': typeof MessagesConversationIdRoute
   '/workers/$workerId': typeof WorkersWorkerIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/market/': typeof MarketIndexRoute
   '/api/public/webhooks/payhero': typeof ApiPublicWebhooksPayheroRoute
 }
 export interface FileRoutesByTo {
@@ -234,9 +255,12 @@ export interface FileRoutesByTo {
   '/admin/users': typeof AdminUsersRoute
   '/admin/verification': typeof AdminVerificationRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
+  '/market/$listingId': typeof MarketListingIdRoute
+  '/market/new': typeof MarketNewRoute
   '/messages/$conversationId': typeof MessagesConversationIdRoute
   '/workers/$workerId': typeof WorkersWorkerIdRoute
   '/admin': typeof AdminIndexRoute
+  '/market': typeof MarketIndexRoute
   '/api/public/webhooks/payhero': typeof ApiPublicWebhooksPayheroRoute
 }
 export interface FileRoutesById {
@@ -265,9 +289,12 @@ export interface FileRoutesById {
   '/admin/users': typeof AdminUsersRoute
   '/admin/verification': typeof AdminVerificationRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
+  '/market/$listingId': typeof MarketListingIdRoute
+  '/market/new': typeof MarketNewRoute
   '/messages/$conversationId': typeof MessagesConversationIdRoute
   '/workers/$workerId': typeof WorkersWorkerIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/market/': typeof MarketIndexRoute
   '/api/public/webhooks/payhero': typeof ApiPublicWebhooksPayheroRoute
 }
 export interface FileRouteTypes {
@@ -297,9 +324,12 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/verification'
     | '/jobs/$jobId'
+    | '/market/$listingId'
+    | '/market/new'
     | '/messages/$conversationId'
     | '/workers/$workerId'
     | '/admin/'
+    | '/market/'
     | '/api/public/webhooks/payhero'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -326,9 +356,12 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/verification'
     | '/jobs/$jobId'
+    | '/market/$listingId'
+    | '/market/new'
     | '/messages/$conversationId'
     | '/workers/$workerId'
     | '/admin'
+    | '/market'
     | '/api/public/webhooks/payhero'
   id:
     | '__root__'
@@ -356,9 +389,12 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/verification'
     | '/jobs/$jobId'
+    | '/market/$listingId'
+    | '/market/new'
     | '/messages/$conversationId'
     | '/workers/$workerId'
     | '/admin/'
+    | '/market/'
     | '/api/public/webhooks/payhero'
   fileRoutesById: FileRoutesById
 }
@@ -378,7 +414,10 @@ export interface RootRouteChildren {
   VerifyRoute: typeof VerifyRoute
   WalletRoute: typeof WalletRoute
   JobsJobIdRoute: typeof JobsJobIdRoute
+  MarketListingIdRoute: typeof MarketListingIdRoute
+  MarketNewRoute: typeof MarketNewRoute
   WorkersWorkerIdRoute: typeof WorkersWorkerIdRoute
+  MarketIndexRoute: typeof MarketIndexRoute
   ApiPublicWebhooksPayheroRoute: typeof ApiPublicWebhooksPayheroRoute
 }
 
@@ -559,6 +598,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JobsJobIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/market/': {
+      id: '/market/'
+      path: '/market'
+      fullPath: '/market/'
+      preLoaderRoute: typeof MarketIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/market/$listingId': {
+      id: '/market/$listingId'
+      path: '/market/$listingId'
+      fullPath: '/market/$listingId'
+      preLoaderRoute: typeof MarketListingIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/market/new': {
+      id: '/market/new'
+      path: '/market/new'
+      fullPath: '/market/new'
+      preLoaderRoute: typeof MarketNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/messages/$conversationId': {
       id: '/messages/$conversationId'
       path: '/$conversationId'
@@ -639,7 +699,10 @@ const rootRouteChildren: RootRouteChildren = {
   VerifyRoute: VerifyRoute,
   WalletRoute: WalletRoute,
   JobsJobIdRoute: JobsJobIdRoute,
+  MarketListingIdRoute: MarketListingIdRoute,
+  MarketNewRoute: MarketNewRoute,
   WorkersWorkerIdRoute: WorkersWorkerIdRoute,
+  MarketIndexRoute: MarketIndexRoute,
   ApiPublicWebhooksPayheroRoute: ApiPublicWebhooksPayheroRoute,
 }
 export const routeTree = rootRouteImport
