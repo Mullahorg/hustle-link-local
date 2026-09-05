@@ -15,7 +15,6 @@ import { Route as ActivityRouteImport } from './routes/activity'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as DiscoverRouteImport } from './routes/discover'
-import { Route as MarketRouteImport } from './routes/market'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as MyWorkRouteImport } from './routes/my-work'
 import { Route as NotificationsRouteImport } from './routes/notifications'
@@ -35,6 +34,7 @@ import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminVerificationRouteImport } from './routes/admin.verification'
 import { Route as JobsJobIdRouteImport } from './routes/jobs.$jobId'
+import { Route as MarketIndexRouteImport } from './routes/market.index'
 import { Route as MessagesConversationIdRouteImport } from './routes/messages.$conversationId'
 import { Route as WorkersWorkerIdRouteImport } from './routes/workers.$workerId'
 import { Route as ApiPublicWebhooksPayheroRouteImport } from './routes/api/public/webhooks/payhero'
@@ -67,11 +67,6 @@ const AuthRoute = AuthRouteImport.update({
 const DiscoverRoute = DiscoverRouteImport.update({
   id: '/discover',
   path: '/discover',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MarketRoute = MarketRouteImport.update({
-  id: '/market',
-  path: '/market',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MessagesRoute = MessagesRouteImport.update({
@@ -169,6 +164,11 @@ const JobsJobIdRoute = JobsJobIdRouteImport.update({
   path: '/jobs/$jobId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MarketIndexRoute = MarketIndexRouteImport.update({
+  id: '/market/',
+  path: '/market/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MessagesConversationIdRoute = MessagesConversationIdRouteImport.update({
   id: '/$conversationId',
   path: '/$conversationId',
@@ -193,7 +193,6 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/discover': typeof DiscoverRoute
-  '/market': typeof MarketRoute
   '/messages': typeof MessagesRouteWithChildren
   '/my-work': typeof MyWorkRoute
   '/notifications': typeof NotificationsRoute
@@ -215,6 +214,7 @@ export interface FileRoutesByFullPath {
   '/messages/$conversationId': typeof MessagesConversationIdRoute
   '/workers/$workerId': typeof WorkersWorkerIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/market/': typeof MarketIndexRoute
   '/api/public/webhooks/payhero': typeof ApiPublicWebhooksPayheroRoute
 }
 export interface FileRoutesByTo {
@@ -223,7 +223,6 @@ export interface FileRoutesByTo {
   '/activity': typeof ActivityRoute
   '/auth': typeof AuthRoute
   '/discover': typeof DiscoverRoute
-  '/market': typeof MarketRoute
   '/messages': typeof MessagesRouteWithChildren
   '/my-work': typeof MyWorkRoute
   '/notifications': typeof NotificationsRoute
@@ -245,6 +244,7 @@ export interface FileRoutesByTo {
   '/messages/$conversationId': typeof MessagesConversationIdRoute
   '/workers/$workerId': typeof WorkersWorkerIdRoute
   '/admin': typeof AdminIndexRoute
+  '/market': typeof MarketIndexRoute
   '/api/public/webhooks/payhero': typeof ApiPublicWebhooksPayheroRoute
 }
 export interface FileRoutesById {
@@ -255,7 +255,6 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/discover': typeof DiscoverRoute
-  '/market': typeof MarketRoute
   '/messages': typeof MessagesRouteWithChildren
   '/my-work': typeof MyWorkRoute
   '/notifications': typeof NotificationsRoute
@@ -277,6 +276,7 @@ export interface FileRoutesById {
   '/messages/$conversationId': typeof MessagesConversationIdRoute
   '/workers/$workerId': typeof WorkersWorkerIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/market/': typeof MarketIndexRoute
   '/api/public/webhooks/payhero': typeof ApiPublicWebhooksPayheroRoute
 }
 export interface FileRouteTypes {
@@ -288,7 +288,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/discover'
-    | '/market'
     | '/messages'
     | '/my-work'
     | '/notifications'
@@ -310,6 +309,7 @@ export interface FileRouteTypes {
     | '/messages/$conversationId'
     | '/workers/$workerId'
     | '/admin/'
+    | '/market/'
     | '/api/public/webhooks/payhero'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -318,7 +318,6 @@ export interface FileRouteTypes {
     | '/activity'
     | '/auth'
     | '/discover'
-    | '/market'
     | '/messages'
     | '/my-work'
     | '/notifications'
@@ -340,6 +339,7 @@ export interface FileRouteTypes {
     | '/messages/$conversationId'
     | '/workers/$workerId'
     | '/admin'
+    | '/market'
     | '/api/public/webhooks/payhero'
   id:
     | '__root__'
@@ -349,7 +349,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/discover'
-    | '/market'
     | '/messages'
     | '/my-work'
     | '/notifications'
@@ -371,6 +370,7 @@ export interface FileRouteTypes {
     | '/messages/$conversationId'
     | '/workers/$workerId'
     | '/admin/'
+    | '/market/'
     | '/api/public/webhooks/payhero'
   fileRoutesById: FileRoutesById
 }
@@ -381,7 +381,6 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
   DiscoverRoute: typeof DiscoverRoute
-  MarketRoute: typeof MarketRoute
   MessagesRoute: typeof MessagesRouteWithChildren
   MyWorkRoute: typeof MyWorkRoute
   NotificationsRoute: typeof NotificationsRoute
@@ -392,6 +391,7 @@ export interface RootRouteChildren {
   WalletRoute: typeof WalletRoute
   JobsJobIdRoute: typeof JobsJobIdRoute
   WorkersWorkerIdRoute: typeof WorkersWorkerIdRoute
+  MarketIndexRoute: typeof MarketIndexRoute
   ApiPublicWebhooksPayheroRoute: typeof ApiPublicWebhooksPayheroRoute
 }
 
@@ -437,13 +437,6 @@ declare module '@tanstack/react-router' {
       path: '/discover'
       fullPath: '/discover'
       preLoaderRoute: typeof DiscoverRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/market': {
-      id: '/market'
-      path: '/market'
-      fullPath: '/market'
-      preLoaderRoute: typeof MarketRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/messages': {
@@ -579,6 +572,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JobsJobIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/market/': {
+      id: '/market/'
+      path: '/market'
+      fullPath: '/market/'
+      preLoaderRoute: typeof MarketIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/messages/$conversationId': {
       id: '/messages/$conversationId'
       path: '/$conversationId'
@@ -650,7 +650,6 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
   DiscoverRoute: DiscoverRoute,
-  MarketRoute: MarketRoute,
   MessagesRoute: MessagesRouteWithChildren,
   MyWorkRoute: MyWorkRoute,
   NotificationsRoute: NotificationsRoute,
@@ -661,6 +660,7 @@ const rootRouteChildren: RootRouteChildren = {
   WalletRoute: WalletRoute,
   JobsJobIdRoute: JobsJobIdRoute,
   WorkersWorkerIdRoute: WorkersWorkerIdRoute,
+  MarketIndexRoute: MarketIndexRoute,
   ApiPublicWebhooksPayheroRoute: ApiPublicWebhooksPayheroRoute,
 }
 export const routeTree = rootRouteImport
