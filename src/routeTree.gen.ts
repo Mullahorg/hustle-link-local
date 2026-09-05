@@ -15,6 +15,7 @@ import { Route as ActivityRouteImport } from './routes/activity'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as DiscoverRouteImport } from './routes/discover'
+import { Route as MarketRouteImport } from './routes/market'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as MyWorkRouteImport } from './routes/my-work'
 import { Route as NotificationsRouteImport } from './routes/notifications'
@@ -66,6 +67,11 @@ const AuthRoute = AuthRouteImport.update({
 const DiscoverRoute = DiscoverRouteImport.update({
   id: '/discover',
   path: '/discover',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketRoute = MarketRouteImport.update({
+  id: '/market',
+  path: '/market',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MessagesRoute = MessagesRouteImport.update({
@@ -187,6 +193,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/discover': typeof DiscoverRoute
+  '/market': typeof MarketRoute
   '/messages': typeof MessagesRouteWithChildren
   '/my-work': typeof MyWorkRoute
   '/notifications': typeof NotificationsRoute
@@ -216,6 +223,7 @@ export interface FileRoutesByTo {
   '/activity': typeof ActivityRoute
   '/auth': typeof AuthRoute
   '/discover': typeof DiscoverRoute
+  '/market': typeof MarketRoute
   '/messages': typeof MessagesRouteWithChildren
   '/my-work': typeof MyWorkRoute
   '/notifications': typeof NotificationsRoute
@@ -247,6 +255,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/discover': typeof DiscoverRoute
+  '/market': typeof MarketRoute
   '/messages': typeof MessagesRouteWithChildren
   '/my-work': typeof MyWorkRoute
   '/notifications': typeof NotificationsRoute
@@ -279,6 +288,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/discover'
+    | '/market'
     | '/messages'
     | '/my-work'
     | '/notifications'
@@ -308,6 +318,7 @@ export interface FileRouteTypes {
     | '/activity'
     | '/auth'
     | '/discover'
+    | '/market'
     | '/messages'
     | '/my-work'
     | '/notifications'
@@ -338,6 +349,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/discover'
+    | '/market'
     | '/messages'
     | '/my-work'
     | '/notifications'
@@ -369,6 +381,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
   DiscoverRoute: typeof DiscoverRoute
+  MarketRoute: typeof MarketRoute
   MessagesRoute: typeof MessagesRouteWithChildren
   MyWorkRoute: typeof MyWorkRoute
   NotificationsRoute: typeof NotificationsRoute
@@ -424,6 +437,13 @@ declare module '@tanstack/react-router' {
       path: '/discover'
       fullPath: '/discover'
       preLoaderRoute: typeof DiscoverRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/market': {
+      id: '/market'
+      path: '/market'
+      fullPath: '/market'
+      preLoaderRoute: typeof MarketRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/messages': {
@@ -630,6 +650,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
   DiscoverRoute: DiscoverRoute,
+  MarketRoute: MarketRoute,
   MessagesRoute: MessagesRouteWithChildren,
   MyWorkRoute: MyWorkRoute,
   NotificationsRoute: NotificationsRoute,

@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils";
 
 type MarketSearch = { category?: string; q?: string; area?: string };
 
-export const Route = createFileRoute("/market")({
+export const Route = createFileRoute("/market/")({
   head: () => ({
     meta: [
       { title: "Village market — buy and sell near you | HustlerLink" },
@@ -48,7 +48,7 @@ export const Route = createFileRoute("/market")({
 
 function MarketScreen() {
   const { category, q, area } = Route.useSearch();
-  const navigate = useNavigate({ from: "/market" });
+  const navigate = useNavigate({ from: "/market/" });
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
