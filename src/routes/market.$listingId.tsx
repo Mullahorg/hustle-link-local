@@ -32,7 +32,7 @@ import {
   setListingStatus,
   toggleSaveListing,
 } from "@/lib/market";
-import { startConversation } from "@/lib/workflow";
+import { openConversation } from "@/lib/account";
 
 export const Route = createFileRoute("/market/$listingId")({
   head: () => ({
@@ -75,7 +75,7 @@ function ListingScreen() {
   const message = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error("Sign in to message the seller");
-      const conversationId = await startConversation(user.id, listing!.seller_id);
+      const conversationId = await openConversation(user.id, listing!.seller_id);
       return conversationId;
     },
     onSuccess: (conversationId) =>
