@@ -36,6 +36,7 @@ import { Route as AdminVerificationRouteImport } from './routes/admin.verificati
 import { Route as JobsJobIdRouteImport } from './routes/jobs.$jobId'
 import { Route as MarketIndexRouteImport } from './routes/market.index'
 import { Route as MarketListingIdRouteImport } from './routes/market.$listingId'
+import { Route as MarketNewRouteImport } from './routes/market.new'
 import { Route as MessagesConversationIdRouteImport } from './routes/messages.$conversationId'
 import { Route as WorkersWorkerIdRouteImport } from './routes/workers.$workerId'
 import { Route as ApiPublicWebhooksPayheroRouteImport } from './routes/api/public/webhooks/payhero'
@@ -175,6 +176,11 @@ const MarketListingIdRoute = MarketListingIdRouteImport.update({
   path: '/market/$listingId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MarketNewRoute = MarketNewRouteImport.update({
+  id: '/market/new',
+  path: '/market/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MessagesConversationIdRoute = MessagesConversationIdRouteImport.update({
   id: '/$conversationId',
   path: '/$conversationId',
@@ -218,6 +224,7 @@ export interface FileRoutesByFullPath {
   '/admin/verification': typeof AdminVerificationRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/market/$listingId': typeof MarketListingIdRoute
+  '/market/new': typeof MarketNewRoute
   '/messages/$conversationId': typeof MessagesConversationIdRoute
   '/workers/$workerId': typeof WorkersWorkerIdRoute
   '/admin/': typeof AdminIndexRoute
@@ -249,6 +256,7 @@ export interface FileRoutesByTo {
   '/admin/verification': typeof AdminVerificationRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/market/$listingId': typeof MarketListingIdRoute
+  '/market/new': typeof MarketNewRoute
   '/messages/$conversationId': typeof MessagesConversationIdRoute
   '/workers/$workerId': typeof WorkersWorkerIdRoute
   '/admin': typeof AdminIndexRoute
@@ -282,6 +290,7 @@ export interface FileRoutesById {
   '/admin/verification': typeof AdminVerificationRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/market/$listingId': typeof MarketListingIdRoute
+  '/market/new': typeof MarketNewRoute
   '/messages/$conversationId': typeof MessagesConversationIdRoute
   '/workers/$workerId': typeof WorkersWorkerIdRoute
   '/admin/': typeof AdminIndexRoute
@@ -316,6 +325,7 @@ export interface FileRouteTypes {
     | '/admin/verification'
     | '/jobs/$jobId'
     | '/market/$listingId'
+    | '/market/new'
     | '/messages/$conversationId'
     | '/workers/$workerId'
     | '/admin/'
@@ -347,6 +357,7 @@ export interface FileRouteTypes {
     | '/admin/verification'
     | '/jobs/$jobId'
     | '/market/$listingId'
+    | '/market/new'
     | '/messages/$conversationId'
     | '/workers/$workerId'
     | '/admin'
@@ -379,6 +390,7 @@ export interface FileRouteTypes {
     | '/admin/verification'
     | '/jobs/$jobId'
     | '/market/$listingId'
+    | '/market/new'
     | '/messages/$conversationId'
     | '/workers/$workerId'
     | '/admin/'
@@ -403,6 +415,7 @@ export interface RootRouteChildren {
   WalletRoute: typeof WalletRoute
   JobsJobIdRoute: typeof JobsJobIdRoute
   MarketListingIdRoute: typeof MarketListingIdRoute
+  MarketNewRoute: typeof MarketNewRoute
   WorkersWorkerIdRoute: typeof WorkersWorkerIdRoute
   MarketIndexRoute: typeof MarketIndexRoute
   ApiPublicWebhooksPayheroRoute: typeof ApiPublicWebhooksPayheroRoute
@@ -599,6 +612,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MarketListingIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/market/new': {
+      id: '/market/new'
+      path: '/market/new'
+      fullPath: '/market/new'
+      preLoaderRoute: typeof MarketNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/messages/$conversationId': {
       id: '/messages/$conversationId'
       path: '/$conversationId'
@@ -680,6 +700,7 @@ const rootRouteChildren: RootRouteChildren = {
   WalletRoute: WalletRoute,
   JobsJobIdRoute: JobsJobIdRoute,
   MarketListingIdRoute: MarketListingIdRoute,
+  MarketNewRoute: MarketNewRoute,
   WorkersWorkerIdRoute: WorkersWorkerIdRoute,
   MarketIndexRoute: MarketIndexRoute,
   ApiPublicWebhooksPayheroRoute: ApiPublicWebhooksPayheroRoute,
