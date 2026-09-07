@@ -3,6 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 import {
   Bell,
   ChevronRight,
+  ClipboardList,
+  Store,
+
   HelpCircle,
   Images,
   LogOut,
