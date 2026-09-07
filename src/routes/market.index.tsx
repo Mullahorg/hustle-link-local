@@ -1,5 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { keepPreviousData, useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useInfiniteQuery,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { Plus, Search, ShoppingBasket, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";

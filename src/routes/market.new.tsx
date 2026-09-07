@@ -81,7 +81,8 @@ function SellScreen() {
         description: description.trim(),
         category_slug: category,
         condition,
-        price_cents: Number.isFinite(shillings) && shillings > 0 ? Math.round(shillings * 100) : null,
+        price_cents:
+          Number.isFinite(shillings) && shillings > 0 ? Math.round(shillings * 100) : null,
         price_note: Number.isFinite(shillings) && shillings > 0 ? null : "Price on request",
         unit_label: unit.trim() || null,
         area: filledArea.trim(),
