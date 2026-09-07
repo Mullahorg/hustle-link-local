@@ -39,12 +39,15 @@ export const Route = createFileRoute("/profile")({
 });
 
 const rows = [
+  { icon: ClipboardList, label: "My jobs & applications", to: "/activity" },
+  { icon: Store, label: "My market items", to: "/market" },
   { icon: Wallet, label: "Wallet & payments", to: "/wallet" },
   { icon: Images, label: "My work gallery", to: "/my-work" },
   { icon: ShieldCheck, label: "Verify my ID", to: "/verify" },
   { icon: Bell, label: "Notifications", to: "/notifications" },
   { icon: Settings, label: "Settings & privacy", to: "/settings" },
 ] as const;
+
 
 function ProfileScreen() {
   const { user, loading, signOut } = useAuth();
