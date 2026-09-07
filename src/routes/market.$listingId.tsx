@@ -15,7 +15,14 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { BackHeader, FocusShell } from "@/components/layout/AppShell";
-import { Avatar, CardSkeleton, EmptyState, ErrorState, Rating, VerifiedMark } from "@/components/hl/primitives";
+import {
+  Avatar,
+  CardSkeleton,
+  EmptyState,
+  ErrorState,
+  Rating,
+  VerifiedMark,
+} from "@/components/hl/primitives";
 import { ReportDialog } from "@/components/hl/ReportDialog";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -84,7 +91,8 @@ function ListingScreen() {
   });
 
   const markSold = useMutation({
-    mutationFn: () => setListingStatus(listingId, listing?.status === "sold" ? "available" : "sold"),
+    mutationFn: () =>
+      setListingStatus(listingId, listing?.status === "sold" ? "available" : "sold"),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["listing", listingId] });
       await queryClient.invalidateQueries({ queryKey: ["listings"] });

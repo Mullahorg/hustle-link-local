@@ -162,9 +162,7 @@ export const listingPhotosQuery = (paths: string[]) =>
 export async function uploadListingPhotos(userId: string, files: File[]): Promise<string[]> {
   const paths: string[] = [];
   for (const [index, file] of files.entries()) {
-    paths.push(
-      await uploadPhoto({ bucket: MARKET_BUCKET, userId, file, label: `item-${index}` }),
-    );
+    paths.push(await uploadPhoto({ bucket: MARKET_BUCKET, userId, file, label: `item-${index}` }));
   }
   return paths;
 }
