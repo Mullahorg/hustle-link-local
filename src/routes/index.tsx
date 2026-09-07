@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { Bell, ChevronRight, Plus, Search, Sparkles } from "lucide-react";
+import { Bell, ChevronRight, Plus, Search, Sparkles, Store } from "lucide-react";
 
 import heroWorker from "@/assets/hero-worker.jpg";
 import { AppShell } from "@/components/layout/AppShell";
