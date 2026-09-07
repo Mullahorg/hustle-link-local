@@ -143,10 +143,29 @@ function HomeScreen() {
         </div>
       </section>
 
+      <section className="px-5 pt-6">
+        <Link
+          to="/market"
+          className="flex items-center gap-4 rounded-3xl border-2 border-border bg-accent-soft p-5"
+        >
+          <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-card text-primary-ink">
+            <Store className="size-7" aria-hidden="true" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-lg font-extrabold text-foreground">Village market</span>
+            <span className="block text-base font-medium text-muted-foreground">
+              Buy and sell with neighbours — produce, furniture, phones and more.
+            </span>
+          </span>
+          <ChevronRight className="size-6 shrink-0 text-muted-foreground" aria-hidden="true" />
+        </Link>
+      </section>
+
       <section className="pt-9">
         <SectionHeader title="Browse by trade" />
         <CategoryRail categories={data.categories} />
       </section>
+
 
       {nothingYet ? (
         <section className="px-5 pt-9">
