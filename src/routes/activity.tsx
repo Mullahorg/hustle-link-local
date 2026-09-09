@@ -202,14 +202,16 @@ function Saved() {
   if (!data || data.length === 0) {
     return (
       <div className="px-5">
-        <SavedItems rows={savedItems} />
+        <SavedItems rows={savedItems as unknown as SavedListingRow[]} />
       </div>
     );
   }
 
-
   return (
-    <ul className="space-y-3 px-5">
+    <div className="px-5">
+      <SavedItems rows={savedItems as unknown as SavedListingRow[]} />
+      <ul className="space-y-3">
+
       {data.map((row) => {
         const job = row.jobs as unknown as Partial<JobRow> | null;
         if (!job?.id) return null;
