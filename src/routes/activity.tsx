@@ -249,8 +249,10 @@ function Saved() {
           label="Show more saved jobs"
         />
       </li>
-    </ul>
+      </ul>
+    </div>
   );
+
 }
 
 function Posted() {
