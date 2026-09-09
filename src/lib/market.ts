@@ -148,6 +148,23 @@ export const savedListingIdsQuery = (userId: string | undefined) =>
     },
   });
 
+/** The items a person has bookmarked, newest first. */
+export const savedListingsQuery = (userId: string | undefined) =>
+  queryOptions({
+    queryKey: ["saved-listings", userId],
+    enabled: Boolean(userId),
+    staleTime: 15_000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("saved_listings")
+        .select("listing_id, created_at, market_listings (*)")
+        .order("created_at", { ascending: false });
+      if (error) throw new Error(error.message);
+      return data ?? [];
+    },
+  });
+
+
 /** Photo paths → viewable links. Cached so a scrolling list signs each path once. */
 export const listingPhotosQuery = (paths: string[]) =>
   queryOptions({
