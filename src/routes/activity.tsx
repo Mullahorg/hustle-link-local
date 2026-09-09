@@ -15,7 +15,6 @@ import { timeAgo } from "@/lib/format";
 import type { JobRow } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-
 export const Route = createFileRoute("/activity")({
   head: () => ({
     meta: [
@@ -102,7 +101,6 @@ function ActivityScreen() {
     </AppShell>
   );
 }
-
 
 function Applied() {
   const { user } = useAuth();
@@ -211,48 +209,46 @@ function Saved() {
     <div className="px-5">
       <SavedItems rows={savedItems as unknown as SavedListingRow[]} />
       <ul className="space-y-3">
-
-      {data.map((row) => {
-        const job = row.jobs as unknown as Partial<JobRow> | null;
-        if (!job?.id) return null;
-        return (
-          <li key={row.job_id}>
-            <JobCard
-              job={{
-                id: job.id,
-                title: job.title ?? "Job",
-                description: "",
-                category_slug: "",
-                area: job.area ?? "",
-                budget_min: job.budget_min ?? null,
-                budget_max: job.budget_max ?? null,
-                budget_note: job.budget_note ?? null,
-                urgent: job.urgent ?? false,
-                applicants_count: job.applicants_count ?? 0,
-                created_at: job.created_at ?? new Date().toISOString(),
-                employer_name: null,
-                employer_id: "",
-                employer_verification: null,
-                employer_avatar: null,
-                skills: job.skills ?? [],
-                payment_secured: job.payment_secured ?? false,
-              }}
-            />
-          </li>
-        );
-      })}
-      <li>
-        <LoadMore
-          hasMore={Boolean(query.hasNextPage)}
-          loading={query.isFetchingNextPage}
-          onLoad={() => void query.fetchNextPage()}
-          label="Show more saved jobs"
-        />
-      </li>
+        {data.map((row) => {
+          const job = row.jobs as unknown as Partial<JobRow> | null;
+          if (!job?.id) return null;
+          return (
+            <li key={row.job_id}>
+              <JobCard
+                job={{
+                  id: job.id,
+                  title: job.title ?? "Job",
+                  description: "",
+                  category_slug: "",
+                  area: job.area ?? "",
+                  budget_min: job.budget_min ?? null,
+                  budget_max: job.budget_max ?? null,
+                  budget_note: job.budget_note ?? null,
+                  urgent: job.urgent ?? false,
+                  applicants_count: job.applicants_count ?? 0,
+                  created_at: job.created_at ?? new Date().toISOString(),
+                  employer_name: null,
+                  employer_id: "",
+                  employer_verification: null,
+                  employer_avatar: null,
+                  skills: job.skills ?? [],
+                  payment_secured: job.payment_secured ?? false,
+                }}
+              />
+            </li>
+          );
+        })}
+        <li>
+          <LoadMore
+            hasMore={Boolean(query.hasNextPage)}
+            loading={query.isFetchingNextPage}
+            onLoad={() => void query.fetchNextPage()}
+            label="Show more saved jobs"
+          />
+        </li>
       </ul>
     </div>
   );
-
 }
 
 function Posted() {
@@ -436,4 +432,3 @@ function Loading() {
 function Wrap({ children }: { children: React.ReactNode }) {
   return <div className="px-5">{children}</div>;
 }
-

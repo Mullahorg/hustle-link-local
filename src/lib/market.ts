@@ -164,7 +164,6 @@ export const savedListingsQuery = (userId: string | undefined) =>
     },
   });
 
-
 /** Photo paths → viewable links. Cached so a scrolling list signs each path once. */
 export const listingPhotosQuery = (paths: string[]) =>
   queryOptions({

@@ -308,7 +308,6 @@ function JobDetailScreen() {
                   ? job.budget_min * 100
                   : null
             }
-
           />
 
           {isOwner ? (
