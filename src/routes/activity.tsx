@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { Bookmark, ClipboardList, Briefcase } from "lucide-react";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { Bookmark, ClipboardList, Briefcase, Store } from "lucide-react";
 import { useState } from "react";
 
 import { AppShell, ScreenHeader } from "@/components/layout/AppShell";
@@ -10,9 +10,11 @@ import { LoadMore } from "@/components/hl/LoadMore";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { myApplicationsQuery, myJobsQuery, savedJobsQuery } from "@/lib/account";
+import { myListingsQuery, priceLabel, savedListingsQuery } from "@/lib/market";
 import { timeAgo } from "@/lib/format";
 import type { JobRow } from "@/lib/types";
 import { cn } from "@/lib/utils";
+
 
 export const Route = createFileRoute("/activity")({
   head: () => ({
