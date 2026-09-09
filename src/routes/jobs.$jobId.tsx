@@ -301,7 +301,14 @@ function JobDetailScreen() {
             jobId={jobId}
             employerId={job.employer_id}
             workerId={hired.data ?? null}
-            suggestedCents={job.budget_max ?? job.budget_min ?? null}
+            suggestedCents={
+              job.budget_max != null
+                ? job.budget_max * 100
+                : job.budget_min != null
+                  ? job.budget_min * 100
+                  : null
+            }
+
           />
 
           {isOwner ? (
