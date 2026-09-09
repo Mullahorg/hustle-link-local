@@ -309,6 +309,116 @@ function Posted() {
   );
 }
 
+type SavedListingRow = { listing_id: string; market_listings: MarketListing | null };
+type MarketListing = {
+  id: string;
+  title: string;
+  area: string;
+  status: string;
+  views: number;
+  price_cents: number | null;
+  price_note: string | null;
+  unit_label: string | null;
+  created_at: string;
+};
+
+/** Market items a person bookmarked, shown above their saved jobs. */
+function SavedItems({ rows }: { rows: SavedListingRow[] }) {
+  if (rows.length === 0) return null;
+  return (
+    <section className="mb-6">
+      <h2 className="mb-3 text-xl font-extrabold">Saved items</h2>
+      <ul className="space-y-3">
+        {rows.map((row) => {
+          const listing = row.market_listings;
+          if (!listing) return null;
+          return (
+            <li key={row.listing_id}>
+              <Link
+                to="/market/$listingId"
+                params={{ listingId: listing.id }}
+                className="block rounded-3xl border-2 border-border bg-card p-5 transition-colors hover:border-primary"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <h3 className="min-w-0 text-[1.0625rem] font-extrabold text-foreground">
+                    {listing.title}
+                  </h3>
+                  <Chip tone={listing.status === "available" ? "primary" : "muted"}>
+                    {listing.status === "available" ? "On sale" : "Sold"}
+                  </Chip>
+                </div>
+                <p className="mt-2 text-[0.9375rem] font-semibold text-muted-foreground">
+                  {priceLabel(listing.price_cents, listing.price_note, listing.unit_label)} ·{" "}
+                  {listing.area}
+                </p>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}
+
+/** Everything the person has put up for sale in the village market. */
+function Selling() {
+  const { user } = useAuth();
+  const query = useQuery(myListingsQuery(user?.id));
+
+  if (query.isPending) return <Loading />;
+  const rows = (query.data ?? []) as unknown as MarketListing[];
+
+  if (rows.length === 0) {
+    return (
+      <Wrap>
+        <EmptyState
+          icon={<Store className="size-7" aria-hidden="true" />}
+          title="You aren't selling anything yet"
+          body="Add a photo, a price and where you are — it takes about a minute."
+          action={
+            <Button asChild block>
+              <Link to="/market/new">Sell something</Link>
+            </Button>
+          }
+        />
+      </Wrap>
+    );
+  }
+
+  return (
+    <div className="space-y-3 px-5">
+      <Button asChild block size="lg">
+        <Link to="/market/new">Sell something else</Link>
+      </Button>
+      <ul className="space-y-3">
+        {rows.map((listing) => (
+          <li key={listing.id}>
+            <Link
+              to="/market/$listingId"
+              params={{ listingId: listing.id }}
+              className="block rounded-3xl border-2 border-border bg-card p-5 transition-colors hover:border-primary"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <h3 className="min-w-0 text-[1.0625rem] font-extrabold text-foreground">
+                  {listing.title}
+                </h3>
+                <Chip tone={listing.status === "available" ? "primary" : "muted"}>
+                  {listing.status === "available" ? "On sale" : "Sold"}
+                </Chip>
+              </div>
+              <p className="mt-2 text-[0.9375rem] font-semibold text-muted-foreground">
+                {priceLabel(listing.price_cents, listing.price_note, listing.unit_label)} ·{" "}
+                {listing.views === 1 ? "1 view" : `${listing.views} views`} · posted{" "}
+                {timeAgo(listing.created_at)}
+              </p>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function Loading() {
   return (
     <div className="px-5">
@@ -320,3 +430,4 @@ function Loading() {
 function Wrap({ children }: { children: React.ReactNode }) {
   return <div className="px-5">{children}</div>;
 }
+
