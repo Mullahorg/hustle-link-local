@@ -36,6 +36,7 @@ const tabs = [
   { id: "applied", label: "Applied" },
   { id: "saved", label: "Saved" },
   { id: "posted", label: "Posted" },
+  { id: "selling", label: "Selling" },
 ] as const;
 
 type TabId = (typeof tabs)[number]["id"];
@@ -52,12 +53,15 @@ function ActivityScreen() {
 
   return (
     <AppShell>
-      <ScreenHeader title="Activity" subtitle="Everything you've applied for, saved or posted." />
+      <ScreenHeader
+        title="Activity"
+        subtitle="Jobs you applied for or posted, and items you're selling."
+      />
 
       <div
         role="tablist"
         aria-label="Activity"
-        className="mx-5 grid grid-cols-3 gap-2 rounded-2xl border-2 border-border bg-card p-1.5"
+        className="mx-5 grid grid-cols-4 gap-1.5 rounded-2xl border-2 border-border bg-card p-1.5"
       >
         {tabs.map((item) => (
           <button
@@ -66,7 +70,7 @@ function ActivityScreen() {
             aria-selected={tab === item.id}
             onClick={() => setTab(item.id)}
             className={cn(
-              "min-h-12 rounded-xl text-base font-bold transition-colors",
+              "min-h-12 rounded-xl px-1 text-[0.9375rem] font-bold transition-colors",
               tab === item.id
                 ? "bg-primary text-primary-foreground"
                 : "text-muted-foreground hover:text-foreground",
@@ -80,14 +84,23 @@ function ActivityScreen() {
       <div className="mt-6">
         <AuthGate
           title="Sign in to track your work"
-          body="Applications, saved jobs and the jobs you posted all live here."
+          body="Applications, saved items and the jobs you posted all live here."
         >
-          {tab === "applied" ? <Applied /> : tab === "saved" ? <Saved /> : <Posted />}
+          {tab === "applied" ? (
+            <Applied />
+          ) : tab === "saved" ? (
+            <Saved />
+          ) : tab === "posted" ? (
+            <Posted />
+          ) : (
+            <Selling />
+          )}
         </AuthGate>
       </div>
     </AppShell>
   );
 }
+
 
 function Applied() {
   const { user } = useAuth();
