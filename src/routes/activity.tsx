@@ -167,28 +167,44 @@ function Applied() {
 function Saved() {
   const { user } = useAuth();
   const query = useInfiniteQuery(savedJobsQuery(user?.id));
+  const items = useQuery(savedListingsQuery(user?.id));
   const { isPending } = query;
   const data = query.data?.pages.flat();
+  const savedItems = items.data ?? [];
 
   if (isPending) return <Loading />;
-  if (!data || data.length === 0) {
+  if ((!data || data.length === 0) && savedItems.length === 0) {
     return (
       <Wrap>
         <EmptyState
           icon={<Bookmark className="size-7" aria-hidden="true" />}
           title="Nothing saved"
-          body="Tap the bookmark on any job to keep it here for later."
+          body="Tap the bookmark on any job or market item to keep it here for later."
           action={
-            <Button asChild block variant="outline">
-              <Link to="/discover" search={{ tab: "jobs" }}>
-                Browse jobs
-              </Link>
-            </Button>
+            <div className="w-full space-y-2">
+              <Button asChild block variant="outline">
+                <Link to="/discover" search={{ tab: "jobs" }}>
+                  Browse jobs
+                </Link>
+              </Button>
+              <Button asChild block variant="outline">
+                <Link to="/market">Browse the market</Link>
+              </Button>
+            </div>
           }
         />
       </Wrap>
     );
   }
+
+  if (!data || data.length === 0) {
+    return (
+      <div className="px-5">
+        <SavedItems rows={savedItems} />
+      </div>
+    );
+  }
+
 
   return (
     <ul className="space-y-3 px-5">
