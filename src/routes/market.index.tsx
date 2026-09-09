@@ -134,6 +134,18 @@ function MarketScreen() {
         }
       />
 
+      {user ? (
+        <div className="mb-4 px-5">
+          <Link
+            to="/activity"
+            className="flex min-h-12 items-center justify-between rounded-2xl border-2 border-border bg-card px-4 py-3 text-base font-extrabold text-foreground"
+          >
+            Your items for sale
+            <span className="text-[0.9375rem] font-bold text-primary-ink">Manage</span>
+          </Link>
+        </div>
+      ) : null}
+
       <div className="px-5">
         <div className="flex items-center gap-3 rounded-2xl border-2 border-border-strong bg-card px-4">
           <Search className="size-6 shrink-0 text-muted-foreground" aria-hidden="true" />
