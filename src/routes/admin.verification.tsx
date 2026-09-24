@@ -63,7 +63,11 @@ const tone: Record<string, "default" | "secondary" | "destructive"> = {
 };
 
 /** Private ID photos, opened through short-lived signed links only. */
-function Documents({ request }: { request: Pick<TrailRequest, "front_path" | "back_path" | "selfie_path"> }) {
+function Documents({
+  request,
+}: {
+  request: Pick<TrailRequest, "front_path" | "back_path" | "selfie_path">;
+}) {
   const paths = [request.front_path, request.back_path, request.selfie_path].filter(
     Boolean,
   ) as string[];
@@ -235,7 +239,10 @@ function ReviewDialog({
             ) : (
               <ol className="space-y-2">
                 {(trail.data?.events ?? []).map((event) => (
-                  <li key={event.id} className="rounded-xl border-2 border-border bg-card px-4 py-3">
+                  <li
+                    key={event.id}
+                    className="rounded-xl border-2 border-border bg-card px-4 py-3"
+                  >
                     <p className="font-extrabold text-foreground">
                       {ACTION_COPY[event.action] ?? event.action.replace(/_/g, " ")}
                       {event.status ? ` → ${event.status}` : ""}
