@@ -38,6 +38,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import {
   applyToJob,
+  myProfileQuery,
   myApplicationForJobQuery,
   openConversation,
   toggleSaveJob,
@@ -394,7 +395,7 @@ function JobDetailScreen() {
                 Applications closed
               </Button>
             ) : (
-              <ApplyDialog jobId={jobId} title={job.title} />
+              <ApplyAction jobId={jobId} title={job.title} />
             )}
           </div>
         </div>
@@ -404,6 +405,45 @@ function JobDetailScreen() {
 }
 
 /* ------------------------------------------------------------ apply flow */
+
+/**
+ * Only members whose ID check has been approved can apply. Everyone else
+ * gets a plain explanation and a single way forward.
+ */
+function ApplyAction({ jobId, title }: { jobId: string; title: string }) {
+  const { user } = useAuth();
+  const profile = useQuery(myProfileQuery(user?.id));
+  const status = profile.data?.verification ?? "unverified";
+
+  if (profile.isPending) {
+    return (
+      <Button block size="lg" disabled>
+        Loading…
+      </Button>
+    );
+  }
+
+  if (status !== "verified") {
+    return (
+      <div className="space-y-2">
+        <p className="text-[0.9375rem] font-bold text-foreground">
+          {status === "pending"
+            ? "We're checking your ID. You can apply as soon as it is approved."
+            : status === "rejected"
+              ? "Your ID check was not approved. Send clearer photos to apply."
+              : "Verify your ID once, then you can apply for any job."}
+        </p>
+        <Button asChild block size="lg" variant={status === "pending" ? "outline" : "default"}>
+          <Link to="/verify">
+            {status === "pending" ? "Check my verification" : "Verify my ID"}
+          </Link>
+        </Button>
+      </div>
+    );
+  }
+
+  return <ApplyDialog jobId={jobId} title={title} />;
+}
 
 function ApplyDialog({ jobId, title }: { jobId: string; title: string }) {
   const { user } = useAuth();
