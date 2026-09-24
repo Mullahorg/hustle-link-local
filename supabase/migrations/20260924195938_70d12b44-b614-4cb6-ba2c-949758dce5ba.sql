@@ -1,0 +1,1 @@
+REVOKE ALL ON FUNCTION public.admin_verification_trail(uuid) FROM anon;
