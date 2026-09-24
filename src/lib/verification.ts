@@ -123,3 +123,43 @@ export const STATUS_COPY: Record<string, { title: string; body: string }> = {
     body: "Something was unclear. Read the note below and send clearer photos.",
   },
 };
+
+/* ------------------------------------------------ admin review (staff only) */
+
+export type TrailRequest = {
+  id: string;
+  doc_type: DocType;
+  status: VerificationStatus;
+  attempt: number;
+  id_number_last4: string | null;
+  review_notes: string | null;
+  front_path: string | null;
+  back_path: string | null;
+  selfie_path: string | null;
+  created_at: string;
+  reviewed_at: string | null;
+};
+
+export type TrailEvent = VerificationEvent & { actor_name: string };
+
+/** Every submission and every decision for one member, newest first. */
+export const verificationTrailQuery = (userId: string | undefined, enabled = true) =>
+  queryOptions({
+    queryKey: ["verification-trail", userId],
+    enabled: Boolean(userId) && enabled,
+    staleTime: 10_000,
+    queryFn: async (): Promise<{ requests: TrailRequest[]; events: TrailEvent[] }> => {
+      const { data, error } = await supabase.rpc("admin_verification_trail", {
+        _user_id: userId!,
+      });
+      if (error) throw new Error(error.message);
+      const value = (data ?? {}) as { requests?: TrailRequest[]; events?: TrailEvent[] };
+      return { requests: value.requests ?? [], events: value.events ?? [] };
+    },
+  });
+
+export const ACTION_COPY: Record<string, string> = {
+  submitted: "Documents submitted",
+  reviewed: "Reviewed by our team",
+  resubmission_requested: "New photos requested",
+};
