@@ -394,7 +394,7 @@ function JobDetailScreen() {
                 Applications closed
               </Button>
             ) : (
-              <ApplyDialog jobId={jobId} title={job.title} />
+              <ApplyAction jobId={jobId} title={job.title} />
             )}
           </div>
         </div>
