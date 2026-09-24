@@ -38,6 +38,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import {
   applyToJob,
+  myProfileQuery,
   myApplicationForJobQuery,
   openConversation,
   toggleSaveJob,
