@@ -444,6 +444,53 @@ export type Database = {
           },
         ]
       }
+      market_orders: {
+        Row: {
+          amount_cents: number
+          buyer_id: string
+          completed_at: string | null
+          created_at: string
+          currency: string
+          id: string
+          listing_id: string
+          seller_id: string
+          status: string
+          title: string
+        }
+        Insert: {
+          amount_cents: number
+          buyer_id: string
+          completed_at?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          listing_id: string
+          seller_id: string
+          status?: string
+          title: string
+        }
+        Update: {
+          amount_cents?: number
+          buyer_id?: string
+          completed_at?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          listing_id?: string
+          seller_id?: string
+          status?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "market_orders_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "market_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           body: string
@@ -998,6 +1045,7 @@ export type Database = {
           id: string
           job_id: string | null
           metadata: Json
+          order_id: string | null
           status: Database["public"]["Enums"]["ledger_status"]
           transaction_id: string | null
           updated_at: string
@@ -1014,6 +1062,7 @@ export type Database = {
           id?: string
           job_id?: string | null
           metadata?: Json
+          order_id?: string | null
           status?: Database["public"]["Enums"]["ledger_status"]
           transaction_id?: string | null
           updated_at?: string
@@ -1030,6 +1079,7 @@ export type Database = {
           id?: string
           job_id?: string | null
           metadata?: Json
+          order_id?: string | null
           status?: Database["public"]["Enums"]["ledger_status"]
           transaction_id?: string | null
           updated_at?: string
@@ -1041,6 +1091,13 @@ export type Database = {
             columns: ["job_id"]
             isOneToOne: false
             referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wallet_ledger_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "market_orders"
             referencedColumns: ["id"]
           },
           {
@@ -1164,6 +1221,9 @@ export type Database = {
         Returns: boolean
       }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      market_buy: { Args: { _listing_id: string }; Returns: Json }
+      market_cancel_order: { Args: { _order_id: string }; Returns: Json }
+      market_confirm_received: { Args: { _order_id: string }; Returns: Json }
       market_listing_detail: { Args: { _id: string }; Returns: Json }
       market_listing_view: { Args: { _id: string }; Returns: undefined }
       my_permissions: {
