@@ -25,6 +25,7 @@ import {
   reviewVerification,
   type VerificationStatus,
 } from "@/lib/admin";
+import { ACTION_COPY, verificationTrailQuery, type TrailRequest } from "@/lib/verification";
 
 export const Route = createFileRoute("/admin/verification")({ component: AdminVerification });
 
@@ -45,10 +46,12 @@ type Row = {
 
 const date = (value: string | null) =>
   value
-    ? new Date(value).toLocaleDateString(undefined, {
+    ? new Date(value).toLocaleString(undefined, {
         day: "numeric",
         month: "short",
         year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
       })
     : "—";
 
@@ -60,56 +63,195 @@ const tone: Record<string, "default" | "secondary" | "destructive"> = {
 };
 
 /** Private ID photos, opened through short-lived signed links only. */
-function DocumentViewer({ row }: { row: Row }) {
-  const [open, setOpen] = useState(false);
-  const paths = [row.front_path, row.back_path, row.selfie_path].filter(Boolean) as string[];
+function Documents({ request }: { request: Pick<TrailRequest, "front_path" | "back_path" | "selfie_path"> }) {
+  const paths = [request.front_path, request.back_path, request.selfie_path].filter(
+    Boolean,
+  ) as string[];
   const labels = ["Front", "Back", "Live selfie"];
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["verification-docs", row.id, open],
-    enabled: open && paths.length > 0,
+    queryKey: ["verification-docs", paths.join(",")],
+    enabled: paths.length > 0,
     staleTime: 60_000,
     queryFn: () => signedUrls("verification", paths, 600),
   });
 
+  if (paths.length === 0) {
+    return <p className="font-bold text-muted-foreground">No documents were attached.</p>;
+  }
+  if (isLoading) return <Skeleton className="h-56 w-full rounded-xl" />;
+  if (error) return <p className="font-bold text-destructive">Could not open the documents.</p>;
+
+  return (
+    <ul className="grid gap-3 sm:grid-cols-2">
+      {paths.map((path, index) => (
+        <li key={path}>
+          <p className="mb-1 font-black text-foreground">{labels[index]}</p>
+          {data?.[path] ? (
+            <a href={data[path]} target="_blank" rel="noreferrer">
+              <img
+                src={data[path]}
+                alt={`${labels[index]} of the submitted document`}
+                className="w-full rounded-xl border-2 border-border"
+              />
+            </a>
+          ) : (
+            <p className="text-muted-foreground">Not available</p>
+          )}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** Full review surface: documents, past attempts, decision trail, actions. */
+function ReviewDialog({
+  row,
+  person,
+  onDone,
+}: {
+  row: Row;
+  person?: { full_name: string; area: string | null } | undefined;
+  onDone: () => Promise<unknown>;
+}) {
+  const [open, setOpen] = useState(false);
+  const { can } = usePermissions();
+  const trail = useQuery(verificationTrailQuery(row.user_id, open));
+  const writable = can("verification.write");
+
+  const decide = async (status: VerificationStatus, notes?: string) => {
+    await reviewVerification(row.id, status, notes);
+    await trail.refetch();
+    await onDone();
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" disabled={paths.length === 0}>
-          {paths.length === 0 ? "No documents" : "View documents"}
-        </Button>
+        <Button size="sm">Review</Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[85vh] max-w-[92vw] overflow-y-auto rounded-2xl sm:max-w-lg">
+      <DialogContent className="max-h-[88vh] max-w-[94vw] overflow-y-auto rounded-2xl sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>
-            {row.doc_type.replace(/_/g, " ")} · attempt {row.attempt}
+            {person?.full_name ?? "Member"} · {row.doc_type.replace(/_/g, " ")} · attempt{" "}
+            {row.attempt}
           </DialogTitle>
           <DialogDescription>
-            These photos are private. Links expire in 10 minutes and are never shown publicly.
+            Photos are private. Links expire in 10 minutes and are never shown publicly.
           </DialogDescription>
         </DialogHeader>
-        {isLoading ? (
-          <Skeleton className="h-64 w-full rounded-xl" />
-        ) : error ? (
-          <p className="font-bold text-destructive">Could not open the documents.</p>
-        ) : (
-          <ul className="space-y-3">
-            {paths.map((path, index) => (
-              <li key={path}>
-                <p className="mb-1 font-black text-foreground">{labels[index]}</p>
-                {data?.[path] ? (
-                  <img
-                    src={data[path]}
-                    alt={`${labels[index]} of the submitted document`}
-                    className="w-full rounded-xl border-2 border-border"
-                  />
-                ) : (
-                  <p className="text-muted-foreground">Not available</p>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
+
+        <div className="space-y-6">
+          <section>
+            <h3 className="mb-2 text-lg font-extrabold text-foreground">This submission</h3>
+            <p className="mb-3 font-semibold text-muted-foreground">
+              Sent {date(row.created_at)} ·{" "}
+              {row.id_number_last4 ? `ID ends ••••${row.id_number_last4}` : "no ID number given"}
+            </p>
+            <Documents request={row} />
+          </section>
+
+          {writable ? (
+            <section className="flex flex-wrap gap-2">
+              <ConfirmAction
+                trigger={<Button disabled={row.status === "verified"}>Approve</Button>}
+                title="Approve this verification?"
+                description="The member gets a verified badge and can start applying for jobs."
+                confirmLabel="Approve"
+                withReason
+                reasonLabel="Note (optional, recorded in the audit log)"
+                onConfirm={(reason) => decide("verified", reason)}
+              />
+              <ConfirmAction
+                trigger={
+                  <Button variant="outline" disabled={row.status === "unverified"}>
+                    Ask for new photos
+                  </Button>
+                }
+                title="Ask for clearer photos?"
+                description="The member keeps their place in the queue and can send a new set straight away."
+                confirmLabel="Send request"
+                withReason
+                reasonLabel="What should they fix? (shared with the member)"
+                onConfirm={(reason) => decide("unverified", reason)}
+              />
+              <ConfirmAction
+                trigger={
+                  <Button variant="destructive" disabled={row.status === "rejected"}>
+                    Reject
+                  </Button>
+                }
+                title="Reject this verification?"
+                description="They stay unverified and cannot apply for jobs until a later check passes."
+                confirmLabel="Reject"
+                destructive
+                withReason
+                reasonLabel="Reason (shared with the member)"
+                onConfirm={(reason) => decide("rejected", reason)}
+              />
+            </section>
+          ) : (
+            <p className="font-bold text-muted-foreground">You have read-only access.</p>
+          )}
+
+          <section>
+            <h3 className="mb-2 text-lg font-extrabold text-foreground">Past submissions</h3>
+            {trail.isLoading ? (
+              <Skeleton className="h-20 w-full rounded-xl" />
+            ) : (
+              <ul className="space-y-2">
+                {(trail.data?.requests ?? []).map((request) => (
+                  <li
+                    key={request.id}
+                    className="rounded-xl border-2 border-border bg-card px-4 py-3"
+                  >
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-extrabold text-foreground">
+                        Attempt {request.attempt} · {request.doc_type.replace(/_/g, " ")}
+                      </span>
+                      <Badge variant={tone[request.status] ?? "secondary"}>{request.status}</Badge>
+                    </div>
+                    <p className="mt-1 font-semibold text-muted-foreground">
+                      Sent {date(request.created_at)}
+                      {request.reviewed_at ? ` · decided ${date(request.reviewed_at)}` : ""}
+                    </p>
+                    {request.review_notes ? (
+                      <p className="mt-1 font-medium text-foreground">
+                        Note: {request.review_notes}
+                      </p>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+          <section>
+            <h3 className="mb-2 text-lg font-extrabold text-foreground">Verification history</h3>
+            {trail.isLoading ? (
+              <Skeleton className="h-20 w-full rounded-xl" />
+            ) : (trail.data?.events ?? []).length === 0 ? (
+              <p className="font-semibold text-muted-foreground">Nothing recorded yet.</p>
+            ) : (
+              <ol className="space-y-2">
+                {(trail.data?.events ?? []).map((event) => (
+                  <li key={event.id} className="rounded-xl border-2 border-border bg-card px-4 py-3">
+                    <p className="font-extrabold text-foreground">
+                      {ACTION_COPY[event.action] ?? event.action.replace(/_/g, " ")}
+                      {event.status ? ` → ${event.status}` : ""}
+                    </p>
+                    <p className="mt-1 font-semibold text-muted-foreground">
+                      {date(event.created_at)} · {event.actor_name}
+                    </p>
+                    {event.notes ? (
+                      <p className="mt-1 font-medium text-foreground">{event.notes}</p>
+                    ) : null}
+                  </li>
+                ))}
+              </ol>
+            )}
+          </section>
+        </div>
       </DialogContent>
     </Dialog>
   );
@@ -118,8 +260,9 @@ function DocumentViewer({ row }: { row: Row }) {
 function AdminVerification() {
   const list = useAdminList("created_at");
   const queryClient = useQueryClient();
-  const { can } = usePermissions();
-  const [status, setStatus] = useState<"pending" | "verified" | "rejected" | "all">("pending");
+  const [status, setStatus] = useState<"pending" | "verified" | "rejected" | "unverified" | "all">(
+    "pending",
+  );
 
   const query = useQuery(
     adminListQuery<Row>({
@@ -165,6 +308,11 @@ function AdminVerification() {
       },
     },
     {
+      key: "attempt",
+      header: "Attempt",
+      render: (row) => <span className="font-semibold">#{row.attempt}</span>,
+    },
+    {
       key: "id_number_last4",
       header: "ID ends with",
       render: (row) => (
@@ -172,11 +320,6 @@ function AdminVerification() {
           {row.id_number_last4 ? `••••${row.id_number_last4}` : "—"}
         </span>
       ),
-    },
-    {
-      key: "documents",
-      header: "Documents",
-      render: (row) => <DocumentViewer row={row} />,
     },
     {
       key: "created_at",
@@ -193,57 +336,20 @@ function AdminVerification() {
     {
       key: "actions",
       header: "Decision",
-      render: (row) =>
-        can("verification.write") ? (
-          <div className="flex flex-wrap gap-2">
-            <ConfirmAction
-              trigger={
-                <Button size="sm" disabled={row.status === "verified"}>
-                  Approve
-                </Button>
-              }
-              title="Approve this verification?"
-              description="The member gets a verified badge across HustlerLink and is notified."
-              confirmLabel="Approve"
-              withReason
-              reasonLabel="Note (optional, recorded in the audit log)"
-              onConfirm={async (reason) => {
-                await reviewVerification(row.id, "verified", reason);
-                await refresh();
-              }}
-            />
-            <ConfirmAction
-              trigger={
-                <Button variant="destructive" size="sm" disabled={row.status === "rejected"}>
-                  Reject
-                </Button>
-              }
-              title="Reject this verification?"
-              description="Tell them what was wrong so they can send a clearer document."
-              confirmLabel="Reject"
-              destructive
-              withReason
-              reasonLabel="Reason (shared with the member)"
-              onConfirm={async (reason) => {
-                await reviewVerification(row.id, "rejected", reason);
-                await refresh();
-              }}
-            />
-          </div>
-        ) : (
-          <span className="text-muted-foreground">Read only</span>
-        ),
+      render: (row) => (
+        <ReviewDialog row={row} person={names.data?.[row.user_id]} onDone={refresh} />
+      ),
     },
   ];
 
   return (
     <AdminPage
       title="Verification"
-      description="Review ID checks so members can trust who they hire."
+      description="Approve workers before they apply for jobs. Every decision is kept on record."
     >
       <AdminToolbar>
         <div className="flex flex-wrap gap-2">
-          {(["pending", "verified", "rejected", "all"] as const).map((value) => (
+          {(["pending", "unverified", "verified", "rejected", "all"] as const).map((value) => (
             <Button
               key={value}
               variant={status === value ? "default" : "outline"}
@@ -253,7 +359,11 @@ function AdminVerification() {
                 list.setPage(0);
               }}
             >
-              {value === "all" ? "All" : value.charAt(0).toUpperCase() + value.slice(1)}
+              {value === "all"
+                ? "All"
+                : value === "unverified"
+                  ? "Needs new photos"
+                  : value.charAt(0).toUpperCase() + value.slice(1)}
             </Button>
           ))}
         </div>
