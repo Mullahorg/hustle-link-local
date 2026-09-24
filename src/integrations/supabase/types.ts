@@ -1126,6 +1126,7 @@ export type Database = {
         }
         Returns: Json
       }
+      admin_verification_trail: { Args: { _user_id: string }; Returns: Json }
       claim_super_admin: { Args: never; Returns: Json }
       escrow_fund_job: {
         Args: { _amount_cents: number; _job_id: string }
