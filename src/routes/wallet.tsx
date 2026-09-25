@@ -144,7 +144,6 @@ function WalletBody() {
   const entries = (ledger.data?.pages.flat() ?? []) as LedgerEntry[];
   const pendingPayments = (payments.data ?? []).filter((p) => p.status === "pending");
 
-
   return (
     <div className="space-y-8 px-5 pb-6">
       <PendingWatcher references={pendingPayments.map((p) => p.reference)} onSettled={refresh} />
@@ -250,26 +249,26 @@ function WalletBody() {
                     aria-label={`View receipt for ${entryLabel(entry.entry_type)}`}
                     className="flex w-full items-center gap-4 px-4 py-4 text-left min-h-12 active:bg-secondary"
                   >
-                  <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-primary-soft text-primary-ink">
-                    {entry.status === "held" ? (
-                      <Lock className="size-6" aria-hidden="true" />
-                    ) : entry.direction === "credit" ? (
-                      <ArrowDownLeft className="size-6" aria-hidden="true" />
-                    ) : (
-                      <ArrowUpRight className="size-6" aria-hidden="true" />
-                    )}
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-base font-extrabold">
-                      {entryLabel(entry.entry_type)}
+                    <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-primary-soft text-primary-ink">
+                      {entry.status === "held" ? (
+                        <Lock className="size-6" aria-hidden="true" />
+                      ) : entry.direction === "credit" ? (
+                        <ArrowDownLeft className="size-6" aria-hidden="true" />
+                      ) : (
+                        <ArrowUpRight className="size-6" aria-hidden="true" />
+                      )}
                     </span>
-                    <span className="block truncate text-[0.9375rem] font-semibold text-muted-foreground">
-                      {entry.description}
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-base font-extrabold">
+                        {entryLabel(entry.entry_type)}
+                      </span>
+                      <span className="block truncate text-[0.9375rem] font-semibold text-muted-foreground">
+                        {entry.description}
+                      </span>
+                      <span className="block text-[0.875rem] font-bold text-muted-foreground">
+                        {statusLabel(entry.status)} · {timeAgo(entry.created_at)}
+                      </span>
                     </span>
-                    <span className="block text-[0.875rem] font-bold text-muted-foreground">
-                      {statusLabel(entry.status)} · {timeAgo(entry.created_at)}
-                    </span>
-                  </span>
                     <span className="shrink-0 text-base font-extrabold text-foreground">
                       {signedMoney(entry)}
                     </span>

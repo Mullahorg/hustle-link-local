@@ -183,8 +183,8 @@ function PermissionMatrix() {
     <section className="rounded-2xl border-2 border-border bg-card p-4">
       <h2 className="text-lg font-black text-foreground">What each staff role can do</h2>
       <p className="mt-1 text-[0.9375rem] text-muted-foreground">
-        Only a super admin can change this. The database enforces it too, turning something off
-        here really blocks it.
+        Only a super admin can change this. The database enforces it too, turning something off here
+        really blocks it.
       </p>
 
       <div className="mt-4 flex flex-wrap gap-2">
@@ -420,8 +420,7 @@ function AppSettings() {
     <section className="mt-4 rounded-2xl border-2 border-border bg-card p-4">
       <h2 className="text-lg font-black text-foreground">System settings</h2>
       <p className="mt-1 text-[0.9375rem] text-muted-foreground">
-        Values used across the app, fees, support contact, feature switches. Text or JSON both
-        work.
+        Values used across the app, fees, support contact, feature switches. Text or JSON both work.
       </p>
 
       {isLoading ? (

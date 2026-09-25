@@ -130,7 +130,13 @@ export type PublicProfile = {
   };
   portfolio: { id: string; image_path: string; caption: string | null; url?: string | null }[];
   certificates: { id: string; title: string; issuer: string | null; year: number | null }[];
-  recent_work: { id: string; title: string; category_slug: string; area: string; created_at: string }[];
+  recent_work: {
+    id: string;
+    title: string;
+    category_slug: string;
+    area: string;
+    created_at: string;
+  }[];
 };
 
 /** Sign private gallery photos so guests can see public work samples. */
@@ -162,7 +168,15 @@ export async function fetchWorkerDetail(id: string) {
   if (summary.error) throw new Error(summary.error.message);
 
   const data = summary.data as unknown as PublicProfile | null;
-  if (!data) return { profile: null, stats: null, portfolio: [], certificates: [], recentWork: [], reviews: [] };
+  if (!data)
+    return {
+      profile: null,
+      stats: null,
+      portfolio: [],
+      certificates: [],
+      recentWork: [],
+      reviews: [],
+    };
 
   const urls = await signGallery(data.portfolio.map((item) => item.image_path));
   return {

@@ -67,7 +67,6 @@ function DiscoverScreen() {
     if (focus) inputRef.current?.focus();
   }, [focus]);
 
-
   // Debounce typing into the URL so the query layer caches per search term.
   useEffect(() => {
     const id = setTimeout(() => {

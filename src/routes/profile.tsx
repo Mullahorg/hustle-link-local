@@ -5,7 +5,6 @@ import {
   ChevronRight,
   ClipboardList,
   Store,
-
   HelpCircle,
   Images,
   LogOut,
@@ -50,7 +49,6 @@ const rows = [
   { icon: Bell, label: "Notifications", to: "/notifications" },
   { icon: Settings, label: "Settings & privacy", to: "/settings" },
 ] as const;
-
 
 function ProfileScreen() {
   const { user, loading, signOut } = useAuth();

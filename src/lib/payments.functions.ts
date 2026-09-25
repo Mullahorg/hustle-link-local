@@ -75,7 +75,11 @@ export const requestStkPush = createServerFn({ method: "POST" })
 
     const phone = normalisePhone(String((tx.metadata as { phone?: string } | null)?.phone ?? ""));
     if (phone.length < 12) {
-      return { status: "failed", message: "That phone number looks wrong.", providerReference: null };
+      return {
+        status: "failed",
+        message: "That phone number looks wrong.",
+        providerReference: null,
+      };
     }
 
     try {
@@ -182,7 +186,7 @@ export const checkPaymentStatus = createServerFn({ method: "POST" })
       const { error: applyError } = await supabaseAdmin.rpc("payment_apply_result", {
         _reference: tx.reference,
         _status: status,
-        ...(body.provider_reference ?? body.third_party_reference
+        ...((body.provider_reference ?? body.third_party_reference)
           ? { _provider_reference: (body.provider_reference ?? body.third_party_reference)! }
           : {}),
         ...(status === "succeeded" ? {} : { _failure_reason: "Payment was not completed" }),

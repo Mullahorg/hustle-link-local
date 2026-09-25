@@ -63,7 +63,11 @@ function Locked({ signedIn }: { signedIn: boolean }) {
     <div className="grid min-h-dvh place-items-center bg-background px-5">
       <div className="w-full max-w-md rounded-3xl border-2 border-border bg-card p-7 text-center">
         <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-primary-soft text-primary-ink">
-          {canBootstrap ? <ShieldCheck className="size-7" aria-hidden="true" /> : <Lock className="size-7" aria-hidden="true" />}
+          {canBootstrap ? (
+            <ShieldCheck className="size-7" aria-hidden="true" />
+          ) : (
+            <Lock className="size-7" aria-hidden="true" />
+          )}
         </span>
         <h1 className="mt-4 text-xl font-black text-foreground">
           {canBootstrap ? "Set up the admin console" : "Staff access only"}
@@ -98,7 +102,9 @@ function Locked({ signedIn }: { signedIn: boolean }) {
             </Button>
           ) : (
             <Button asChild block size="lg" variant={signedIn ? "outline" : "default"}>
-              <Link to={signedIn ? "/" : "/auth"}>{signedIn ? "Back to HustlerLink" : "Sign in"}</Link>
+              <Link to={signedIn ? "/" : "/auth"}>
+                {signedIn ? "Back to HustlerLink" : "Sign in"}
+              </Link>
             </Button>
           )}
         </div>

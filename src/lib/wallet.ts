@@ -210,7 +210,6 @@ export const paymentByIdQuery = (id: string) =>
   });
 
 export const paymentQuery = (reference: string) =>
-
   queryOptions({
     queryKey: ["payment", reference],
     staleTime: 2_000,
@@ -285,7 +284,10 @@ export async function fundEscrow(jobId: string, amountCents: number) {
   if (error) throw new Error(error.message);
 }
 
-export async function setEscrowStage(jobId: string, status: "in_progress" | "awaiting_confirmation") {
+export async function setEscrowStage(
+  jobId: string,
+  status: "in_progress" | "awaiting_confirmation",
+) {
   const { error } = await supabase.rpc("escrow_set_status", { _job_id: jobId, _status: status });
   if (error) throw new Error(error.message);
 }

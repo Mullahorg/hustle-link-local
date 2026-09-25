@@ -403,7 +403,6 @@ function SettingsBody() {
                   : "Verify my identity"}
             </Link>
           </Button>
-
         </div>
       </Section>
 

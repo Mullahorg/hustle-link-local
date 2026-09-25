@@ -115,7 +115,6 @@ export function EscrowPanel({
           </p>
         ) : null}
 
-
         <ol className="mt-5 space-y-4">
           {ESCROW_STEPS.map((step, index) => {
             const done = row ? index < current : false;

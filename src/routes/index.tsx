@@ -72,9 +72,7 @@ function HomeScreen() {
         {user ? (
           <Link
             to="/notifications"
-            aria-label={
-              unread ? `Notifications, ${unread} unread` : "Notifications"
-            }
+            aria-label={unread ? `Notifications, ${unread} unread` : "Notifications"}
             className="tap relative grid shrink-0 place-items-center rounded-2xl border-2 border-border bg-card text-foreground"
           >
             <Bell className="size-6" aria-hidden="true" />
@@ -165,7 +163,6 @@ function HomeScreen() {
         <SectionHeader title="Browse by trade" />
         <CategoryRail categories={data.categories} />
       </section>
-
 
       {nothingYet ? (
         <section className="px-5 pt-9">
