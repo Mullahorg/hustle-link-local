@@ -505,8 +505,8 @@ export async function openDispute(input: {
   details: string;
 }) {
   const { error } = await supabase.rpc("open_dispute", {
-    ...(input.orderId ? { _order_id: input.orderId } : {}),
-    ...(input.jobId ? { _job_id: input.jobId } : {}),
+    _order_id: input.orderId ?? null,
+    _job_id: input.jobId ?? null,
     _reason: input.reason,
     _details: input.details,
   } as never);
