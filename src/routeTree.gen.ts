@@ -20,6 +20,7 @@ import { Route as MyWorkRouteImport } from './routes/my-work'
 import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as PostJobRouteImport } from './routes/post-job'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as VerifyRouteImport } from './routes/verify'
 import { Route as WalletRouteImport } from './routes/wallet'
@@ -94,6 +95,11 @@ const PostJobRoute = PostJobRouteImport.update({
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsRoute = SettingsRouteImport.update({
@@ -210,6 +216,7 @@ export interface FileRoutesByFullPath {
   '/notifications': typeof NotificationsRoute
   '/post-job': typeof PostJobRoute
   '/profile': typeof ProfileRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
   '/verify': typeof VerifyRoute
   '/wallet': typeof WalletRoute
@@ -242,6 +249,7 @@ export interface FileRoutesByTo {
   '/notifications': typeof NotificationsRoute
   '/post-job': typeof PostJobRoute
   '/profile': typeof ProfileRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
   '/verify': typeof VerifyRoute
   '/wallet': typeof WalletRoute
@@ -276,6 +284,7 @@ export interface FileRoutesById {
   '/notifications': typeof NotificationsRoute
   '/post-job': typeof PostJobRoute
   '/profile': typeof ProfileRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
   '/verify': typeof VerifyRoute
   '/wallet': typeof WalletRoute
@@ -311,6 +320,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/post-job'
     | '/profile'
+    | '/reset-password'
     | '/settings'
     | '/verify'
     | '/wallet'
@@ -343,6 +353,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/post-job'
     | '/profile'
+    | '/reset-password'
     | '/settings'
     | '/verify'
     | '/wallet'
@@ -376,6 +387,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/post-job'
     | '/profile'
+    | '/reset-password'
     | '/settings'
     | '/verify'
     | '/wallet'
@@ -410,6 +422,7 @@ export interface RootRouteChildren {
   NotificationsRoute: typeof NotificationsRoute
   PostJobRoute: typeof PostJobRoute
   ProfileRoute: typeof ProfileRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SettingsRoute: typeof SettingsRoute
   VerifyRoute: typeof VerifyRoute
   WalletRoute: typeof WalletRoute
@@ -498,6 +511,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings': {
@@ -695,6 +715,7 @@ const rootRouteChildren: RootRouteChildren = {
   NotificationsRoute: NotificationsRoute,
   PostJobRoute: PostJobRoute,
   ProfileRoute: ProfileRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SettingsRoute: SettingsRoute,
   VerifyRoute: VerifyRoute,
   WalletRoute: WalletRoute,
