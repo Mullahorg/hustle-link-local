@@ -86,6 +86,100 @@ export type Database = {
         }
         Relationships: []
       }
+      business_members: {
+        Row: {
+          business_id: string
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["business_role"]
+          user_id: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["business_role"]
+          user_id: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["business_role"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_members_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      businesses: {
+        Row: {
+          about: string | null
+          area: string
+          category_slug: string | null
+          created_at: string
+          email: string | null
+          id: string
+          logo_url: string | null
+          name: string
+          owner_id: string
+          phone: string | null
+          registration_no: string | null
+          slug: string
+          status: string
+          updated_at: string
+          verified: boolean
+        }
+        Insert: {
+          about?: string | null
+          area?: string
+          category_slug?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          logo_url?: string | null
+          name: string
+          owner_id: string
+          phone?: string | null
+          registration_no?: string | null
+          slug: string
+          status?: string
+          updated_at?: string
+          verified?: boolean
+        }
+        Update: {
+          about?: string | null
+          area?: string
+          category_slug?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          logo_url?: string | null
+          name?: string
+          owner_id?: string
+          phone?: string | null
+          registration_no?: string | null
+          slug?: string
+          status?: string
+          updated_at?: string
+          verified?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "businesses_category_slug_fkey"
+            columns: ["category_slug"]
+            isOneToOne: false
+            referencedRelation: "market_categories"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
       categories: {
         Row: {
           icon: string
@@ -253,6 +347,33 @@ export type Database = {
         }
         Relationships: []
       }
+      feature_flags: {
+        Row: {
+          description: string | null
+          enabled: boolean
+          key: string
+          label: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          description?: string | null
+          enabled?: boolean
+          key: string
+          label: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          description?: string | null
+          enabled?: boolean
+          key?: string
+          label?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       job_applications: {
         Row: {
           created_at: string
@@ -348,6 +469,7 @@ export type Database = {
           budget_max: number | null
           budget_min: number | null
           budget_note: string | null
+          business_id: string | null
           category_slug: string
           created_at: string
           description: string
@@ -368,6 +490,7 @@ export type Database = {
           budget_max?: number | null
           budget_min?: number | null
           budget_note?: string | null
+          business_id?: string | null
           category_slug: string
           created_at?: string
           description?: string
@@ -388,6 +511,7 @@ export type Database = {
           budget_max?: number | null
           budget_min?: number | null
           budget_note?: string | null
+          business_id?: string | null
           category_slug?: string
           created_at?: string
           description?: string
@@ -403,6 +527,13 @@ export type Database = {
           urgent?: boolean
         }
         Relationships: [
+          {
+            foreignKeyName: "jobs_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "jobs_category_slug_fkey"
             columns: ["category_slug"]
@@ -435,7 +566,9 @@ export type Database = {
       }
       market_listings: {
         Row: {
+          archived_at: string | null
           area: string
+          business_id: string | null
           category_slug: string
           condition: string
           created_at: string
@@ -446,6 +579,7 @@ export type Database = {
           hidden_reason: string | null
           id: string
           images: string[]
+          last_activity_at: string
           listing_type: string
           negotiable: boolean
           offers_delivery: boolean
@@ -465,7 +599,9 @@ export type Database = {
           views: number
         }
         Insert: {
+          archived_at?: string | null
           area: string
+          business_id?: string | null
           category_slug: string
           condition?: string
           created_at?: string
@@ -476,6 +612,7 @@ export type Database = {
           hidden_reason?: string | null
           id?: string
           images?: string[]
+          last_activity_at?: string
           listing_type?: string
           negotiable?: boolean
           offers_delivery?: boolean
@@ -495,7 +632,9 @@ export type Database = {
           views?: number
         }
         Update: {
+          archived_at?: string | null
           area?: string
+          business_id?: string | null
           category_slug?: string
           condition?: string
           created_at?: string
@@ -506,6 +645,7 @@ export type Database = {
           hidden_reason?: string | null
           id?: string
           images?: string[]
+          last_activity_at?: string
           listing_type?: string
           negotiable?: boolean
           offers_delivery?: boolean
@@ -525,6 +665,13 @@ export type Database = {
           views?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "market_listings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "market_listings_category_slug_fkey"
             columns: ["category_slug"]
@@ -763,6 +910,36 @@ export type Database = {
         }
         Relationships: []
       }
+      platform_events: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          id: string
+          kind: string
+          payload: Json
+          subject_id: string | null
+          subject_type: string | null
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          kind: string
+          payload?: Json
+          subject_id?: string | null
+          subject_type?: string | null
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          payload?: Json
+          subject_id?: string | null
+          subject_type?: string | null
+        }
+        Relationships: []
+      }
       portfolio_items: {
         Row: {
           caption: string | null
@@ -878,6 +1055,36 @@ export type Database = {
             referencedColumns: ["slug"]
           },
         ]
+      }
+      push_subscriptions: {
+        Row: {
+          auth_key: string
+          created_at: string
+          endpoint: string
+          id: string
+          p256dh: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          auth_key: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          p256dh: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          auth_key?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       reports: {
         Row: {
@@ -1027,6 +1234,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      search_queries: {
+        Row: {
+          created_at: string
+          id: string
+          results: number
+          scope: string
+          term: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          results?: number
+          scope?: string
+          term: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          results?: number
+          scope?: string
+          term?: string
+          user_id?: string | null
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
@@ -1225,12 +1459,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_archive_stale_listings: { Args: { _days?: number }; Returns: Json }
+      admin_businesses: { Args: { _limit?: number }; Returns: Json }
       admin_delete_category: { Args: { _slug: string }; Returns: Json }
       admin_delete_review: {
         Args: { _id: string; _reason?: string }
         Returns: Json
       }
       admin_disputes: { Args: { _status?: string }; Returns: Json }
+      admin_orders: {
+        Args: { _limit?: number; _status?: string }
+        Returns: Json
+      }
       admin_resolve_dispute: {
         Args: { _id: string; _note: string; _outcome: string }
         Returns: Json
@@ -1249,6 +1489,19 @@ export type Database = {
           _link?: string
           _title: string
           _user_id: string
+        }
+        Returns: Json
+      }
+      admin_set_business_verified: {
+        Args: { _id: string; _verified: boolean }
+        Returns: Json
+      }
+      admin_set_flag: {
+        Args: {
+          _description?: string
+          _enabled: boolean
+          _key: string
+          _label: string
         }
         Returns: Json
       }
@@ -1282,6 +1535,7 @@ export type Database = {
         Returns: Json
       }
       admin_stats: { Args: never; Returns: Json }
+      admin_storage_stats: { Args: never; Returns: Json }
       admin_update_report: {
         Args: {
           _id: string
@@ -1300,7 +1554,28 @@ export type Database = {
         Returns: Json
       }
       admin_verification_trail: { Args: { _user_id: string }; Returns: Json }
+      archive_listing: {
+        Args: { _archive?: boolean; _id: string }
+        Returns: Json
+      }
+      business_can_manage: {
+        Args: { _business_id: string; _user_id: string }
+        Returns: boolean
+      }
+      business_role_of: {
+        Args: { _business_id: string; _user_id: string }
+        Returns: Database["public"]["Enums"]["business_role"]
+      }
       claim_super_admin: { Args: never; Returns: Json }
+      emit_event: {
+        Args: {
+          _kind: string
+          _payload?: Json
+          _subject_id: string
+          _subject_type: string
+        }
+        Returns: undefined
+      }
       escrow_fund_job: {
         Args: { _amount_cents: number; _job_id: string }
         Returns: Json
@@ -1317,6 +1592,7 @@ export type Database = {
         }
         Returns: Json
       }
+      fraud_signals: { Args: never; Returns: Json }
       has_permission: {
         Args: {
           _permission: Database["public"]["Enums"]["app_permission"]
@@ -1337,6 +1613,10 @@ export type Database = {
         Returns: boolean
       }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      log_search: {
+        Args: { _results?: number; _scope?: string; _term: string }
+        Returns: undefined
+      }
       market_buy: { Args: { _listing_id: string }; Returns: Json }
       market_cancel_order: { Args: { _order_id: string }; Returns: Json }
       market_confirm_received: { Args: { _order_id: string }; Returns: Json }
@@ -1422,6 +1702,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      recommended_for_me: { Args: { _limit?: number }; Returns: Json }
       require_permission: {
         Args: { _permission: Database["public"]["Enums"]["app_permission"] }
         Returns: undefined
@@ -1537,6 +1818,8 @@ export type Database = {
         }[]
       }
       seller_dashboard: { Args: never; Returns: Json }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
       submit_verification: {
         Args: {
           _back_path: string
@@ -1548,6 +1831,9 @@ export type Database = {
         Returns: Json
       }
       super_admin_exists: { Args: never; Returns: boolean }
+      system_health: { Args: never; Returns: Json }
+      trending_searches: { Args: { _limit?: number }; Returns: Json }
+      unified_search: { Args: { _limit?: number; _q?: string }; Returns: Json }
       wallet_available_cents: { Args: { _user_id: string }; Returns: number }
       wallet_cancel_topup: { Args: { _reference: string }; Returns: Json }
       wallet_request_withdrawal: {
@@ -1617,6 +1903,13 @@ export type Database = {
         | "accepted"
         | "rejected"
         | "withdrawn"
+      business_role:
+        | "owner"
+        | "manager"
+        | "finance"
+        | "staff"
+        | "driver"
+        | "support"
       escrow_status:
         | "awaiting_funding"
         | "secured"
@@ -1806,6 +2099,14 @@ export const Constants = {
         "accepted",
         "rejected",
         "withdrawn",
+      ],
+      business_role: [
+        "owner",
+        "manager",
+        "finance",
+        "staff",
+        "driver",
+        "support",
       ],
       escrow_status: [
         "awaiting_funding",

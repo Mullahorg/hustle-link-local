@@ -21,6 +21,7 @@ import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as PostJobRouteImport } from './routes/post-job'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as SearchRouteImport } from './routes/search'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as VerifyRouteImport } from './routes/verify'
 import { Route as WalletRouteImport } from './routes/wallet'
@@ -102,6 +103,11 @@ const ProfileRoute = ProfileRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsRoute = SettingsRouteImport.update({
@@ -229,6 +235,7 @@ export interface FileRoutesByFullPath {
   '/post-job': typeof PostJobRoute
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
   '/verify': typeof VerifyRoute
   '/wallet': typeof WalletRoute
@@ -264,6 +271,7 @@ export interface FileRoutesByTo {
   '/post-job': typeof PostJobRoute
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
   '/verify': typeof VerifyRoute
   '/wallet': typeof WalletRoute
@@ -301,6 +309,7 @@ export interface FileRoutesById {
   '/post-job': typeof PostJobRoute
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
   '/verify': typeof VerifyRoute
   '/wallet': typeof WalletRoute
@@ -339,6 +348,7 @@ export interface FileRouteTypes {
     | '/post-job'
     | '/profile'
     | '/reset-password'
+    | '/search'
     | '/settings'
     | '/verify'
     | '/wallet'
@@ -374,6 +384,7 @@ export interface FileRouteTypes {
     | '/post-job'
     | '/profile'
     | '/reset-password'
+    | '/search'
     | '/settings'
     | '/verify'
     | '/wallet'
@@ -410,6 +421,7 @@ export interface FileRouteTypes {
     | '/post-job'
     | '/profile'
     | '/reset-password'
+    | '/search'
     | '/settings'
     | '/verify'
     | '/wallet'
@@ -447,6 +459,7 @@ export interface RootRouteChildren {
   PostJobRoute: typeof PostJobRoute
   ProfileRoute: typeof ProfileRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  SearchRoute: typeof SearchRoute
   SettingsRoute: typeof SettingsRoute
   VerifyRoute: typeof VerifyRoute
   WalletRoute: typeof WalletRoute
@@ -543,6 +556,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings': {
@@ -757,6 +777,7 @@ const rootRouteChildren: RootRouteChildren = {
   PostJobRoute: PostJobRoute,
   ProfileRoute: ProfileRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  SearchRoute: SearchRoute,
   SettingsRoute: SettingsRoute,
   VerifyRoute: VerifyRoute,
   WalletRoute: WalletRoute,
