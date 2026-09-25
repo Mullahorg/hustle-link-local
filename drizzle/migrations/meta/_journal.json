@@ -43,6 +43,13 @@
       "when": 1790370590940,
       "tag": "0005_businesses_events_flags_storage",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1790370668009,
+      "tag": "0006_unified_search_recommendations_admin_rpcs",
+      "breakpoints": true
     }
   ]
 }

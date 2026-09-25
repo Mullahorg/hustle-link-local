@@ -1459,12 +1459,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_archive_stale_listings: { Args: { _days?: number }; Returns: Json }
+      admin_businesses: { Args: { _limit?: number }; Returns: Json }
       admin_delete_category: { Args: { _slug: string }; Returns: Json }
       admin_delete_review: {
         Args: { _id: string; _reason?: string }
         Returns: Json
       }
       admin_disputes: { Args: { _status?: string }; Returns: Json }
+      admin_orders: {
+        Args: { _limit?: number; _status?: string }
+        Returns: Json
+      }
       admin_resolve_dispute: {
         Args: { _id: string; _note: string; _outcome: string }
         Returns: Json
@@ -1484,6 +1490,10 @@ export type Database = {
           _title: string
           _user_id: string
         }
+        Returns: Json
+      }
+      admin_set_business_verified: {
+        Args: { _id: string; _verified: boolean }
         Returns: Json
       }
       admin_set_flag: {
@@ -1525,6 +1535,7 @@ export type Database = {
         Returns: Json
       }
       admin_stats: { Args: never; Returns: Json }
+      admin_storage_stats: { Args: never; Returns: Json }
       admin_update_report: {
         Args: {
           _id: string
@@ -1543,6 +1554,10 @@ export type Database = {
         Returns: Json
       }
       admin_verification_trail: { Args: { _user_id: string }; Returns: Json }
+      archive_listing: {
+        Args: { _archive?: boolean; _id: string }
+        Returns: Json
+      }
       business_can_manage: {
         Args: { _business_id: string; _user_id: string }
         Returns: boolean
@@ -1577,6 +1592,7 @@ export type Database = {
         }
         Returns: Json
       }
+      fraud_signals: { Args: never; Returns: Json }
       has_permission: {
         Args: {
           _permission: Database["public"]["Enums"]["app_permission"]
@@ -1597,6 +1613,10 @@ export type Database = {
         Returns: boolean
       }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      log_search: {
+        Args: { _results?: number; _scope?: string; _term: string }
+        Returns: undefined
+      }
       market_buy: { Args: { _listing_id: string }; Returns: Json }
       market_cancel_order: { Args: { _order_id: string }; Returns: Json }
       market_confirm_received: { Args: { _order_id: string }; Returns: Json }
@@ -1682,6 +1702,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      recommended_for_me: { Args: { _limit?: number }; Returns: Json }
       require_permission: {
         Args: { _permission: Database["public"]["Enums"]["app_permission"] }
         Returns: undefined
@@ -1797,6 +1818,8 @@ export type Database = {
         }[]
       }
       seller_dashboard: { Args: never; Returns: Json }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
       submit_verification: {
         Args: {
           _back_path: string
@@ -1808,6 +1831,9 @@ export type Database = {
         Returns: Json
       }
       super_admin_exists: { Args: never; Returns: boolean }
+      system_health: { Args: never; Returns: Json }
+      trending_searches: { Args: { _limit?: number }; Returns: Json }
+      unified_search: { Args: { _limit?: number; _q?: string }; Returns: Json }
       wallet_available_cents: { Args: { _user_id: string }; Returns: number }
       wallet_cancel_topup: { Args: { _reference: string }; Returns: Json }
       wallet_request_withdrawal: {
