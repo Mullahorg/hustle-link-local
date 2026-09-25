@@ -443,7 +443,7 @@ function ListingScreen() {
                 disabled={buy.isPending}
               >
                 <ShieldCheck aria-hidden="true" />
-                {buy.isPending ? "Paying…" : "Buy safely"}
+                {buy.isPending ? "Paying…" : "Buy"}
               </Button>
             ) : null}
           </div>
