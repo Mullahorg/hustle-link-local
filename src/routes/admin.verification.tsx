@@ -132,7 +132,9 @@ function ReviewDialog({
     toast.success("Decision saved. The member was notified in the app.");
     void sendEmail({ data: { requestId: row.id } })
       .then((r) =>
-        r.sent ? toast.success("Email sent to the member") : toast.info(`Email not sent: ${r.message}`),
+        r.sent
+          ? toast.success("Email sent to the member")
+          : toast.info(`Email not sent: ${r.message}`),
       )
       .catch(() => toast.info("Email not sent — check email settings"));
     await trail.refetch();

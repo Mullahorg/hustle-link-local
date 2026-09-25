@@ -4,7 +4,12 @@ import { getRequest } from "@tanstack/react-start/server";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 async function requirePermission(
-  supabase: { rpc: (fn: "has_permission", args: { _user_id: string; _permission: string }) => PromiseLike<{ data: unknown }> },
+  supabase: {
+    rpc: (
+      fn: "has_permission",
+      args: { _user_id: string; _permission: string },
+    ) => PromiseLike<{ data: unknown }>;
+  },
   userId: string,
   permission: string,
 ) {
@@ -98,7 +103,11 @@ export const emailVerificationDecision = createServerFn({ method: "POST" })
       name: profile?.full_name?.split(" ")[0] || "there",
       title: note.title,
       body: note.body ?? "",
-      actionLabel: approved ? "Find jobs" : req.status === "rejected" ? "Open settings" : "Send new photos",
+      actionLabel: approved
+        ? "Find jobs"
+        : req.status === "rejected"
+          ? "Open settings"
+          : "Send new photos",
       actionUrl: `${siteOrigin()}${approved ? "/discover" : req.status === "rejected" ? "/settings" : "/verify"}`,
     });
     return sendEmail({ to, subject: note.title, html, text });

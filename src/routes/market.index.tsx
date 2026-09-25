@@ -267,7 +267,10 @@ function MarketScreen() {
           className="mt-3 flex items-end gap-2"
           onSubmit={(event) => {
             event.preventDefault();
-            setPrice(toShillings(minDraft.replace(/[^0-9]/g, "")), toShillings(maxDraft.replace(/[^0-9]/g, "")));
+            setPrice(
+              toShillings(minDraft.replace(/[^0-9]/g, "")),
+              toShillings(maxDraft.replace(/[^0-9]/g, "")),
+            );
           }}
         >
           <label className="min-w-0 flex-1">
@@ -294,7 +297,14 @@ function MarketScreen() {
             Apply
           </Button>
           {hasPrice ? (
-            <Button type="button" size="lg" variant="ghost" className="shrink-0 px-3" onClick={() => setPrice()} aria-label="Clear price">
+            <Button
+              type="button"
+              size="lg"
+              variant="ghost"
+              className="shrink-0 px-3"
+              onClick={() => setPrice()}
+              aria-label="Clear price"
+            >
               <X aria-hidden="true" />
             </Button>
           ) : null}

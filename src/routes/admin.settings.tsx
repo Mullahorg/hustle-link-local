@@ -73,9 +73,27 @@ function EmailSettings() {
 
   const s = status.data;
   const fields = [
-    { key: "api_key", label: "Resend API key", secret: true, current: s?.hasKey ? `Saved · ${s.keyHint}` : null, placeholder: "re_..." },
-    { key: "from", label: "Sender (from a domain verified in Resend)", secret: false, current: s?.from ? `Saved · ${s.from}` : null, placeholder: "HustlerLink <notify@yourdomain.com>" },
-    { key: "reply_to", label: "Reply-to address (optional)", secret: false, current: s?.replyTo ? `Saved · ${s.replyTo}` : null, placeholder: "support@yourdomain.com" },
+    {
+      key: "api_key",
+      label: "Resend API key",
+      secret: true,
+      current: s?.hasKey ? `Saved · ${s.keyHint}` : null,
+      placeholder: "re_...",
+    },
+    {
+      key: "from",
+      label: "Sender (from a domain verified in Resend)",
+      secret: false,
+      current: s?.from ? `Saved · ${s.from}` : null,
+      placeholder: "HustlerLink <notify@yourdomain.com>",
+    },
+    {
+      key: "reply_to",
+      label: "Reply-to address (optional)",
+      secret: false,
+      current: s?.replyTo ? `Saved · ${s.replyTo}` : null,
+      placeholder: "support@yourdomain.com",
+    },
   ] as const;
 
   return (
@@ -104,7 +122,9 @@ function EmailSettings() {
                 <label className="mb-1 block font-black text-foreground" htmlFor={`email-${f.key}`}>
                   {f.label}
                 </label>
-                <p className="mb-2 text-[0.875rem] text-muted-foreground">{f.current ?? "Not set yet"}</p>
+                <p className="mb-2 text-[0.875rem] text-muted-foreground">
+                  {f.current ?? "Not set yet"}
+                </p>
                 <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
                   <Input
                     id={`email-${f.key}`}
@@ -124,7 +144,12 @@ function EmailSettings() {
               </li>
             ))}
           </ul>
-          <Button className="mt-3" variant="outline" disabled={busy || !s?.hasKey || !s?.from} onClick={() => void test()}>
+          <Button
+            className="mt-3"
+            variant="outline"
+            disabled={busy || !s?.hasKey || !s?.from}
+            onClick={() => void test()}
+          >
             Send me a test email
           </Button>
         </>
@@ -250,7 +275,9 @@ function PaymentKeys() {
   });
 
   const callbackHint =
-    typeof window === "undefined" ? "/api/public/webhooks/payhero" : `${window.location.origin}/api/public/webhooks/payhero`;
+    typeof window === "undefined"
+      ? "/api/public/webhooks/payhero"
+      : `${window.location.origin}/api/public/webhooks/payhero`;
 
   const save = async (next: Record<string, unknown>) => {
     setBusy(true);
@@ -290,7 +317,6 @@ function PaymentKeys() {
           Callback URL to paste into PayHero: <span className="font-bold">{callbackHint}</span>
         </p>
       </div>
-
 
       {isLoading ? (
         <Skeleton className="mt-4 h-56 w-full rounded-xl" />
