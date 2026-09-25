@@ -51,6 +51,7 @@ import {
   savedListingIdsQuery,
   setListingStatus,
   toggleSaveListing,
+  type ListingDetail,
 } from "@/lib/market";
 import { openConversation } from "@/lib/account";
 import { money } from "@/lib/wallet";
@@ -509,10 +510,7 @@ function ListingScreen() {
   );
 }
 
-type FullListing = NonNullable<ReturnType<typeof useListingType>>;
-function useListingType() {
-  return null as unknown as import("@/lib/market").ListingDetail["listing"] | null;
-}
+type FullListing = ListingDetail["listing"];
 
 function ListingFacts({ listing }: { listing: FullListing }) {
   const facts: { icon: React.ReactNode; text: string }[] = [];
