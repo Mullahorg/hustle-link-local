@@ -9,7 +9,9 @@ import {
   MessageCircle,
   Phone,
   ShieldAlert,
+  ShieldCheck,
   Trash2,
+  Wallet,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -29,10 +31,14 @@ import { useAuth } from "@/hooks/useAuth";
 import { timeAgo } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import {
+  buyListing,
+  cancelOrder,
   conditionLabel,
+  confirmReceived,
   countListingView,
   deleteListing,
   listingDetailQuery,
+  listingOrderQuery,
   listingPhotosQuery,
   priceLabel,
   savedListingIdsQuery,
@@ -40,6 +46,7 @@ import {
   toggleSaveListing,
 } from "@/lib/market";
 import { openConversation } from "@/lib/account";
+import { money } from "@/lib/wallet";
 
 export const Route = createFileRoute("/market/$listingId")({
   head: () => ({
@@ -111,6 +118,44 @@ function ListingScreen() {
     onError: (error: Error) => toast.error(error.message),
   });
 
+  const order = useQuery(listingOrderQuery(listingId, user?.id));
+  const refreshAfterMoney = async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["listing", listingId] }),
+      queryClient.invalidateQueries({ queryKey: ["listing-order", listingId] }),
+      queryClient.invalidateQueries({ queryKey: ["listings"] }),
+      queryClient.invalidateQueries({ queryKey: ["wallet-summary"] }),
+      queryClient.invalidateQueries({ queryKey: ["wallet-ledger"] }),
+    ]);
+  };
+  const buy = useMutation({
+    mutationFn: () => {
+      if (!user) throw new Error("Sign in to buy this item");
+      return buyListing(listingId);
+    },
+    onSuccess: async () => {
+      await refreshAfterMoney();
+      toast.success("Paid. Your money is held safely until you confirm you got the item.");
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+  const confirm = useMutation({
+    mutationFn: () => confirmReceived(order.data!.id),
+    onSuccess: async () => {
+      await refreshAfterMoney();
+      toast.success("Thanks! The seller has been paid.");
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+  const cancel = useMutation({
+    mutationFn: () => cancelOrder(order.data!.id),
+    onSuccess: async () => {
+      await refreshAfterMoney();
+      toast.success("Order cancelled. The buyer's money is back in their wallet.");
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
   const onSave = async () => {
     if (!user) {
       toast.info("Sign in to keep items you like");
@@ -168,6 +213,8 @@ function ListingScreen() {
 
   const activePath = images[active];
   const activeUrl = activePath ? photos?.[activePath] : undefined;
+  const canBuy =
+    listing.status === "available" && Boolean(listing.price_cents && listing.price_cents > 0);
 
   return (
     <FocusShell>
@@ -227,7 +274,58 @@ function ListingScreen() {
             <span>{timeAgo(listing.created_at)}</span>
           </div>
 
-          {listing.status === "sold" ? (
+          {order.data ? (
+            <section
+              aria-label="Your order"
+              className="mt-4 rounded-3xl border-2 border-primary bg-card p-4"
+            >
+              <p className="text-base font-extrabold text-foreground">
+                {order.data.status === "held"
+                  ? user?.id === order.data.buyer_id
+                    ? `You paid ${money(order.data.amount_cents)} — held safely`
+                    : `Bought for ${money(order.data.amount_cents)} — payment held`
+                  : order.data.status === "released"
+                    ? `Completed — seller paid ${money(order.data.amount_cents)}`
+                    : "Order cancelled — buyer refunded"}
+              </p>
+              <p className="mt-1 text-[0.9375rem] font-semibold text-muted-foreground">
+                {order.data.status === "held"
+                  ? user?.id === order.data.buyer_id
+                    ? "Collect the item, check it, then confirm below. The seller gets paid only then."
+                    : "Hand over the item. You get paid when the buyer confirms."
+                  : "See the receipt in your wallet."}
+              </p>
+              {order.data.status === "held" ? (
+                <div className="mt-3 space-y-2">
+                  {user?.id === order.data.buyer_id ? (
+                    <Button
+                      block
+                      size="lg"
+                      onClick={() => confirm.mutate()}
+                      disabled={confirm.isPending}
+                    >
+                      <CheckCircle2 aria-hidden="true" />I got the item — pay the seller
+                    </Button>
+                  ) : null}
+                  <Button
+                    block
+                    size="lg"
+                    variant="outline"
+                    onClick={() => cancel.mutate()}
+                    disabled={cancel.isPending}
+                  >
+                    Cancel and refund
+                  </Button>
+                </div>
+              ) : null}
+              <Button asChild block size="lg" variant="outline" className="mt-2">
+                <Link to="/wallet">
+                  <Wallet aria-hidden="true" />
+                  Open wallet and receipts
+                </Link>
+              </Button>
+            </section>
+          ) : listing.status === "sold" ? (
             <p className="mt-4 rounded-2xl bg-secondary px-4 py-3 text-base font-bold text-secondary-foreground">
               This item is marked sold.
             </p>
@@ -309,11 +407,11 @@ function ListingScreen() {
 
       {!mine ? (
         <div className="fixed inset-x-0 bottom-0 z-40 border-t-2 border-border bg-card px-5 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
-          <div className="mx-auto flex max-w-screen-sm items-center gap-2">
+          <div className="mx-auto flex max-w-screen-sm items-center gap-2 [&>*]:min-w-0 [&>*]:px-3">
             {listing.phone ? (
               showPhone ? (
                 <Button asChild variant="outline" size="lg" className="flex-1">
-                  <a href={`tel:${listing.phone}`}>{listing.phone}</a>
+                  <a href={`tel:${listing.phone}`}>{canBuy ? "Call" : listing.phone}</a>
                 </Button>
               ) : (
                 <Button
@@ -323,19 +421,31 @@ function ListingScreen() {
                   onClick={() => setShowPhone(true)}
                 >
                   <Phone aria-hidden="true" />
-                  Show number
+                  {canBuy ? "Call" : "Show number"}
                 </Button>
               )
             ) : null}
             <Button
               size="lg"
+              variant={canBuy ? "outline" : "default"}
               className="flex-1"
               onClick={() => message.mutate()}
               disabled={message.isPending}
             >
               <MessageCircle aria-hidden="true" />
-              Message seller
+              {canBuy ? "Message" : "Message seller"}
             </Button>
+            {canBuy ? (
+              <Button
+                size="lg"
+                className="flex-1"
+                onClick={() => buy.mutate()}
+                disabled={buy.isPending}
+              >
+                <ShieldCheck aria-hidden="true" />
+                {buy.isPending ? "Paying…" : "Buy"}
+              </Button>
+            ) : null}
           </div>
         </div>
       ) : null}
