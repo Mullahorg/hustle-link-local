@@ -5,8 +5,10 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput, passwordHint } from "@/components/hl/PasswordInput";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { friendlyAuthError } from "@/lib/auth-errors";
 
 type AuthSearch = { redirect?: string };
 
@@ -69,7 +71,7 @@ function AuthScreen() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await navigate({ to: returnTo as any });
     } catch (error) {
-      toast.error("That didn't work", { description: (error as Error).message });
+      toast.error("That didn't work", { description: friendlyAuthError(error) });
     } finally {
       setBusy(false);
     }
@@ -91,7 +93,7 @@ function AuthScreen() {
       return;
     }
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/settings`,
+      redirectTo: `${window.location.origin}/reset-password`,
     });
     if (error) toast.error("Could not send the reset link", { description: error.message });
     else toast.success("Check your email", { description: "We sent you a link to reset it." });
@@ -189,19 +191,19 @@ function AuthScreen() {
             <Label htmlFor="password" className="text-base font-bold">
               Password
             </Label>
-            <Input
+            <PasswordInput
               id="password"
-              type="password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               autoComplete={mode === "signin" ? "current-password" : "new-password"}
-              minLength={6}
+              minLength={mode === "signup" ? 8 : 1}
               required
-              className="h-14 rounded-2xl border-2 text-base font-semibold"
             />
-            <p className="text-[0.875rem] font-semibold text-muted-foreground">
-              At least 6 characters.
-            </p>
+            {mode === "signup" ? (
+              <p className="text-[0.875rem] font-semibold text-muted-foreground" aria-live="polite">
+                {passwordHint(password)}
+              </p>
+            ) : null}
           </div>
 
           <Button type="submit" block size="lg" disabled={busy}>
