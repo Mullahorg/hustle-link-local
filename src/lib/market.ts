@@ -89,18 +89,33 @@ export const marketCategoriesQuery = () =>
     },
   });
 
-export const listingsQuery = (args: { q?: string; category?: string; area?: string }) =>
+export const listingsQuery = (args: {
+  q?: string;
+  category?: string;
+  area?: string;
+  minShillings?: number;
+  maxShillings?: number;
+}) =>
   infiniteQueryOptions({
-    queryKey: ["listings", args.q ?? "", args.category ?? "", args.area ?? ""],
+    queryKey: [
+      "listings",
+      args.q ?? "",
+      args.category ?? "",
+      args.area ?? "",
+      args.minShillings ?? 0,
+      args.maxShillings ?? 0,
+    ],
     initialPageParam: 0,
     staleTime: 20_000,
     getNextPageParam: (last: ListingRow[], pages: ListingRow[][]) =>
       last.length < MARKET_PAGE ? undefined : pages.length * MARKET_PAGE,
     queryFn: async ({ pageParam }) => {
-      const { data, error } = await supabase.rpc("search_listings", {
+      const { data, error } = await supabase.rpc("search_listings_priced", {
         _q: args.q ?? "",
         _category: args.category ?? "",
         _area: args.area ?? "",
+        ...(args.minShillings ? { _min_cents: args.minShillings * 100 } : {}),
+        ...(args.maxShillings ? { _max_cents: args.maxShillings * 100 } : {}),
         _limit: MARKET_PAGE,
         _offset: pageParam,
       });

@@ -23,7 +23,20 @@ import {
 } from "@/lib/market";
 import { cn } from "@/lib/utils";
 
-type MarketSearch = { category?: string; q?: string; area?: string };
+type MarketSearch = { category?: string; q?: string; area?: string; min?: number; max?: number };
+
+const toShillings = (v: unknown) => {
+  const n = Math.round(Number(v));
+  return Number.isFinite(n) && n > 0 ? n : undefined;
+};
+
+/** KSh bands villagers actually shop in. */
+const PRICE_BANDS: { label: string; min?: number; max?: number }[] = [
+  { label: "Under KSh 500", max: 500 },
+  { label: "KSh 500 – 2,000", min: 500, max: 2000 },
+  { label: "KSh 2,000 – 10,000", min: 2000, max: 10000 },
+  { label: "Over KSh 10,000", min: 10000 },
+];
 
 export const Route = createFileRoute("/market/")({
   head: () => ({
@@ -47,12 +60,35 @@ export const Route = createFileRoute("/market/")({
     ...(typeof search["category"] === "string" ? { category: search["category"] } : {}),
     ...(typeof search["q"] === "string" ? { q: search["q"] } : {}),
     ...(typeof search["area"] === "string" ? { area: search["area"] } : {}),
+    ...(toShillings(search["min"]) ? { min: toShillings(search["min"]) } : {}),
+    ...(toShillings(search["max"]) ? { max: toShillings(search["max"]) } : {}),
   }),
   component: MarketScreen,
 });
 
 function MarketScreen() {
-  const { category, q, area } = Route.useSearch();
+  const { category, q, area, min, max } = Route.useSearch();
+  const [minDraft, setMinDraft] = useState(min ? String(min) : "");
+  const [maxDraft, setMaxDraft] = useState(max ? String(max) : "");
+  useEffect(() => {
+    setMinDraft(min ? String(min) : "");
+    setMaxDraft(max ? String(max) : "");
+  }, [min, max]);
+  const setPrice = (nextMin?: number, nextMax?: number) => {
+    if (nextMin && nextMax && nextMin > nextMax) [nextMin, nextMax] = [nextMax, nextMin];
+    void navigate({
+      search: (prev: MarketSearch) => {
+        const next: MarketSearch = { ...prev };
+        delete next.min;
+        delete next.max;
+        if (nextMin) next.min = nextMin;
+        if (nextMax) next.max = nextMax;
+        return next;
+      },
+      replace: true,
+    });
+  };
+  const hasPrice = Boolean(min || max);
   const navigate = useNavigate({ from: "/market/" });
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -64,9 +100,8 @@ function MarketScreen() {
       if ((q ?? "") === draft) return;
       void navigate({
         search: (prev: MarketSearch) => {
-          const next: MarketSearch = {};
-          if (prev.category) next.category = prev.category;
-          if (prev.area) next.area = prev.area;
+          const next: MarketSearch = { ...prev };
+          delete next.q;
           if (draft) next.q = draft;
           return next;
         },
@@ -82,6 +117,8 @@ function MarketScreen() {
       ...(q ? { q } : {}),
       ...(category ? { category } : {}),
       ...(area ? { area } : {}),
+      ...(min ? { minShillings: min } : {}),
+      ...(max ? { maxShillings: max } : {}),
     }),
     placeholderData: keepPreviousData,
   });
@@ -93,10 +130,9 @@ function MarketScreen() {
   const setCategory = (slug: string | undefined) =>
     void navigate({
       search: (prev: MarketSearch) => {
-        const next: MarketSearch = {};
+        const next: MarketSearch = { ...prev };
+        delete next.category;
         if (slug) next.category = slug;
-        if (prev.q) next.q = prev.q;
-        if (prev.area) next.area = prev.area;
         return next;
       },
       replace: true,
@@ -204,6 +240,67 @@ function MarketScreen() {
         ))}
       </ul>
 
+      <section aria-label="Price in shillings" className="mt-4 px-5">
+        <ul className="no-scrollbar flex gap-2 overflow-x-auto pb-1">
+          {PRICE_BANDS.map((band) => {
+            const active = min === band.min && max === band.max;
+            return (
+              <li key={band.label}>
+                <button
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => (active ? setPrice() : setPrice(band.min, band.max))}
+                  className={cn(
+                    "min-h-12 rounded-full border-2 px-5 text-[0.9375rem] font-bold whitespace-nowrap",
+                    active
+                      ? "border-primary bg-primary-soft text-primary-ink"
+                      : "border-border bg-card text-muted-foreground",
+                  )}
+                >
+                  {band.label}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+        <form
+          className="mt-3 flex items-end gap-2"
+          onSubmit={(event) => {
+            event.preventDefault();
+            setPrice(toShillings(minDraft.replace(/[^0-9]/g, "")), toShillings(maxDraft.replace(/[^0-9]/g, "")));
+          }}
+        >
+          <label className="min-w-0 flex-1">
+            <span className="mb-1 block text-[0.9375rem] font-bold text-foreground">Min KSh</span>
+            <input
+              inputMode="numeric"
+              value={minDraft}
+              onChange={(e) => setMinDraft(e.target.value)}
+              placeholder="0"
+              className="h-12 w-full rounded-2xl border-2 border-border-strong bg-card px-3 text-base font-semibold text-foreground outline-none"
+            />
+          </label>
+          <label className="min-w-0 flex-1">
+            <span className="mb-1 block text-[0.9375rem] font-bold text-foreground">Max KSh</span>
+            <input
+              inputMode="numeric"
+              value={maxDraft}
+              onChange={(e) => setMaxDraft(e.target.value)}
+              placeholder="Any"
+              className="h-12 w-full rounded-2xl border-2 border-border-strong bg-card px-3 text-base font-semibold text-foreground outline-none"
+            />
+          </label>
+          <Button type="submit" size="lg" variant="outline" className="shrink-0">
+            Apply
+          </Button>
+          {hasPrice ? (
+            <Button type="button" size="lg" variant="ghost" className="shrink-0 px-3" onClick={() => setPrice()} aria-label="Clear price">
+              <X aria-hidden="true" />
+            </Button>
+          ) : null}
+        </form>
+      </section>
+
       <div className="mt-6 space-y-4 px-5">
         {listings.isPending ? (
           <CardSkeleton rows={2} />
@@ -212,14 +309,14 @@ function MarketScreen() {
         ) : items.length === 0 ? (
           <EmptyState
             icon={<ShoppingBasket className="size-7" aria-hidden="true" />}
-            title={q || category ? "Nothing matches that" : "The market is empty today"}
+            title={q || category || hasPrice ? "Nothing matches that" : "The market is empty today"}
             body={
-              q || category
+              q || category || hasPrice
                 ? "Try another word, or look at everything on sale."
                 : "Be the first to put something up for sale. It takes about a minute."
             }
             action={
-              q || category ? (
+              q || category || hasPrice ? (
                 <Button
                   block
                   variant="outline"
