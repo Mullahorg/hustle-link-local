@@ -5,6 +5,7 @@ import {
   CreditCard,
   Flag,
   Gauge,
+  Scale,
   ScrollText,
   Settings,
   ShieldCheck,
@@ -28,6 +29,7 @@ type NavItem = {
     | "/admin/reviews"
     | "/admin/categories"
     | "/admin/payments"
+    | "/admin/disputes"
     | "/admin/audit"
     | "/admin/settings";
   label: string;
@@ -49,6 +51,7 @@ export const ADMIN_NAV: NavItem[] = [
   { to: "/admin/reviews", label: "Reviews", icon: Star, needs: "reviews.read" },
   { to: "/admin/categories", label: "Trades", icon: Tags, needs: "categories.read" },
   { to: "/admin/payments", label: "Payments", icon: CreditCard, needs: "payments.read" },
+  { to: "/admin/disputes", label: "Disputes", icon: Scale, needs: "payments.read" },
   { to: "/admin/audit", label: "Audit log", icon: ScrollText, needs: "audit.read" },
   { to: "/admin/settings", label: "Settings", icon: Settings, needs: "settings.read" },
 ];
