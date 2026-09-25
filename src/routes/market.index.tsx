@@ -60,8 +60,8 @@ export const Route = createFileRoute("/market/")({
     ...(typeof search["category"] === "string" ? { category: search["category"] } : {}),
     ...(typeof search["q"] === "string" ? { q: search["q"] } : {}),
     ...(typeof search["area"] === "string" ? { area: search["area"] } : {}),
-    ...(toShillings(search["min"]) ? { min: toShillings(search["min"]) } : {}),
-    ...(toShillings(search["max"]) ? { max: toShillings(search["max"]) } : {}),
+    ...(toShillings(search["min"]) ? { min: toShillings(search["min"])! } : {}),
+    ...(toShillings(search["max"]) ? { max: toShillings(search["max"])! } : {}),
   }),
   component: MarketScreen,
 });
