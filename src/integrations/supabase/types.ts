@@ -172,6 +172,69 @@ export type Database = {
           },
         ]
       }
+      disputes: {
+        Row: {
+          against_id: string
+          created_at: string
+          details: string | null
+          id: string
+          job_id: string | null
+          kind: string
+          opened_by: string
+          order_id: string | null
+          reason: string
+          resolution_note: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+        }
+        Insert: {
+          against_id: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          job_id?: string | null
+          kind: string
+          opened_by: string
+          order_id?: string | null
+          reason: string
+          resolution_note?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+        }
+        Update: {
+          against_id?: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          job_id?: string | null
+          kind?: string
+          opened_by?: string
+          order_id?: string | null
+          reason?: string
+          resolution_note?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "disputes_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "disputes_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "market_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       favorite_workers: {
         Row: {
           created_at: string
@@ -376,20 +439,29 @@ export type Database = {
           category_slug: string
           condition: string
           created_at: string
+          delivery_fee_cents: number
+          delivery_note: string | null
           description: string
           hidden_at: string | null
           hidden_reason: string | null
           id: string
           images: string[]
+          listing_type: string
+          negotiable: boolean
+          offers_delivery: boolean
+          offers_pickup: boolean
           phone: string | null
           price_cents: number | null
           price_note: string | null
           search_vector: unknown
           seller_id: string
+          sku: string | null
           status: string
+          stock_qty: number | null
           title: string
           unit_label: string | null
           updated_at: string
+          variants: string[]
           views: number
         }
         Insert: {
@@ -397,20 +469,29 @@ export type Database = {
           category_slug: string
           condition?: string
           created_at?: string
+          delivery_fee_cents?: number
+          delivery_note?: string | null
           description?: string
           hidden_at?: string | null
           hidden_reason?: string | null
           id?: string
           images?: string[]
+          listing_type?: string
+          negotiable?: boolean
+          offers_delivery?: boolean
+          offers_pickup?: boolean
           phone?: string | null
           price_cents?: number | null
           price_note?: string | null
           search_vector?: unknown
           seller_id: string
+          sku?: string | null
           status?: string
+          stock_qty?: number | null
           title: string
           unit_label?: string | null
           updated_at?: string
+          variants?: string[]
           views?: number
         }
         Update: {
@@ -418,20 +499,29 @@ export type Database = {
           category_slug?: string
           condition?: string
           created_at?: string
+          delivery_fee_cents?: number
+          delivery_note?: string | null
           description?: string
           hidden_at?: string | null
           hidden_reason?: string | null
           id?: string
           images?: string[]
+          listing_type?: string
+          negotiable?: boolean
+          offers_delivery?: boolean
+          offers_pickup?: boolean
           phone?: string | null
           price_cents?: number | null
           price_note?: string | null
           search_vector?: unknown
           seller_id?: string
+          sku?: string | null
           status?: string
+          stock_qty?: number | null
           title?: string
           unit_label?: string | null
           updated_at?: string
+          variants?: string[]
           views?: number
         }
         Relationships: [
@@ -451,11 +541,18 @@ export type Database = {
           completed_at: string | null
           created_at: string
           currency: string
+          delivery_address: string | null
+          delivery_fee_cents: number
+          fulfilment: string
+          fulfilment_status: string
           id: string
           listing_id: string
+          quantity: number
           seller_id: string
           status: string
           title: string
+          updated_at: string
+          variant: string | null
         }
         Insert: {
           amount_cents: number
@@ -463,11 +560,18 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           currency?: string
+          delivery_address?: string | null
+          delivery_fee_cents?: number
+          fulfilment?: string
+          fulfilment_status?: string
           id?: string
           listing_id: string
+          quantity?: number
           seller_id: string
           status?: string
           title: string
+          updated_at?: string
+          variant?: string | null
         }
         Update: {
           amount_cents?: number
@@ -475,11 +579,18 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           currency?: string
+          delivery_address?: string | null
+          delivery_fee_cents?: number
+          fulfilment?: string
+          fulfilment_status?: string
           id?: string
           listing_id?: string
+          quantity?: number
           seller_id?: string
           status?: string
           title?: string
+          updated_at?: string
+          variant?: string | null
         }
         Relationships: [
           {
@@ -1119,6 +1230,11 @@ export type Database = {
         Args: { _id: string; _reason?: string }
         Returns: Json
       }
+      admin_disputes: { Args: { _status?: string }; Returns: Json }
+      admin_resolve_dispute: {
+        Args: { _id: string; _note: string; _outcome: string }
+        Returns: Json
+      }
       admin_review_verification: {
         Args: {
           _id: string
@@ -1226,11 +1342,42 @@ export type Database = {
       market_confirm_received: { Args: { _order_id: string }; Returns: Json }
       market_listing_detail: { Args: { _id: string }; Returns: Json }
       market_listing_view: { Args: { _id: string }; Returns: undefined }
+      market_place_order: {
+        Args: {
+          _address?: string
+          _fulfilment?: string
+          _listing_id: string
+          _quantity?: number
+          _variant?: string
+        }
+        Returns: Json
+      }
+      market_refund_internal: {
+        Args: { _order_id: string }
+        Returns: undefined
+      }
+      market_release_internal: {
+        Args: { _order_id: string }
+        Returns: undefined
+      }
+      market_set_fulfilment: {
+        Args: { _order_id: string; _status: string }
+        Returns: Json
+      }
       my_permissions: {
         Args: never
         Returns: {
           permission: Database["public"]["Enums"]["app_permission"]
         }[]
+      }
+      open_dispute: {
+        Args: {
+          _details: string
+          _job_id: string
+          _order_id: string
+          _reason: string
+        }
+        Returns: Json
       }
       payment_apply_result: {
         Args: {
@@ -1389,6 +1536,7 @@ export type Database = {
           verification: Database["public"]["Enums"]["verification_status"]
         }[]
       }
+      seller_dashboard: { Args: never; Returns: Json }
       submit_verification: {
         Args: {
           _back_path: string
@@ -1411,6 +1559,7 @@ export type Database = {
         Returns: Json
       }
       wallet_summary: { Args: { _user_id?: string }; Returns: Json }
+      withdraw_dispute: { Args: { _id: string }; Returns: Json }
       write_audit: {
         Args: {
           _action: string
