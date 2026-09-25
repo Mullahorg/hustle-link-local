@@ -63,7 +63,8 @@ function EmailSettings() {
     setBusy(true);
     try {
       const r = await sendTestEmail();
-      r.sent ? toast.success("Test email sent to your inbox") : toast.error(r.message);
+      if (r.sent) toast.success("Test email sent to your inbox");
+      else toast.error(r.message);
     } catch (error) {
       toast.error(friendlyAuthError(error));
     } finally {
