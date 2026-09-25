@@ -85,7 +85,7 @@ function timelineFor(entry: LedgerEntry): { title: string; done: boolean }[] {
   }
   return [
     { title: "Recorded on your wallet", done: true },
-    { title: "Held safely for the job", done: entry.status === "held" || settled },
+    { title: "Held safely", done: entry.status === "held" || settled },
     { title: settled ? "Completed" : "Waiting to complete", done: settled },
   ];
 }
