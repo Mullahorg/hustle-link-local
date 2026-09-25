@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 import { AppShell, BackHeader } from "@/components/layout/AppShell";
 import { AuthGate } from "@/components/hl/AuthGate";
+import { SecuritySettings } from "@/components/hl/SecuritySettings";
 import { Avatar, CardSkeleton, Chip } from "@/components/hl/primitives";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -432,7 +433,7 @@ function SettingsBody() {
         </ul>
       </Section>
 
-      <Section title="Privacy | blocked people">
+      <Section title="Privacy and blocked people">
         {blocked.isPending ? (
           <CardSkeleton rows={1} kind="worker" />
         ) : (blocked.data ?? []).length === 0 ? (
@@ -468,6 +469,15 @@ function SettingsBody() {
             More languages are on the way.
           </p>
         </div>
+      </Section>
+
+      <Section title="Sign-in and security">
+        <SecuritySettings
+          hasPassword={Boolean(
+            user?.identities?.some((identity) => identity.provider === "email") ??
+              user?.app_metadata?.provider === "email",
+          )}
+        />
       </Section>
 
       <Section title="Account">

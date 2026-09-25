@@ -61,7 +61,7 @@ export function ReportDialog({
       await submitReport({
         reporterId: user.id,
         reason,
-        details: context ? `${details}\n\n,  reported content: ${context}` : details,
+        details: context ? `${details}\n\nReported content: ${context}` : details,
         ...(subjectUserId ? { subjectUserId } : {}),
         ...(jobId ? { jobId } : {}),
       });

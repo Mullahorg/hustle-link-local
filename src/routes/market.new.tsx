@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { AuthGate } from "@/components/hl/AuthGate";
 import { BackHeader, FocusShell } from "@/components/layout/AppShell";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/hooks/useAuth";
 import { myProfileQuery } from "@/lib/account";
 import {
@@ -14,7 +15,9 @@ import {
   marketCategoriesQuery,
   priceLabel,
   uploadListingPhotos,
+  listingTypeLabel,
   type ListingCondition,
+  type ListingType,
 } from "@/lib/market";
 import { cn } from "@/lib/utils";
 
@@ -63,13 +66,24 @@ function SellScreen() {
   const [unit, setUnit] = useState("");
   const [area, setArea] = useState("");
   const [phone, setPhone] = useState("");
+  const [kind, setKind] = useState<ListingType>("product");
+  const [stock, setStock] = useState("1");
+  const [options, setOptions] = useState("");
+  const [sku, setSku] = useState("");
+  const [negotiable, setNegotiable] = useState(false);
+  const [pickup, setPickup] = useState(true);
+  const [delivery, setDelivery] = useState(false);
+  const [deliveryFee, setDeliveryFee] = useState("");
+  const [deliveryNote, setDeliveryNote] = useState("");
 
   const previews = useMemo(() => files.map((file) => URL.createObjectURL(file)), [files]);
 
   const filledArea = area || profile.data?.area || "";
   const filledPhone = phone || profile.data?.phone || "";
 
-  const ready = title.trim().length >= 3 && category && filledArea.trim().length >= 2;
+  const ready =
+    title.trim().length >= 3 && category && filledArea.trim().length >= 2 && (pickup || delivery);
+  const countsStock = kind === "product";
 
   const publish = useMutation({
     mutationFn: async () => {
@@ -89,6 +103,21 @@ function SellScreen() {
         area: filledArea.trim(),
         phone: filledPhone.trim() || null,
         images,
+        listing_type: kind,
+        stock_qty: countsStock ? Math.max(0, Math.floor(Number(stock) || 1)) : null,
+        sku: sku.trim() || null,
+        variants: options
+          .split(",")
+          .map((o) => o.trim())
+          .filter(Boolean)
+          .slice(0, 12),
+        negotiable,
+        offers_pickup: pickup,
+        offers_delivery: delivery,
+        delivery_fee_cents: delivery
+          ? Math.max(0, Math.round((Number(deliveryFee.replace(/[^0-9.]/g, "")) || 0) * 100))
+          : 0,
+        delivery_note: delivery ? deliveryNote.trim() || null : null,
       });
     },
     onSuccess: (listingId) => {
@@ -144,6 +173,28 @@ function SellScreen() {
                 />
               </label>
             ) : null}
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-base font-extrabold text-foreground">What is it?</h2>
+          <div className="mt-3 grid grid-cols-3 gap-2">
+            {(["product", "service", "rental"] as const).map((value) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setKind(value)}
+                aria-pressed={kind === value}
+                className={cn(
+                  "min-h-12 rounded-2xl border-2 text-[0.9375rem] font-bold",
+                  kind === value
+                    ? "border-primary bg-primary-soft text-primary-ink"
+                    : "border-border bg-card text-muted-foreground",
+                )}
+              >
+                {listingTypeLabel[value]}
+              </button>
+            ))}
           </div>
         </section>
 
@@ -229,6 +280,100 @@ function SellScreen() {
               </button>
             ))}
           </div>
+        </section>
+
+        <label className="flex min-h-12 items-center justify-between gap-3 rounded-2xl border-2 border-border bg-card px-4">
+          <span className="text-base font-bold text-foreground">Open to offers</span>
+          <Switch checked={negotiable} onCheckedChange={setNegotiable} />
+        </label>
+
+        {countsStock ? (
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="How many?">
+              <input
+                value={stock}
+                onChange={(event) => setStock(event.target.value.replace(/[^0-9]/g, ""))}
+                inputMode="numeric"
+                className={inputClass}
+              />
+            </Field>
+            <Field label="Code (optional)">
+              <input
+                value={sku}
+                onChange={(event) => setSku(event.target.value)}
+                placeholder="Shop code"
+                className={inputClass}
+              />
+            </Field>
+          </div>
+        ) : null}
+
+        <Field label="Choices buyers pick from (optional)">
+          <input
+            value={options}
+            onChange={(event) => setOptions(event.target.value)}
+            placeholder="Small, Medium, Large"
+            className={inputClass}
+          />
+        </Field>
+        <p className="-mt-4 text-[0.9375rem] font-medium text-muted-foreground">
+          Separate with commas, like sizes or colours. Leave empty if there is only one kind.
+        </p>
+
+        <section>
+          <h2 className="text-base font-extrabold text-foreground">How do buyers get it?</h2>
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              aria-pressed={pickup}
+              onClick={() => setPickup((v) => !v)}
+              className={cn(
+                "min-h-12 rounded-2xl border-2 text-[0.9375rem] font-bold",
+                pickup
+                  ? "border-primary bg-primary-soft text-primary-ink"
+                  : "border-border bg-card text-muted-foreground",
+              )}
+            >
+              They collect
+            </button>
+            <button
+              type="button"
+              aria-pressed={delivery}
+              onClick={() => setDelivery((v) => !v)}
+              className={cn(
+                "min-h-12 rounded-2xl border-2 text-[0.9375rem] font-bold",
+                delivery
+                  ? "border-primary bg-primary-soft text-primary-ink"
+                  : "border-border bg-card text-muted-foreground",
+              )}
+            >
+              I deliver
+            </button>
+          </div>
+          {!pickup && !delivery ? (
+            <p className="mt-2 text-[0.9375rem] font-bold text-destructive">Pick at least one.</p>
+          ) : null}
+          {delivery ? (
+            <div className="mt-3 grid grid-cols-2 gap-3">
+              <Field label="Delivery fee (KSh)">
+                <input
+                  value={deliveryFee}
+                  onChange={(event) => setDeliveryFee(event.target.value)}
+                  inputMode="numeric"
+                  placeholder="0 for free"
+                  className={inputClass}
+                />
+              </Field>
+              <Field label="Where you deliver">
+                <input
+                  value={deliveryNote}
+                  onChange={(event) => setDeliveryNote(event.target.value)}
+                  placeholder="Within Ruaka"
+                  className={inputClass}
+                />
+              </Field>
+            </div>
+          ) : null}
         </section>
 
         <Field label="Where can buyers find it?">

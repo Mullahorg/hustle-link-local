@@ -17,7 +17,7 @@ export function friendlyAuthError(raw: unknown): string {
   if (message.includes("invalid login credentials") || message.includes("invalid credentials"))
     return "That email and password don't match. Check your password and try again.";
   if (message.includes("email not confirmed"))
-    return "Please confirm your email first, check your inbox for the link we sent.";
+    return "Please confirm your email first. Check your inbox for the link we sent.";
   if (
     message.includes("invalid") &&
     (message.includes("otp") || message.includes("token") || message.includes("code"))
@@ -32,6 +32,8 @@ export function friendlyAuthError(raw: unknown): string {
       message.includes("6 characters"))
   )
     return "That password is too weak. Use at least 8 characters with a number.";
+  if (message.includes("current password") || message.includes("reauthentication"))
+    return "Your current password is not right. Check it and try again.";
   if (message.includes("same password"))
     return "That's your current password. Choose a different one.";
   if (message.includes("rate limit") || message.includes("too many"))

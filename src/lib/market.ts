@@ -36,8 +36,31 @@ export type ListingRow = {
   seller_verification: string | null;
 };
 
+export type ListingType = "product" | "service" | "business" | "rental" | "digital";
+
+export type SellerFields = {
+  listing_type: ListingType;
+  stock_qty: number | null;
+  sku: string | null;
+  variants: string[];
+  negotiable: boolean;
+  offers_pickup: boolean;
+  offers_delivery: boolean;
+  delivery_fee_cents: number;
+  delivery_note: string | null;
+};
+
+export const listingTypeLabel: Record<ListingType, string> = {
+  product: "Item",
+  service: "Service",
+  business: "Business",
+  rental: "For hire",
+  digital: "Digital",
+};
+
 export type ListingDetail = {
-  listing: ListingRow & {
+  listing: ListingRow &
+    SellerFields & {
     phone: string | null;
     seller_id: string;
     updated_at: string;
@@ -210,7 +233,7 @@ export async function createListing(input: {
   area: string;
   phone: string | null;
   images: string[];
-}): Promise<string> {
+} & SellerFields): Promise<string> {
   const { data, error } = await supabase
     .from("market_listings")
     .insert({
@@ -225,6 +248,15 @@ export async function createListing(input: {
       area: input.area,
       phone: input.phone,
       images: input.images,
+      listing_type: input.listing_type,
+      stock_qty: input.stock_qty,
+      sku: input.sku,
+      variants: input.variants,
+      negotiable: input.negotiable,
+      offers_pickup: input.offers_pickup,
+      offers_delivery: input.offers_delivery,
+      delivery_fee_cents: input.delivery_fee_cents,
+      delivery_note: input.delivery_note,
     })
     .select("id")
     .single();
@@ -280,7 +312,31 @@ export type MarketOrder = {
   status: "held" | "released" | "refunded";
   created_at: string;
   completed_at: string | null;
+  quantity: number;
+  variant: string | null;
+  fulfilment: "pickup" | "delivery";
+  delivery_address: string | null;
+  delivery_fee_cents: number;
+  fulfilment_status: FulfilmentStatus;
 };
+
+export type FulfilmentStatus = "placed" | "ready" | "on_the_way" | "delivered";
+
+/** The steps a buyer and seller see, in order. Pickup skips "on the way". */
+export function fulfilmentSteps(fulfilment: "pickup" | "delivery") {
+  return fulfilment === "delivery"
+    ? ([
+        ["placed", "Paid"],
+        ["ready", "Packed"],
+        ["on_the_way", "On the way"],
+        ["delivered", "Delivered"],
+      ] as const)
+    : ([
+        ["placed", "Paid"],
+        ["ready", "Ready to collect"],
+        ["delivered", "Collected"],
+      ] as const);
+}
 
 /** The latest order on a listing that the signed-in person is part of. */
 export const listingOrderQuery = (listingId: string, userId: string | undefined) =>
@@ -292,6 +348,7 @@ export const listingOrderQuery = (listingId: string, userId: string | undefined)
         .from("market_orders")
         .select("*")
         .eq("listing_id", listingId)
+        .or(`buyer_id.eq.${userId},seller_id.eq.${userId}`)
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
@@ -313,5 +370,150 @@ export async function confirmReceived(orderId: string) {
 
 export async function cancelOrder(orderId: string) {
   const { error } = await supabase.rpc("market_cancel_order", { _order_id: orderId });
+  if (error) throw new Error(error.message);
+}
+
+
+export async function placeOrder(input: {
+  listingId: string;
+  quantity: number;
+  variant: string | null;
+  fulfilment: "pickup" | "delivery";
+  address: string | null;
+}): Promise<string> {
+  const { data, error } = await supabase.rpc("market_place_order", {
+    _listing_id: input.listingId,
+    _quantity: input.quantity,
+    ...(input.variant ? { _variant: input.variant } : {}),
+    _fulfilment: input.fulfilment,
+    ...(input.address ? { _address: input.address } : {}),
+  });
+  if (error) throw new Error(error.message);
+  return (data as { order_id: string }).order_id;
+}
+
+export async function setFulfilment(orderId: string, status: Exclude<FulfilmentStatus, "placed">) {
+  const { error } = await supabase.rpc("market_set_fulfilment", {
+    _order_id: orderId,
+    _status: status,
+  });
+  if (error) throw new Error(error.message);
+}
+
+export async function updateStock(listingId: string, stock: number | null) {
+  const patch: { stock_qty: number | null; status?: string } = { stock_qty: stock };
+  if (stock !== null && stock > 0) patch.status = "available";
+  if (stock === 0) patch.status = "sold";
+  const { error } = await supabase.from("market_listings").update(patch).eq("id", listingId);
+  if (error) throw new Error(error.message);
+}
+
+/* ------------------------------------------------------------ seller dashboard */
+
+export type SellerStats = {
+  open_orders: number;
+  pending_cents: number;
+  sales_30d_cents: number;
+  sales_30d_count: number;
+  active_items: number;
+  low_stock: number;
+  views_total: number;
+};
+
+export const sellerStatsQuery = (userId: string | undefined) =>
+  queryOptions({
+    queryKey: ["seller-stats", userId],
+    enabled: Boolean(userId),
+    staleTime: 15_000,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("seller_dashboard");
+      if (error) throw new Error(error.message);
+      return data as unknown as SellerStats;
+    },
+  });
+
+export type SellerOrder = MarketOrder & { buyer_name: string | null };
+
+export const sellerOrdersQuery = (userId: string | undefined, open: boolean) =>
+  queryOptions({
+    queryKey: ["seller-orders", userId, open],
+    enabled: Boolean(userId),
+    staleTime: 10_000,
+    queryFn: async (): Promise<SellerOrder[]> => {
+      let query = supabase
+        .from("market_orders")
+        .select("*")
+        .eq("seller_id", userId!)
+        .order("created_at", { ascending: false })
+        .limit(50);
+      query = open ? query.eq("status", "held") : query.neq("status", "held");
+      const { data, error } = await query;
+      if (error) throw new Error(error.message);
+      const rows = (data ?? []) as MarketOrder[];
+      const ids = [...new Set(rows.map((row) => row.buyer_id))];
+      const names = new Map<string, string>();
+      if (ids.length) {
+        const { data: people } = await supabase
+          .from("profiles")
+          .select("id, full_name")
+          .in("id", ids);
+        for (const person of people ?? []) names.set(person.id, person.full_name);
+      }
+      return rows.map((row) => ({ ...row, buyer_name: names.get(row.buyer_id) ?? null }));
+    },
+  });
+
+/* ------------------------------------------------------------------ disputes */
+
+export type Dispute = {
+  id: string;
+  kind: "order" | "job";
+  order_id: string | null;
+  job_id: string | null;
+  opened_by: string;
+  against_id: string;
+  reason: string;
+  details: string | null;
+  status: "open" | "resolved_refund" | "resolved_release" | "closed" | "withdrawn";
+  resolution_note: string | null;
+  created_at: string;
+  resolved_at: string | null;
+};
+
+export const disputeQuery = (target: { orderId?: string; jobId?: string }, userId?: string) =>
+  queryOptions({
+    queryKey: ["dispute", target.orderId ?? "", target.jobId ?? "", userId],
+    enabled: Boolean(userId && (target.orderId || target.jobId)),
+    queryFn: async (): Promise<Dispute | null> => {
+      let query = supabase.from("disputes").select("*");
+      query = target.orderId
+        ? query.eq("order_id", target.orderId)
+        : query.eq("job_id", target.jobId!);
+      const { data, error } = await query
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) throw new Error(error.message);
+      return (data as Dispute | null) ?? null;
+    },
+  });
+
+export async function openDispute(input: {
+  orderId?: string;
+  jobId?: string;
+  reason: string;
+  details: string;
+}) {
+  const { error } = await supabase.rpc("open_dispute", {
+    _order_id: input.orderId ?? null,
+    _job_id: input.jobId ?? null,
+    _reason: input.reason,
+    _details: input.details,
+  } as never);
+  if (error) throw new Error(error.message);
+}
+
+export async function withdrawDispute(id: string) {
+  const { error } = await supabase.rpc("withdraw_dispute", { _id: id });
   if (error) throw new Error(error.message);
 }

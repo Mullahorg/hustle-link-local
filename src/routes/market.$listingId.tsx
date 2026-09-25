@@ -11,6 +11,11 @@ import {
   ShieldAlert,
   ShieldCheck,
   Trash2,
+  Truck,
+  Package,
+  Tag,
+  Minus,
+  Plus,
   Wallet,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -31,8 +36,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { timeAgo } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import {
-  buyListing,
   cancelOrder,
+  fulfilmentSteps,
+  listingTypeLabel,
+  placeOrder,
   conditionLabel,
   confirmReceived,
   countListingView,
@@ -47,6 +54,14 @@ import {
 } from "@/lib/market";
 import { openConversation } from "@/lib/account";
 import { money } from "@/lib/wallet";
+import { DisputePanel } from "@/components/hl/DisputePanel";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/market/$listingId")({
   head: () => ({
@@ -128,12 +143,19 @@ function ListingScreen() {
       queryClient.invalidateQueries({ queryKey: ["wallet-ledger"] }),
     ]);
   };
+  const [buyOpen, setBuyOpen] = useState(false);
   const buy = useMutation({
-    mutationFn: () => {
+    mutationFn: (input: {
+      quantity: number;
+      variant: string | null;
+      fulfilment: "pickup" | "delivery";
+      address: string | null;
+    }) => {
       if (!user) throw new Error("Sign in to buy this item");
-      return buyListing(listingId);
+      return placeOrder({ listingId, ...input });
     },
     onSuccess: async () => {
+      setBuyOpen(false);
       await refreshAfterMoney();
       toast.success("Paid. Your money is held safely until you confirm you got the item.");
     },
@@ -274,6 +296,8 @@ function ListingScreen() {
             <span>{timeAgo(listing.created_at)}</span>
           </div>
 
+          <ListingFacts listing={listing} />
+
           {order.data ? (
             <section
               aria-label="Your order"
@@ -291,10 +315,23 @@ function ListingScreen() {
               <p className="mt-1 text-[0.9375rem] font-semibold text-muted-foreground">
                 {order.data.status === "held"
                   ? user?.id === order.data.buyer_id
-                    ? "Collect the item, check it, then confirm below. The seller gets paid only then."
+                    ? order.data.fulfilment === "delivery"
+                      ? "The seller will deliver. Check the item, then confirm below. The seller gets paid only then."
+                      : "Collect the item, check it, then confirm below. The seller gets paid only then."
                     : "Hand over the item. You get paid when the buyer confirms."
                   : "See the receipt in your wallet."}
               </p>
+              {order.data.status === "held" ? (
+                <OrderSteps
+                  fulfilment={order.data.fulfilment}
+                  current={order.data.fulfilment_status}
+                />
+              ) : null}
+              {order.data.fulfilment === "delivery" && order.data.delivery_address ? (
+                <p className="mt-2 text-[0.9375rem] font-semibold text-foreground">
+                  Deliver to: {order.data.delivery_address}
+                </p>
+              ) : null}
               {order.data.status === "held" ? (
                 <div className="mt-3 space-y-2">
                   {user?.id === order.data.buyer_id ? (
@@ -307,17 +344,26 @@ function ListingScreen() {
                       <CheckCircle2 aria-hidden="true" />I got the item, pay the seller
                     </Button>
                   ) : null}
-                  <Button
-                    block
-                    size="lg"
-                    variant="outline"
-                    onClick={() => cancel.mutate()}
-                    disabled={cancel.isPending}
-                  >
-                    Cancel and refund
-                  </Button>
+                  {user?.id === order.data.seller_id ||
+                  order.data.fulfilment_status === "placed" ? (
+                    <Button
+                      block
+                      size="lg"
+                      variant="outline"
+                      onClick={() => cancel.mutate()}
+                      disabled={cancel.isPending}
+                    >
+                      Cancel and refund
+                    </Button>
+                  ) : null}
+                  {user?.id === order.data.seller_id ? (
+                    <Button asChild block size="lg" variant="outline">
+                      <Link to="/market/seller">Update delivery in seller dashboard</Link>
+                    </Button>
+                  ) : null}
                 </div>
               ) : null}
+              <DisputePanel orderId={order.data.id} moneyHeld={order.data.status === "held"} />
               <Button asChild block size="lg" variant="outline" className="mt-2">
                 <Link to="/wallet">
                   <Wallet aria-hidden="true" />
@@ -439,7 +485,7 @@ function ListingScreen() {
               <Button
                 size="lg"
                 className="flex-1"
-                onClick={() => buy.mutate()}
+                onClick={() => (user ? setBuyOpen(true) : toast.info("Sign in to buy this item"))}
                 disabled={buy.isPending}
               >
                 <ShieldCheck aria-hidden="true" />
@@ -449,6 +495,246 @@ function ListingScreen() {
           </div>
         </div>
       ) : null}
+
+      {canBuy ? (
+        <BuyDialog
+          open={buyOpen}
+          onOpenChange={setBuyOpen}
+          listing={listing}
+          busy={buy.isPending}
+          onBuy={(input) => buy.mutate(input)}
+        />
+      ) : null}
     </FocusShell>
+  );
+}
+
+type FullListing = NonNullable<ReturnType<typeof useListingType>>;
+function useListingType() {
+  return null as unknown as import("@/lib/market").ListingDetail["listing"] | null;
+}
+
+function ListingFacts({ listing }: { listing: FullListing }) {
+  const facts: { icon: React.ReactNode; text: string }[] = [];
+  if (listing.listing_type && listing.listing_type !== "product")
+    facts.push({ icon: <Tag className="size-5" aria-hidden="true" />, text: listingTypeLabel[listing.listing_type] });
+  if (listing.stock_qty !== null && listing.stock_qty !== undefined && listing.status === "available")
+    facts.push({
+      icon: <Package className="size-5" aria-hidden="true" />,
+      text: listing.stock_qty <= 3 ? `Only ${listing.stock_qty} left` : `${listing.stock_qty} in stock`,
+    });
+  if (listing.offers_delivery)
+    facts.push({
+      icon: <Truck className="size-5" aria-hidden="true" />,
+      text: `Delivery ${listing.delivery_fee_cents > 0 ? money(listing.delivery_fee_cents) : "free"}${listing.delivery_note ? `, ${listing.delivery_note}` : ""}`,
+    });
+  if (listing.offers_pickup)
+    facts.push({ icon: <MapPin className="size-5" aria-hidden="true" />, text: `Collect in ${listing.area}` });
+  if (listing.negotiable) facts.push({ icon: <MessageCircle className="size-5" aria-hidden="true" />, text: "Open to offers" });
+  if (facts.length === 0) return null;
+  return (
+    <ul className="mt-4 grid gap-2 rounded-2xl bg-secondary p-4">
+      {facts.map((fact) => (
+        <li key={fact.text} className="flex items-center gap-2 text-[0.9375rem] font-bold text-secondary-foreground">
+          {fact.icon}
+          {fact.text}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function OrderSteps({
+  fulfilment,
+  current,
+}: {
+  fulfilment: "pickup" | "delivery";
+  current: string;
+}) {
+  const steps = fulfilmentSteps(fulfilment);
+  const at = Math.max(0, steps.findIndex(([key]) => key === current));
+  return (
+    <ol className="mt-3 flex gap-1" aria-label="Order progress">
+      {steps.map(([key, label], index) => (
+        <li key={key} className="flex-1">
+          <span className={cn("block h-1.5 rounded-full", index <= at ? "bg-primary" : "bg-border")} />
+          <span
+            className={cn(
+              "mt-1 block text-[0.8125rem] font-bold",
+              index <= at ? "text-foreground" : "text-muted-foreground",
+            )}
+            aria-current={index === at ? "step" : undefined}
+          >
+            {label}
+          </span>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+function BuyDialog({
+  open,
+  onOpenChange,
+  listing,
+  busy,
+  onBuy,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  listing: FullListing;
+  busy: boolean;
+  onBuy: (input: {
+    quantity: number;
+    variant: string | null;
+    fulfilment: "pickup" | "delivery";
+    address: string | null;
+  }) => void;
+}) {
+  const max = Math.min(listing.stock_qty ?? 100, 100);
+  const [quantity, setQuantity] = useState(1);
+  const [variant, setVariant] = useState<string | null>(null);
+  const [fulfilment, setFulfilment] = useState<"pickup" | "delivery">(
+    listing.offers_pickup ? "pickup" : "delivery",
+  );
+  const [address, setAddress] = useState("");
+  const fee = fulfilment === "delivery" ? listing.delivery_fee_cents : 0;
+  const total = (listing.price_cents ?? 0) * quantity + fee;
+  const needsVariant = listing.variants.length > 0 && !variant;
+  const needsAddress = fulfilment === "delivery" && address.trim().length < 4;
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-[92vw] rounded-3xl sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="text-xl font-extrabold">Buy {listing.title}</DialogTitle>
+          <DialogDescription className="text-[0.9375rem] font-medium text-muted-foreground">
+            We hold your money until you say you got it.
+          </DialogDescription>
+        </DialogHeader>
+
+        {listing.variants.length > 0 ? (
+          <div>
+            <p className="text-base font-bold">Choose one</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {listing.variants.map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  aria-pressed={variant === option}
+                  onClick={() => setVariant(option)}
+                  className={cn(
+                    "min-h-12 rounded-full border-2 px-4 text-[0.9375rem] font-bold",
+                    variant === option
+                      ? "border-primary bg-primary-soft text-primary-ink"
+                      : "border-border bg-card text-foreground",
+                  )}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
+        {max > 1 ? (
+          <div className="flex items-center justify-between">
+            <p className="text-base font-bold">How many</p>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                aria-label="One less"
+                disabled={quantity <= 1}
+                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+              >
+                <Minus aria-hidden="true" />
+              </Button>
+              <span className="w-8 text-center text-lg font-extrabold" aria-live="polite">
+                {quantity}
+              </span>
+              <Button
+                variant="outline"
+                size="icon"
+                aria-label="One more"
+                disabled={quantity >= max}
+                onClick={() => setQuantity((q) => Math.min(max, q + 1))}
+              >
+                <Plus aria-hidden="true" />
+              </Button>
+            </div>
+          </div>
+        ) : null}
+
+        {listing.offers_pickup && listing.offers_delivery ? (
+          <div className="grid grid-cols-2 gap-2">
+            {(["pickup", "delivery"] as const).map((value) => (
+              <button
+                key={value}
+                type="button"
+                aria-pressed={fulfilment === value}
+                onClick={() => setFulfilment(value)}
+                className={cn(
+                  "min-h-12 rounded-2xl border-2 text-[0.9375rem] font-bold",
+                  fulfilment === value
+                    ? "border-primary bg-primary-soft text-primary-ink"
+                    : "border-border bg-card text-muted-foreground",
+                )}
+              >
+                {value === "pickup" ? "I'll collect" : "Deliver to me"}
+              </button>
+            ))}
+          </div>
+        ) : null}
+
+        {fulfilment === "delivery" ? (
+          <label className="block">
+            <span className="text-base font-bold">Where to deliver</span>
+            <input
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="Estate, landmark, gate colour"
+              className="mt-2 h-14 w-full rounded-2xl border-2 border-border-strong bg-card px-4 text-base font-semibold outline-none"
+            />
+          </label>
+        ) : null}
+
+        <dl className="space-y-1 rounded-2xl bg-secondary p-4 text-[0.9375rem] font-semibold text-secondary-foreground">
+          <div className="flex justify-between">
+            <dt>
+              {quantity} × {money(listing.price_cents ?? 0)}
+            </dt>
+            <dd>{money((listing.price_cents ?? 0) * quantity)}</dd>
+          </div>
+          {fee > 0 ? (
+            <div className="flex justify-between">
+              <dt>Delivery</dt>
+              <dd>{money(fee)}</dd>
+            </div>
+          ) : null}
+          <div className="flex justify-between pt-1 text-base font-extrabold text-foreground">
+            <dt>You pay from your wallet</dt>
+            <dd>{money(total)}</dd>
+          </div>
+        </dl>
+
+        <Button
+          block
+          size="lg"
+          disabled={busy || needsVariant || needsAddress}
+          onClick={() =>
+            onBuy({
+              quantity,
+              variant,
+              fulfilment,
+              address: fulfilment === "delivery" ? address.trim() : null,
+            })
+          }
+        >
+          <ShieldCheck aria-hidden="true" />
+          {busy ? "Paying…" : needsVariant ? "Choose an option" : `Pay ${money(total)}`}
+        </Button>
+      </DialogContent>
+    </Dialog>
   );
 }
