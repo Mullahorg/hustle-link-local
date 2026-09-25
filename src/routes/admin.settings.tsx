@@ -21,6 +21,143 @@ import {
 } from "@/lib/admin";
 import { friendlyAuthError } from "@/lib/auth-errors";
 import { paymentProviderStatus } from "@/lib/payments.functions";
+import { emailSettingsStatus, sendTestEmail } from "@/lib/email.functions";
+
+/** Resend email settings: key + sender, entered here and never shown again. */
+function EmailSettings() {
+  const queryClient = useQueryClient();
+  const [busy, setBusy] = useState(false);
+  const [draft, setDraft] = useState({ api_key: "", from: "", reply_to: "" });
+  const status = useQuery({
+    queryKey: ["email-settings"],
+    queryFn: () => emailSettingsStatus(),
+  });
+  const raw = useQuery({
+    queryKey: ["email-settings-raw"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("app_settings")
+        .select("value")
+        .eq("key", "email.resend")
+        .maybeSingle();
+      return (data?.value as Record<string, unknown> | null) ?? {};
+    },
+  });
+
+  const save = async (next: Record<string, unknown>) => {
+    setBusy(true);
+    try {
+      await setSetting("email.resend", { ...(raw.data ?? {}), ...next });
+      setDraft({ api_key: "", from: "", reply_to: "" });
+      await queryClient.invalidateQueries({ queryKey: ["email-settings"] });
+      await queryClient.invalidateQueries({ queryKey: ["email-settings-raw"] });
+      toast.success("Email settings saved");
+    } catch (error) {
+      toast.error(friendlyAuthError(error));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const test = async () => {
+    setBusy(true);
+    try {
+      const r = await sendTestEmail();
+      if (r.sent) toast.success("Test email sent to your inbox");
+      else toast.error(r.message);
+    } catch (error) {
+      toast.error(friendlyAuthError(error));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const s = status.data;
+  const fields = [
+    {
+      key: "api_key",
+      label: "Resend API key",
+      secret: true,
+      current: s?.hasKey ? `Saved · ${s.keyHint}` : null,
+      placeholder: "re_...",
+    },
+    {
+      key: "from",
+      label: "Sender (from a domain verified in Resend)",
+      secret: false,
+      current: s?.from ? `Saved · ${s.from}` : null,
+      placeholder: "HustlerLink <notify@yourdomain.com>",
+    },
+    {
+      key: "reply_to",
+      label: "Reply-to address (optional)",
+      secret: false,
+      current: s?.replyTo ? `Saved · ${s.replyTo}` : null,
+      placeholder: "support@yourdomain.com",
+    },
+  ] as const;
+
+  return (
+    <section className="mt-4 rounded-2xl border-2 border-border bg-card p-4">
+      <h2 className="text-lg font-black text-foreground">Email (Resend)</h2>
+      <p className="mt-1 text-[0.9375rem] text-muted-foreground">
+        Used to email members when their ID is approved, rejected, or needs new photos. Create an
+        API key at resend.com → API Keys and verify your sending domain there. The key is hidden
+        once saved.
+      </p>
+      {status.isLoading ? (
+        <Skeleton className="mt-4 h-48 w-full rounded-xl" />
+      ) : (
+        <>
+          <div className="mt-4 flex items-center justify-between gap-3 rounded-xl border-2 border-border p-3">
+            <span className="font-black text-foreground">Send emails</span>
+            <Switch
+              checked={s?.enabled ?? true}
+              aria-label="Send emails"
+              onCheckedChange={(checked) => void save({ enabled: checked })}
+            />
+          </div>
+          <ul className="mt-3 space-y-3">
+            {fields.map((f) => (
+              <li key={f.key} className="rounded-xl border-2 border-border p-3">
+                <label className="mb-1 block font-black text-foreground" htmlFor={`email-${f.key}`}>
+                  {f.label}
+                </label>
+                <p className="mb-2 text-[0.875rem] text-muted-foreground">
+                  {f.current ?? "Not set yet"}
+                </p>
+                <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
+                  <Input
+                    id={`email-${f.key}`}
+                    type={f.secret ? "password" : "text"}
+                    autoComplete="off"
+                    placeholder={f.placeholder}
+                    value={draft[f.key]}
+                    onChange={(e) => setDraft((p) => ({ ...p, [f.key]: e.target.value }))}
+                  />
+                  <Button
+                    disabled={busy || !draft[f.key].trim()}
+                    onClick={() => void save({ [f.key]: draft[f.key].trim() })}
+                  >
+                    Save
+                  </Button>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <Button
+            className="mt-3"
+            variant="outline"
+            disabled={busy || !s?.hasKey || !s?.from}
+            onClick={() => void test()}
+          >
+            Send me a test email
+          </Button>
+        </>
+      )}
+    </section>
+  );
+}
 
 export const Route = createFileRoute("/admin/settings")({ component: AdminSettings });
 
@@ -139,7 +276,9 @@ function PaymentKeys() {
   });
 
   const callbackHint =
-    typeof window === "undefined" ? "/api/public/webhooks/payhero" : `${window.location.origin}/api/public/webhooks/payhero`;
+    typeof window === "undefined"
+      ? "/api/public/webhooks/payhero"
+      : `${window.location.origin}/api/public/webhooks/payhero`;
 
   const save = async (next: Record<string, unknown>) => {
     setBusy(true);
@@ -179,7 +318,6 @@ function PaymentKeys() {
           Callback URL to paste into PayHero: <span className="font-bold">{callbackHint}</span>
         </p>
       </div>
-
 
       {isLoading ? (
         <Skeleton className="mt-4 h-56 w-full rounded-xl" />
@@ -381,6 +519,7 @@ function AdminSettings() {
         </p>
       )}
       {can("settings.write") ? <PaymentKeys /> : null}
+      {can("settings.write") ? <EmailSettings /> : null}
       {can("settings.read") || can("settings.write") ? <AppSettings /> : null}
     </AdminPage>
   );

@@ -1335,6 +1335,36 @@ export type Database = {
           views: number
         }[]
       }
+      search_listings_priced: {
+        Args: {
+          _area?: string
+          _category?: string
+          _limit?: number
+          _max_cents?: number
+          _min_cents?: number
+          _offset?: number
+          _q?: string
+        }
+        Returns: {
+          area: string
+          category_slug: string
+          condition: string
+          created_at: string
+          description: string
+          id: string
+          images: string[]
+          price_cents: number
+          price_note: string
+          seller_avatar: string
+          seller_id: string
+          seller_name: string
+          seller_verification: Database["public"]["Enums"]["verification_status"]
+          status: string
+          title: string
+          unit_label: string
+          views: number
+        }[]
+      }
       search_workers: {
         Args: {
           _category?: string
