@@ -12,6 +12,7 @@ import { myProfileQuery } from "@/lib/account";
 import {
   createListing,
   marketCategoriesQuery,
+  priceLabel,
   uploadListingPhotos,
   type ListingCondition,
 } from "@/lib/market";
