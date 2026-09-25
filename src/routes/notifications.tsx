@@ -18,9 +18,9 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/notifications")({
   head: () => ({
     meta: [
-      { title: "Notifications — HustlerLink" },
+      { title: "Notifications | HustlerLink" },
       { name: "description", content: "Job matches, replies and review reminders in one list." },
-      { property: "og:title", content: "Notifications — HustlerLink" },
+      { property: "og:title", content: "Notifications | HustlerLink" },
       {
         property: "og:description",
         content: "Job matches, replies and review reminders in one list.",

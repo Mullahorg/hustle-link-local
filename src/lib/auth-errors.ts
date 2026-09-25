@@ -12,7 +12,7 @@ export function friendlyAuthError(raw: unknown): string {
   if (message.includes("invalid login credentials") || message.includes("invalid credentials"))
     return "That email and password don't match. Check your password and try again.";
   if (message.includes("email not confirmed"))
-    return "Please confirm your email first — check your inbox for the link we sent.";
+    return "Please confirm your email first, check your inbox for the link we sent.";
   if (message.includes("invalid") && (message.includes("otp") || message.includes("token") || message.includes("code")))
     return "That code is wrong or has expired. Request a new one.";
   if (message.includes("expired"))

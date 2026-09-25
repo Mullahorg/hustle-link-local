@@ -26,15 +26,15 @@ import { myProfileQuery } from "@/lib/account";
 export const Route = createFileRoute("/profile")({
   head: () => ({
     meta: [
-      { title: "Your profile — HustlerLink" },
+      { title: "Your profile | HustlerLink" },
       {
         name: "description",
-        content: "Your skills, reviews and verification — the things that get you hired.",
+        content: "Your skills, reviews and verification, the things that get you hired.",
       },
-      { property: "og:title", content: "Your profile — HustlerLink" },
+      { property: "og:title", content: "Your profile | HustlerLink" },
       {
         property: "og:description",
-        content: "Your skills, reviews and verification — the things that get you hired.",
+        content: "Your skills, reviews and verification, the things that get you hired.",
       },
     ],
   }),

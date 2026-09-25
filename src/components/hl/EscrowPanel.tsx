@@ -103,14 +103,14 @@ export function EscrowPanel({
         {workerId && !row ? (
           <p className="mt-4 rounded-2xl border-2 border-accent bg-accent-soft p-4 text-[0.9375rem] font-bold text-foreground">
             {isEmployer
-              ? "You have agreed with a worker. The deal is only on once you secure the payment below — the worker should not travel before that."
+              ? "You have agreed with a worker. The deal is only on once you secure the payment below, the worker should not travel before that."
               : "The employer has accepted you. Wait until the payment is secured here before you travel to the job."}
           </p>
         ) : null}
 
         {row && row.status === "secured" ? (
           <p className="mt-4 rounded-2xl border-2 border-primary bg-primary-soft p-4 text-[0.9375rem] font-bold text-primary-ink">
-            The deal is on. {money(row.amount_cents, row.currency)} is held safely — it is safe to
+            The deal is on. {money(row.amount_cents, row.currency)} is held safely, it is safe to
             travel and start the work.
           </p>
         ) : null}

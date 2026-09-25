@@ -55,7 +55,7 @@ function AdminAudit() {
       header: "Target",
       render: (row) => (
         <span className="text-[0.875rem] text-muted-foreground">
-          {row.entity_type ?? "—"} {row.entity_id ? `· ${row.entity_id.slice(0, 8)}` : ""}
+          {row.entity_type ?? "-"} {row.entity_id ? `· ${row.entity_id.slice(0, 8)}` : ""}
         </span>
       ),
     },
@@ -64,7 +64,7 @@ function AdminAudit() {
       header: "Details",
       render: (row) => {
         const detail =
-          row.details && Object.keys(row.details).length > 0 ? JSON.stringify(row.details) : "—";
+          row.details && Object.keys(row.details).length > 0 ? JSON.stringify(row.details) : "-";
         return (
           <span className="block max-w-sm truncate text-[0.875rem] text-muted-foreground">
             {detail}

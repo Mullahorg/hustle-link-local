@@ -1,7 +1,7 @@
 /**
  * Email sending through Resend. The API key and sender address are entered by
  * an admin on the admin Settings page (stored under app_settings "email.resend")
- * and read here with the server-only client — never shipped to the browser.
+ * and read here with the server-only client, never shipped to the browser.
  */
 
 export type EmailConfig = {

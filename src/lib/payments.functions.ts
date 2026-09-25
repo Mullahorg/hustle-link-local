@@ -7,10 +7,10 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
  * provider-agnostic so another provider can be added without touching the UI.
  *
  * Credentials are read from the admin console settings (with environment
- * variables as a fallback) — nothing is hard-coded here, so adding keys in
+ * variables as a fallback), nothing is hard-coded here, so adding keys in
  * Settings is all that is needed to switch payments on.
  *
- * The client never decides a payment succeeded — only the provider callback
+ * The client never decides a payment succeeded, only the provider callback
  * or a provider status check does.
  */
 
@@ -132,7 +132,7 @@ export const requestStkPush = createServerFn({ method: "POST" })
 
 /**
  * Ask the provider what happened to a payment. Used as a safety net when a
- * callback is delayed — the result is applied through the same idempotent
+ * callback is delayed, the result is applied through the same idempotent
  * database function the webhook uses, so money can never be double counted.
  */
 export const checkPaymentStatus = createServerFn({ method: "POST" })

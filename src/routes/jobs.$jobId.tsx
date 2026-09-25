@@ -65,15 +65,15 @@ export const Route = createFileRoute("/jobs/$jobId")({
     const job = loaderData as { title?: string; area?: string; description?: string } | null;
     if (!job?.title) {
       return {
-        meta: [{ title: "Job unavailable — HustlerLink" }, { name: "robots", content: "noindex" }],
+        meta: [{ title: "Job unavailable | HustlerLink" }, { name: "robots", content: "noindex" }],
       };
     }
     const description = `${job.description?.slice(0, 140) || "Work available"} · ${job.area}`;
     return {
       meta: [
-        { title: `${job.title} — HustlerLink` },
+        { title: `${job.title} | HustlerLink` },
         { name: "description", content: description },
-        { property: "og:title", content: `${job.title} — HustlerLink` },
+        { property: "og:title", content: `${job.title} | HustlerLink` },
         { property: "og:description", content: description },
         { property: "og:type", content: "article" },
         { name: "twitter:card", content: "summary" },
@@ -563,7 +563,7 @@ function EmployerPanel({
       if (variables.status === "accepted") onStatus("in_progress");
       toast.success(
         variables.status === "accepted"
-          ? "Worker hired — the job is now in progress"
+          ? "Worker hired, the job is now in progress"
           : variables.status === "shortlisted"
             ? "Shortlisted"
             : "Application declined",

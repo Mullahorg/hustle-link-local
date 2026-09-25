@@ -26,12 +26,12 @@ import { ReportDialog } from "@/components/hl/ReportDialog";
 export const Route = createFileRoute("/workers/$workerId")({
   head: () => ({
     meta: [
-      { title: "Worker profile — HustlerLink" },
+      { title: "Worker profile | HustlerLink" },
       {
         name: "description",
         content: "Skills, rates, verification and honest reviews before you hire.",
       },
-      { property: "og:title", content: "Worker profile — HustlerLink" },
+      { property: "og:title", content: "Worker profile | HustlerLink" },
       {
         property: "og:description",
         content: "Skills, rates, verification and honest reviews before you hire.",
@@ -303,7 +303,7 @@ function WorkerScreen() {
                 >
                   <p className="text-base font-extrabold">{certificate.title}</p>
                   <p className="text-[0.9375rem] font-semibold text-muted-foreground">
-                    {[certificate.issuer, certificate.year].filter(Boolean).join(" · ") || "—"}
+                    {[certificate.issuer, certificate.year].filter(Boolean).join(" · ") || "-"}
                   </p>
                 </li>
               ))}

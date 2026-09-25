@@ -15,10 +15,10 @@ import { friendlyAuthError } from "@/lib/auth-errors";
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
-      { title: "Admin console — HustlerLink" },
+      { title: "Admin console | HustlerLink" },
       { name: "description", content: "Internal operations console for HustlerLink staff." },
       { name: "robots", content: "noindex, nofollow" },
-      { property: "og:title", content: "Admin console — HustlerLink" },
+      { property: "og:title", content: "Admin console | HustlerLink" },
       { property: "og:description", content: "Internal operations console for HustlerLink staff." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -70,7 +70,7 @@ function Locked({ signedIn }: { signedIn: boolean }) {
         </h1>
         <p className="mt-2 text-[0.9375rem] text-muted-foreground">
           {canBootstrap
-            ? "No super admin exists yet. Claim the role for this account — this can only happen once, and every future administrator must be added from inside the console."
+            ? "No super admin exists yet. Claim the role for this account, this can only happen once, and every future administrator must be added from inside the console."
             : signedIn
               ? "This area is for HustlerLink staff. If you think that's a mistake, contact your administrator."
               : "Sign in with a staff account to continue."}

@@ -33,21 +33,21 @@ const toShillings = (v: unknown) => {
 /** KSh bands villagers actually shop in. */
 const PRICE_BANDS: { label: string; min?: number; max?: number }[] = [
   { label: "Under KSh 500", max: 500 },
-  { label: "KSh 500 – 2,000", min: 500, max: 2000 },
-  { label: "KSh 2,000 – 10,000", min: 2000, max: 10000 },
+  { label: "KSh 500 to 2,000", min: 500, max: 2000 },
+  { label: "KSh 2,000 to 10,000", min: 2000, max: 10000 },
   { label: "Over KSh 10,000", min: 10000 },
 ];
 
 export const Route = createFileRoute("/market/")({
   head: () => ({
     meta: [
-      { title: "Village market — buy and sell near you | HustlerLink" },
+      { title: "Village market | buy and sell near you | HustlerLink" },
       {
         name: "description",
         content:
           "Buy and sell locally: farm produce, livestock, furniture, phones, tools and more from neighbours near you.",
       },
-      { property: "og:title", content: "Village market — buy and sell near you" },
+      { property: "og:title", content: "Village market | buy and sell near you" },
       {
         property: "og:description",
         content: "A simple local market where anyone can sell to their neighbours.",

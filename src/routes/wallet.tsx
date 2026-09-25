@@ -40,12 +40,12 @@ import {
 export const Route = createFileRoute("/wallet")({
   head: () => ({
     meta: [
-      { title: "Your wallet — HustlerLink" },
+      { title: "Your wallet | HustlerLink" },
       {
         name: "description",
         content: "Top up with M-Pesa, see money held safely for a job, and track every payment.",
       },
-      { property: "og:title", content: "Your wallet — HustlerLink" },
+      { property: "og:title", content: "Your wallet | HustlerLink" },
       {
         property: "og:description",
         content: "Top up with M-Pesa, see money held safely for a job, and track every payment.",

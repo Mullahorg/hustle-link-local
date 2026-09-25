@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { signedUrls, uploadPhoto } from "@/lib/media";
 
 /**
- * Village market — anyone can sell anything to their neighbours.
+ * Village market, anyone can sell anything to their neighbours.
  *
  * Deliberately simple: a photo, a price, a place, and a way to talk. Prices are
  * kept in cents so nothing rounds badly, and photos live in a private bucket
@@ -55,7 +55,7 @@ export type ListingDetail = {
   };
 };
 
-/** "KSh 1,200 per kg" — always readable at arm's length in the sun. */
+/** "KSh 1,200 per kg", always readable at arm's length in the sun. */
 export function priceLabel(
   cents: number | null | undefined,
   unit?: string | null,

@@ -5,7 +5,7 @@ import type { Database } from "@/integrations/supabase/types";
 
 /**
  * Workflow layer: everything the worker and employer journeys need after a job
- * exists — applications, hiring, completion, reviews, blocking and presence.
+ * exists, applications, hiring, completion, reviews, blocking and presence.
  * All calls run in the browser against RLS-protected tables.
  */
 

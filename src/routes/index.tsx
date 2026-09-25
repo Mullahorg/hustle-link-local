@@ -14,13 +14,13 @@ import { unreadCountQuery } from "@/lib/account";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "HustlerLink — Find work and hire trusted workers" },
+      { title: "HustlerLink | Find work and hire trusted workers" },
       {
         name: "description",
         content:
           "HustlerLink connects fundis, cleaners, tutors and drivers with people who need them. Post a job, get applications, hire with confidence.",
       },
-      { property: "og:title", content: "HustlerLink — Find work and hire trusted workers" },
+      { property: "og:title", content: "HustlerLink | Find work and hire trusted workers" },
       {
         property: "og:description",
         content:
@@ -154,7 +154,7 @@ function HomeScreen() {
           <span className="min-w-0 flex-1">
             <span className="block text-lg font-extrabold text-foreground">Village market</span>
             <span className="block text-base font-medium text-muted-foreground">
-              Buy and sell with neighbours — produce, furniture, phones and more.
+              Buy and sell with neighbours, produce, furniture, phones and more.
             </span>
           </span>
           <ChevronRight className="size-6 shrink-0 text-muted-foreground" aria-hidden="true" />
@@ -171,7 +171,7 @@ function HomeScreen() {
         <section className="px-5 pt-9">
           <EmptyState
             icon={<Sparkles className="size-7" aria-hidden="true" />}
-            title="You're early — nothing posted yet"
+            title="You're early | nothing posted yet"
             body="Be the first to post a job, or list your own skills so people can find you."
             action={
               <div className="space-y-2">
