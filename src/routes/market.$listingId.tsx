@@ -407,11 +407,11 @@ function ListingScreen() {
 
       {!mine ? (
         <div className="fixed inset-x-0 bottom-0 z-40 border-t-2 border-border bg-card px-5 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
-          <div className="mx-auto flex max-w-screen-sm items-center gap-2">
+          <div className="mx-auto flex max-w-screen-sm items-center gap-2 [&>*]:min-w-0 [&>*]:px-3">
             {listing.phone ? (
               showPhone ? (
                 <Button asChild variant="outline" size="lg" className="flex-1">
-                  <a href={`tel:${listing.phone}`}>{listing.phone}</a>
+                  <a href={`tel:${listing.phone}`}>{canBuy ? "Call" : listing.phone}</a>
                 </Button>
               ) : (
                 <Button
@@ -421,7 +421,7 @@ function ListingScreen() {
                   onClick={() => setShowPhone(true)}
                 >
                   <Phone aria-hidden="true" />
-                  Show number
+                  {canBuy ? "Call" : "Show number"}
                 </Button>
               )
             ) : null}
