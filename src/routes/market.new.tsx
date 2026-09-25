@@ -197,7 +197,16 @@ function SellScreen() {
           </Field>
         </div>
         <p className="-mt-4 text-[0.9375rem] font-medium text-muted-foreground">
-          Leave the price empty if you would rather people ask.
+          {Number(price.replace(/[^0-9.]/g, "")) > 0 ? (
+            <>
+              Buyers will see{" "}
+              <span className="font-extrabold text-foreground">
+                {priceLabel(Math.round(Number(price.replace(/[^0-9.]/g, "")) * 100), unit)}
+              </span>
+            </>
+          ) : (
+            "Type the price in shillings, or leave it empty if you would rather people ask."
+          )}
         </p>
 
         <section>
