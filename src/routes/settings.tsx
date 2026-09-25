@@ -432,7 +432,7 @@ function SettingsBody() {
         </ul>
       </Section>
 
-      <Section title="Privacy | blocked people">
+      <Section title="Privacy and blocked people">
         {blocked.isPending ? (
           <CardSkeleton rows={1} kind="worker" />
         ) : (blocked.data ?? []).length === 0 ? (

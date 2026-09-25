@@ -70,7 +70,7 @@ function AboutScreen() {
     <AppShell>
       <ScreenHeader
         title="How HustlerLink works"
-        subtitle="Find work or hire someone you can trust | in four steps."
+        subtitle="Find work or hire someone you can trust, in four steps."
       />
 
       <section className="px-5">

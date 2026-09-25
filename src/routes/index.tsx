@@ -168,7 +168,7 @@ function HomeScreen() {
         <section className="px-5 pt-9">
           <EmptyState
             icon={<Sparkles className="size-7" aria-hidden="true" />}
-            title="You're early | nothing posted yet"
+            title="You're early. Nothing posted yet"
             body="Be the first to post a job, or list your own skills so people can find you."
             action={
               <div className="space-y-2">
