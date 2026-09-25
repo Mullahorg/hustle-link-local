@@ -13,12 +13,12 @@ type AuthSearch = { redirect?: string };
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in — HustlerLink" },
+      { title: "Sign in | HustlerLink" },
       {
         name: "description",
         content: "Create your HustlerLink account to post jobs, apply for work and chat safely.",
       },
-      { property: "og:title", content: "Sign in — HustlerLink" },
+      { property: "og:title", content: "Sign in | HustlerLink" },
       {
         property: "og:description",
         content: "Create your HustlerLink account to post jobs, apply for work and chat safely.",

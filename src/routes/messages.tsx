@@ -14,12 +14,12 @@ import { shortTime } from "@/lib/format";
 export const Route = createFileRoute("/messages")({
   head: () => ({
     meta: [
-      { title: "Messages — HustlerLink" },
+      { title: "Messages | HustlerLink" },
       {
         name: "description",
         content: "Agree the details, the price and the time before anyone travels.",
       },
-      { property: "og:title", content: "Messages — HustlerLink" },
+      { property: "og:title", content: "Messages | HustlerLink" },
       {
         property: "og:description",
         content: "Agree the details, the price and the time before anyone travels.",

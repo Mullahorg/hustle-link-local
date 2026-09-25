@@ -63,7 +63,10 @@ export const myRolesQuery = (userId: string | undefined) =>
     enabled: Boolean(userId),
     staleTime: 60_000,
     queryFn: async (): Promise<AppRole[]> => {
-      const { data, error } = await supabase.from("user_roles").select("role").eq("user_id", userId!);
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId!);
       if (error) throw new Error(error.message);
       return (data ?? []).map((r) => r.role);
     },
@@ -143,9 +146,21 @@ export type ListResult<T> = { rows: T[]; total: number };
  * RLS decides what actually comes back, so an under-privileged staff member
  * simply sees an empty table rather than a leak.
  */
-export const adminListQuery = <T,>(args: ListArgs) =>
+export const adminListQuery = <T>(args: ListArgs) =>
   queryOptions({
-    queryKey: ["admin-list", args.table, args.columns ?? "*", args.page, args.pageSize ?? ADMIN_PAGE, args.sort ?? "", args.ascending ?? false, args.q ?? "", args.searchColumns?.join(",") ?? "", JSON.stringify(args.eq ?? {}), JSON.stringify(args.nullish ?? {})],
+    queryKey: [
+      "admin-list",
+      args.table,
+      args.columns ?? "*",
+      args.page,
+      args.pageSize ?? ADMIN_PAGE,
+      args.sort ?? "",
+      args.ascending ?? false,
+      args.q ?? "",
+      args.searchColumns?.join(",") ?? "",
+      JSON.stringify(args.eq ?? {}),
+      JSON.stringify(args.nullish ?? {}),
+    ],
     enabled: args.enabled ?? true,
     staleTime: 15_000,
     queryFn: async (): Promise<ListResult<T>> => {
@@ -216,7 +231,12 @@ export const upsertCategory = (slug: string, name: string, icon: string, sortOrd
 export const deleteCategory = (slug: string) => rpc("admin_delete_category", { _slug: slug });
 
 export const sendNotification = (userId: string, title: string, body: string, link?: string) =>
-  rpc("admin_send_notification", { _user_id: userId, _title: title, _body: body, _link: link ?? null });
+  rpc("admin_send_notification", {
+    _user_id: userId,
+    _title: title,
+    _body: body,
+    _link: link ?? null,
+  });
 
 export const setSetting = (key: string, value: unknown) =>
   rpc("admin_set_setting", { _key: key, _value: value });

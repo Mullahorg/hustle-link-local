@@ -28,7 +28,7 @@ function siteOrigin(): string {
   }
 }
 
-/** Status for the admin Settings card — never returns the key itself. */
+/** Status for the admin Settings card, never returns the key itself. */
 export const emailSettingsStatus = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {

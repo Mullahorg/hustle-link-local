@@ -15,10 +15,10 @@ import { friendlyAuthError } from "@/lib/auth-errors";
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
-      { title: "Admin console — HustlerLink" },
+      { title: "Admin console | HustlerLink" },
       { name: "description", content: "Internal operations console for HustlerLink staff." },
       { name: "robots", content: "noindex, nofollow" },
-      { property: "og:title", content: "Admin console — HustlerLink" },
+      { property: "og:title", content: "Admin console | HustlerLink" },
       { property: "og:description", content: "Internal operations console for HustlerLink staff." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -63,14 +63,18 @@ function Locked({ signedIn }: { signedIn: boolean }) {
     <div className="grid min-h-dvh place-items-center bg-background px-5">
       <div className="w-full max-w-md rounded-3xl border-2 border-border bg-card p-7 text-center">
         <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-primary-soft text-primary-ink">
-          {canBootstrap ? <ShieldCheck className="size-7" aria-hidden="true" /> : <Lock className="size-7" aria-hidden="true" />}
+          {canBootstrap ? (
+            <ShieldCheck className="size-7" aria-hidden="true" />
+          ) : (
+            <Lock className="size-7" aria-hidden="true" />
+          )}
         </span>
         <h1 className="mt-4 text-xl font-black text-foreground">
           {canBootstrap ? "Set up the admin console" : "Staff access only"}
         </h1>
         <p className="mt-2 text-[0.9375rem] text-muted-foreground">
           {canBootstrap
-            ? "No super admin exists yet. Claim the role for this account — this can only happen once, and every future administrator must be added from inside the console."
+            ? "No super admin exists yet. Claim the role for this account, this can only happen once, and every future administrator must be added from inside the console."
             : signedIn
               ? "This area is for HustlerLink staff. If you think that's a mistake, contact your administrator."
               : "Sign in with a staff account to continue."}
@@ -98,7 +102,9 @@ function Locked({ signedIn }: { signedIn: boolean }) {
             </Button>
           ) : (
             <Button asChild block size="lg" variant={signedIn ? "outline" : "default"}>
-              <Link to={signedIn ? "/" : "/auth"}>{signedIn ? "Back to HustlerLink" : "Sign in"}</Link>
+              <Link to={signedIn ? "/" : "/auth"}>
+                {signedIn ? "Back to HustlerLink" : "Sign in"}
+              </Link>
             </Button>
           )}
         </div>

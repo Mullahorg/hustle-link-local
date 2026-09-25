@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 /**
- * Provider webhook — the only thing allowed to mark a payment successful.
+ * Provider webhook, the only thing allowed to mark a payment successful.
  * Every event is stored, signature-checked and applied idempotently.
  */
 export const Route = createFileRoute("/api/public/webhooks/payhero")({

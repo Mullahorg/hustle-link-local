@@ -61,7 +61,7 @@ export function ReportDialog({
       await submitReport({
         reporterId: user.id,
         reason,
-        details: context ? `${details}\n\n— reported content: ${context}` : details,
+        details: context ? `${details}\n\n,  reported content: ${context}` : details,
         ...(subjectUserId ? { subjectUserId } : {}),
         ...(jobId ? { jobId } : {}),
       });
@@ -69,7 +69,7 @@ export function ReportDialog({
     onSuccess: () => {
       setOpen(false);
       setDetails("");
-      toast.success("Thanks — our team will look at this");
+      toast.success("Thanks, our team will look at this");
     },
     onError: (error: Error) => toast.error("Could not send report", { description: error.message }),
   });
@@ -83,7 +83,7 @@ export function ReportDialog({
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["is-blocked"] });
       await queryClient.invalidateQueries({ queryKey: ["blocked-users"] });
-      toast.success(blocked.data ? "Unblocked" : "Blocked — they can no longer reach you");
+      toast.success(blocked.data ? "Unblocked" : "Blocked, they can no longer reach you");
     },
     onError: (error: Error) => toast.error("Could not update", { description: error.message }),
   });

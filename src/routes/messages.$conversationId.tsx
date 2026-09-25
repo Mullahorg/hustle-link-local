@@ -18,9 +18,9 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/messages/$conversationId")({
   head: () => ({
     meta: [
-      { title: "Chat — HustlerLink" },
+      { title: "Chat | HustlerLink" },
       { name: "description", content: "Agree the work, the price and the time in one place." },
-      { property: "og:title", content: "Chat — HustlerLink" },
+      { property: "og:title", content: "Chat | HustlerLink" },
       {
         property: "og:description",
         content: "Agree the work, the price and the time in one place.",
@@ -118,7 +118,7 @@ function Thread({ conversationId }: { conversationId: string }) {
     };
   }, [conversationId, queryClient]);
 
-  // Only jump to the bottom for new messages — loading older pages must keep
+  // Only jump to the bottom for new messages, loading older pages must keep
   // the reader where they are.
   const latestId = data?.[data.length - 1]?.id;
   useEffect(() => {

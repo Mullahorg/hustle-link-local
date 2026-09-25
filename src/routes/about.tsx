@@ -8,7 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "How HustlerLink works — hire or get hired safely" },
+      { title: "How HustlerLink works | hire or get hired safely" },
       {
         name: "description",
         content:
@@ -70,7 +70,7 @@ function AboutScreen() {
     <AppShell>
       <ScreenHeader
         title="How HustlerLink works"
-        subtitle="Find work or hire someone you can trust — in four steps."
+        subtitle="Find work or hire someone you can trust | in four steps."
       />
 
       <section className="px-5">

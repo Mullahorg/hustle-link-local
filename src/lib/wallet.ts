@@ -7,7 +7,7 @@ import type { Database } from "@/integrations/supabase/types";
  * Wallet layer.
  *
  * Every balance on screen is derived from the append-only ledger in the
- * database — nothing here ever writes a balance. Money only moves through
+ * database, nothing here ever writes a balance. Money only moves through
  * SECURITY DEFINER database functions, and top ups only settle when the
  * payment provider confirms them through the webhook.
  */
@@ -112,7 +112,7 @@ export function entryLabel(type: string): string {
     case "market_incoming":
       return "Sale payment on the way";
     case "market_sale":
-      return "Item sold — you got paid";
+      return "Item sold, you got paid";
     default:
       return type.replace(/_/g, " ");
   }
@@ -172,7 +172,7 @@ export const walletLedgerQuery = (userId: string | undefined) =>
     },
   });
 
-/** Payments a person started — used for status polling and receipts. */
+/** Payments a person started, used for status polling and receipts. */
 export const myPaymentsQuery = (userId: string | undefined) =>
   queryOptions({
     queryKey: ["my-payments", userId ?? "anon"],
@@ -191,7 +191,7 @@ export const myPaymentsQuery = (userId: string | undefined) =>
     },
   });
 
-/** One payment looked up by its internal id — used by receipts. */
+/** One payment looked up by its internal id, used by receipts. */
 export const paymentByIdQuery = (id: string) =>
   queryOptions({
     queryKey: ["payment-by-id", id],
@@ -210,7 +210,6 @@ export const paymentByIdQuery = (id: string) =>
   });
 
 export const paymentQuery = (reference: string) =>
-
   queryOptions({
     queryKey: ["payment", reference],
     staleTime: 2_000,
@@ -285,7 +284,10 @@ export async function fundEscrow(jobId: string, amountCents: number) {
   if (error) throw new Error(error.message);
 }
 
-export async function setEscrowStage(jobId: string, status: "in_progress" | "awaiting_confirmation") {
+export async function setEscrowStage(
+  jobId: string,
+  status: "in_progress" | "awaiting_confirmation",
+) {
   const { error } = await supabase.rpc("escrow_set_status", { _job_id: jobId, _status: status });
   if (error) throw new Error(error.message);
 }

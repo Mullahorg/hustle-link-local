@@ -18,12 +18,12 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/post-job")({
   head: () => ({
     meta: [
-      { title: "Post a job — HustlerLink" },
+      { title: "Post a job | HustlerLink" },
       {
         name: "description",
         content: "Describe the work in three short steps and get applications the same day.",
       },
-      { property: "og:title", content: "Post a job — HustlerLink" },
+      { property: "og:title", content: "Post a job | HustlerLink" },
       {
         property: "og:description",
         content: "Describe the work in three short steps and get applications the same day.",

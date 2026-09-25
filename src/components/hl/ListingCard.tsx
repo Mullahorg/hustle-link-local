@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { conditionLabel, listingPhotosQuery, priceLabel, type ListingRow } from "@/lib/market";
 
 /**
- * One item for sale. Photo first — that is how people shop in a village market —
+ * One item for sale. Photo first, that is how people shop in a village market ,
  * then the price in big type, then where it is and who is selling.
  */
 export function ListingCard({

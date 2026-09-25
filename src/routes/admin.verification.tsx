@@ -56,7 +56,7 @@ const date = (value: string | null) =>
         hour: "2-digit",
         minute: "2-digit",
       })
-    : "—";
+    : "-";
 
 const tone: Record<string, "default" | "secondary" | "destructive"> = {
   verified: "default",
@@ -136,7 +136,7 @@ function ReviewDialog({
           ? toast.success("Email sent to the member")
           : toast.info(`Email not sent: ${r.message}`),
       )
-      .catch(() => toast.info("Email not sent — check email settings"));
+      .catch(() => toast.info("Email not sent, check email settings"));
     await trail.refetch();
     await onDone();
   };
@@ -336,7 +336,7 @@ function AdminVerification() {
       header: "ID ends with",
       render: (row) => (
         <span className="font-semibold">
-          {row.id_number_last4 ? `••••${row.id_number_last4}` : "—"}
+          {row.id_number_last4 ? `••••${row.id_number_last4}` : "-"}
         </span>
       ),
     },

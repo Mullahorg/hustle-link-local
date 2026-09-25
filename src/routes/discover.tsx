@@ -24,13 +24,13 @@ type DiscoverSearch = { tab: Tab; category?: string; q?: string; focus?: boolean
 export const Route = createFileRoute("/discover")({
   head: () => ({
     meta: [
-      { title: "Discover jobs and workers — HustlerLink" },
+      { title: "Discover jobs and workers | HustlerLink" },
       {
         name: "description",
         content:
           "Search open jobs or browse verified fundis, cleaners, tutors and drivers near you.",
       },
-      { property: "og:title", content: "Discover jobs and workers — HustlerLink" },
+      { property: "og:title", content: "Discover jobs and workers | HustlerLink" },
       {
         property: "og:description",
         content: "Search open jobs or browse verified workers near you.",
@@ -66,7 +66,6 @@ function DiscoverScreen() {
   useEffect(() => {
     if (focus) inputRef.current?.focus();
   }, [focus]);
-
 
   // Debounce typing into the URL so the query layer caches per search term.
   useEffect(() => {

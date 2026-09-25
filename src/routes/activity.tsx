@@ -18,12 +18,12 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/activity")({
   head: () => ({
     meta: [
-      { title: "Your activity — HustlerLink" },
+      { title: "Your activity | HustlerLink" },
       {
         name: "description",
         content: "Track the jobs you applied for, the ones you saved and the ones you posted.",
       },
-      { property: "og:title", content: "Your activity — HustlerLink" },
+      { property: "og:title", content: "Your activity | HustlerLink" },
       {
         property: "og:description",
         content: "Track the jobs you applied for, the ones you saved and the ones you posted.",
@@ -115,7 +115,7 @@ function Applied() {
         <EmptyState
           icon={<ClipboardList className="size-7" aria-hidden="true" />}
           title="No applications yet"
-          body="Find a job that suits you and apply — it takes one tap."
+          body="Find a job that suits you and apply, it takes one tap."
           action={
             <Button asChild block>
               <Link to="/discover" search={{ tab: "jobs" }}>
@@ -376,7 +376,7 @@ function Selling() {
         <EmptyState
           icon={<Store className="size-7" aria-hidden="true" />}
           title="You aren't selling anything yet"
-          body="Add a photo, a price and where you are — it takes about a minute."
+          body="Add a photo, a price and where you are, it takes about a minute."
           action={
             <Button asChild block>
               <Link to="/market/new">Sell something</Link>

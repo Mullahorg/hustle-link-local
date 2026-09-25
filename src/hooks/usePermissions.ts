@@ -5,7 +5,7 @@ import { myPermissionsQuery, myRolesQuery, type AppRole, type Permission } from 
 
 /**
  * Frontend mirror of the backend permission check. The database is still the
- * authority — this only decides what we bother rendering.
+ * authority, this only decides what we bother rendering.
  */
 export function usePermissions() {
   const { user, loading } = useAuth();

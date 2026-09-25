@@ -5,7 +5,6 @@ import {
   ChevronRight,
   ClipboardList,
   Store,
-
   HelpCircle,
   Images,
   LogOut,
@@ -26,15 +25,15 @@ import { myProfileQuery } from "@/lib/account";
 export const Route = createFileRoute("/profile")({
   head: () => ({
     meta: [
-      { title: "Your profile — HustlerLink" },
+      { title: "Your profile | HustlerLink" },
       {
         name: "description",
-        content: "Your skills, reviews and verification — the things that get you hired.",
+        content: "Your skills, reviews and verification, the things that get you hired.",
       },
-      { property: "og:title", content: "Your profile — HustlerLink" },
+      { property: "og:title", content: "Your profile | HustlerLink" },
       {
         property: "og:description",
-        content: "Your skills, reviews and verification — the things that get you hired.",
+        content: "Your skills, reviews and verification, the things that get you hired.",
       },
     ],
   }),
@@ -50,7 +49,6 @@ const rows = [
   { icon: Bell, label: "Notifications", to: "/notifications" },
   { icon: Settings, label: "Settings & privacy", to: "/settings" },
 ] as const;
-
 
 function ProfileScreen() {
   const { user, loading, signOut } = useAuth();

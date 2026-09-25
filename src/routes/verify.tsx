@@ -24,13 +24,13 @@ import {
 export const Route = createFileRoute("/verify")({
   head: () => ({
     meta: [
-      { title: "Verify your identity — HustlerLink" },
+      { title: "Verify your identity | HustlerLink" },
       {
         name: "description",
         content:
           "Send your ID and a live selfie. Verified members win more work and hire with confidence.",
       },
-      { property: "og:title", content: "Verify your identity — HustlerLink" },
+      { property: "og:title", content: "Verify your identity | HustlerLink" },
       {
         property: "og:description",
         content: "A two minute ID check that unlocks the verified badge on your profile.",
@@ -157,7 +157,7 @@ function VerifyFlow() {
 
       {!locked ? (
         <>
-          {/* Step 1 — document type ----------------------------------- */}
+          {/* Step 1, document type ----------------------------------- */}
           <Step number={1} title="Choose your document" hint={spec.hint}>
             <div className="grid gap-3">
               {DOC_TYPES.map((item) => (
@@ -184,7 +184,7 @@ function VerifyFlow() {
             </div>
           </Step>
 
-          {/* Step 2 — document photos --------------------------------- */}
+          {/* Step 2, document photos --------------------------------- */}
           <Step
             number={2}
             title="Photograph your document"
@@ -210,7 +210,7 @@ function VerifyFlow() {
             />
           </Step>
 
-          {/* Step 3 — live selfie ------------------------------------- */}
+          {/* Step 3, live selfie ------------------------------------- */}
           <Step
             number={3}
             title="Take a live selfie"
@@ -325,7 +325,7 @@ function PhotoSlot({
         <div className="min-w-0 flex-1">
           <p className="text-base font-extrabold text-foreground">{label}</p>
           <p className="text-[0.875rem] font-semibold text-muted-foreground">
-            {shot ? "Looks good — tap to retake" : "Tap to take or choose a photo"}
+            {shot ? "Looks good, tap to retake" : "Tap to take or choose a photo"}
           </p>
         </div>
       </div>

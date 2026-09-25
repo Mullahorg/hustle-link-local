@@ -25,12 +25,12 @@ import {
 export const Route = createFileRoute("/my-work")({
   head: () => ({
     meta: [
-      { title: "My work gallery — HustlerLink" },
+      { title: "My work gallery | HustlerLink" },
       {
         name: "description",
         content: "Add photos of jobs you have finished and the certificates you hold.",
       },
-      { property: "og:title", content: "My work gallery — HustlerLink" },
+      { property: "og:title", content: "My work gallery | HustlerLink" },
       {
         property: "og:description",
         content: "Add photos of jobs you have finished and the certificates you hold.",
@@ -249,7 +249,7 @@ function Certificates() {
               <div className="min-w-0 flex-1">
                 <p className="truncate text-base font-extrabold">{certificate.title}</p>
                 <p className="text-[0.9375rem] font-semibold text-muted-foreground">
-                  {[certificate.issuer, certificate.year].filter(Boolean).join(" · ") || "—"}
+                  {[certificate.issuer, certificate.year].filter(Boolean).join(" · ") || "-"}
                 </p>
               </div>
               <Button

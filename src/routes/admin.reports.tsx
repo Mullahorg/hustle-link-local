@@ -78,7 +78,7 @@ function AdminReports() {
   });
 
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["admin-list"] });
-  const nameOf = (id: string | null) => (id ? (names.data?.[id]?.full_name ?? "Member") : "—");
+  const nameOf = (id: string | null) => (id ? (names.data?.[id]?.full_name ?? "Member") : "-");
 
   const columns: Column<Row>[] = [
     {

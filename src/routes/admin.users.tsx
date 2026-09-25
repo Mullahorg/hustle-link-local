@@ -50,7 +50,7 @@ const date = (value: string | null) =>
         month: "short",
         year: "numeric",
       })
-    : "—";
+    : "-";
 
 function RolesDialog({ userId, name }: { userId: string; name: string }) {
   const queryClient = useQueryClient();
@@ -176,7 +176,7 @@ function AdminUsers() {
       key: "rating_avg",
       header: "Rating",
       sortable: true,
-      render: (row) => (row.rating_avg > 0 ? row.rating_avg.toFixed(1) : "—"),
+      render: (row) => (row.rating_avg > 0 ? row.rating_avg.toFixed(1) : "-"),
     },
     { key: "created_at", header: "Joined", sortable: true, render: (row) => date(row.created_at) },
     {

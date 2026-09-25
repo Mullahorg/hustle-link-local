@@ -32,9 +32,9 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/settings")({
   head: () => ({
     meta: [
-      { title: "Settings — HustlerLink" },
+      { title: "Settings | HustlerLink" },
       { name: "description", content: "Your profile, skills, privacy and account settings." },
-      { property: "og:title", content: "Settings — HustlerLink" },
+      { property: "og:title", content: "Settings | HustlerLink" },
       {
         property: "og:description",
         content: "Your profile, skills, privacy and account settings.",
@@ -403,7 +403,6 @@ function SettingsBody() {
                   : "Verify my identity"}
             </Link>
           </Button>
-
         </div>
       </Section>
 
@@ -433,7 +432,7 @@ function SettingsBody() {
         </ul>
       </Section>
 
-      <Section title="Privacy — blocked people">
+      <Section title="Privacy | blocked people">
         {blocked.isPending ? (
           <CardSkeleton rows={1} kind="worker" />
         ) : (blocked.data ?? []).length === 0 ? (

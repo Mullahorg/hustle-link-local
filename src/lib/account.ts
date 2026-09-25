@@ -21,7 +21,7 @@ export const myProfileQuery = (userId: string | undefined) =>
     },
   });
 
-/** Unread notification count — drives the badge on the home bell. */
+/** Unread notification count, drives the badge on the home bell. */
 export const unreadCountQuery = (userId: string | undefined) =>
   queryOptions({
     queryKey: ["unread-notifications", userId],
@@ -142,7 +142,7 @@ export const messagesQuery = (conversationId: string | undefined) =>
     },
   });
 
-/** The other person in a conversation — used for report/block in the chat header. */
+/** The other person in a conversation, used for report/block in the chat header. */
 export const conversationPeerQuery = (conversationId: string, userId: string | undefined) =>
   queryOptions({
     queryKey: ["conversation-peer", conversationId, userId],
@@ -336,7 +336,7 @@ export async function requestVerification(userId: string, last4: string) {
 
 /* ------------------------------------------------- saved jobs & favourites */
 
-/** Ids of every job the member saved — powers the save toggle on cards. */
+/** Ids of every job the member saved, powers the save toggle on cards. */
 export const savedJobIdsQuery = (userId: string | undefined) =>
   queryOptions({
     queryKey: ["saved-job-ids", userId],

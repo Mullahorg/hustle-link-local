@@ -21,13 +21,13 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/market/new")({
   head: () => ({
     meta: [
-      { title: "Sell something — Village market | HustlerLink" },
+      { title: "Sell something | Village market | HustlerLink" },
       {
         name: "description",
         content:
           "Put an item up for sale in a minute: add photos, a price and where buyers can find you.",
       },
-      { property: "og:title", content: "Sell something — Village market" },
+      { property: "og:title", content: "Sell something | Village market" },
       { property: "og:description", content: "Put an item up for sale in about a minute." },
       { property: "og:type", content: "website" },
     ],

@@ -51,12 +51,12 @@ import { money } from "@/lib/wallet";
 export const Route = createFileRoute("/market/$listingId")({
   head: () => ({
     meta: [
-      { title: "Item for sale — Village market | HustlerLink" },
+      { title: "Item for sale | Village market | HustlerLink" },
       {
         name: "description",
         content: "See the photos, price and seller of this item on the HustlerLink village market.",
       },
-      { property: "og:title", content: "Item for sale — Village market" },
+      { property: "og:title", content: "Item for sale | Village market" },
       { property: "og:description", content: "See the photos, price and seller of this item." },
       { property: "og:type", content: "article" },
     ],
@@ -282,11 +282,11 @@ function ListingScreen() {
               <p className="text-base font-extrabold text-foreground">
                 {order.data.status === "held"
                   ? user?.id === order.data.buyer_id
-                    ? `You paid ${money(order.data.amount_cents)} — held safely`
-                    : `Bought for ${money(order.data.amount_cents)} — payment held`
+                    ? `You paid ${money(order.data.amount_cents)}, held safely`
+                    : `Bought for ${money(order.data.amount_cents)}, payment held`
                   : order.data.status === "released"
-                    ? `Completed — seller paid ${money(order.data.amount_cents)}`
-                    : "Order cancelled — buyer refunded"}
+                    ? `Completed, seller paid ${money(order.data.amount_cents)}`
+                    : "Order cancelled, buyer refunded"}
               </p>
               <p className="mt-1 text-[0.9375rem] font-semibold text-muted-foreground">
                 {order.data.status === "held"
@@ -304,7 +304,7 @@ function ListingScreen() {
                       onClick={() => confirm.mutate()}
                       disabled={confirm.isPending}
                     >
-                      <CheckCircle2 aria-hidden="true" />I got the item — pay the seller
+                      <CheckCircle2 aria-hidden="true" />I got the item, pay the seller
                     </Button>
                   ) : null}
                   <Button
