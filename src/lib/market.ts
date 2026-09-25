@@ -251,3 +251,52 @@ export async function toggleSaveListing(input: {
 export async function countListingView(id: string) {
   await supabase.rpc("market_listing_view", { _id: id });
 }
+
+/* ---------------------------------------------------------- protected buying */
+
+export type MarketOrder = {
+  id: string;
+  listing_id: string;
+  buyer_id: string;
+  seller_id: string;
+  title: string;
+  amount_cents: number;
+  currency: string;
+  status: "held" | "released" | "refunded";
+  created_at: string;
+  completed_at: string | null;
+};
+
+/** The latest order on a listing that the signed-in person is part of. */
+export const listingOrderQuery = (listingId: string, userId: string | undefined) =>
+  queryOptions({
+    queryKey: ["listing-order", listingId, userId],
+    enabled: Boolean(userId),
+    queryFn: async (): Promise<MarketOrder | null> => {
+      const { data, error } = await supabase
+        .from("market_orders")
+        .select("*")
+        .eq("listing_id", listingId)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return (data as MarketOrder | null) ?? null;
+    },
+  });
+
+export async function buyListing(listingId: string): Promise<string> {
+  const { data, error } = await supabase.rpc("market_buy", { _listing_id: listingId });
+  if (error) throw new Error(error.message);
+  return (data as { order_id: string }).order_id;
+}
+
+export async function confirmReceived(orderId: string) {
+  const { error } = await supabase.rpc("market_confirm_received", { _order_id: orderId });
+  if (error) throw new Error(error.message);
+}
+
+export async function cancelOrder(orderId: string) {
+  const { error } = await supabase.rpc("market_cancel_order", { _order_id: orderId });
+  if (error) throw new Error(error.message);
+}

@@ -51,6 +51,16 @@ function friendlyExplanation(entry: LedgerEntry): string {
       return "Money that was held for a job came back to your wallet.";
     case "fee":
       return "A service fee for using HustlerLink.";
+    case "market_purchase":
+      return "You paid for a market item from your wallet. The money is held safely until you confirm you received it.";
+    case "market_hold":
+      return "This money is held for your market item. The seller only gets it after you confirm you received the item.";
+    case "market_release":
+      return "The hold on this market payment has ended.";
+    case "market_incoming":
+      return "A buyer paid for your item. You get the money once they confirm they received it.";
+    case "market_sale":
+      return "The buyer confirmed they received your item. The money is now in your available balance.";
     default:
       return "A movement on your wallet.";
   }

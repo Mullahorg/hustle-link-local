@@ -103,6 +103,16 @@ export function entryLabel(type: string): string {
       return "Refund";
     case "fee":
       return "Service fee";
+    case "market_purchase":
+      return "Market purchase";
+    case "market_hold":
+      return "Held for your item";
+    case "market_release":
+      return "Hold ended";
+    case "market_incoming":
+      return "Sale payment on the way";
+    case "market_sale":
+      return "Item sold — you got paid";
     default:
       return type.replace(/_/g, " ");
   }
