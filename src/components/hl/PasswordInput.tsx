@@ -21,7 +21,11 @@ export function PasswordInput({ className, ...props }: Omit<ComponentProps<"inpu
         aria-pressed={visible}
         className="absolute top-1/2 right-1 grid size-12 -translate-y-1/2 place-items-center rounded-xl text-muted-foreground hover:text-foreground"
       >
-        {visible ? <EyeOff className="size-5" aria-hidden="true" /> : <Eye className="size-5" aria-hidden="true" />}
+        {visible ? (
+          <EyeOff className="size-5" aria-hidden="true" />
+        ) : (
+          <Eye className="size-5" aria-hidden="true" />
+        )}
       </button>
     </div>
   );
@@ -30,7 +34,8 @@ export function PasswordInput({ className, ...props }: Omit<ComponentProps<"inpu
 /** Plain-language strength hint instead of a colour bar. */
 export function passwordHint(value: string): string {
   if (!value) return "At least 8 characters. A short sentence is easy to remember.";
-  if (value.length < 8) return `${8 - value.length} more character${value.length === 7 ? "" : "s"} needed.`;
+  if (value.length < 8)
+    return `${8 - value.length} more character${value.length === 7 ? "" : "s"} needed.`;
   const kinds = [/[a-z]/, /[A-Z]/, /[0-9]/, /[^A-Za-z0-9]/].filter((r) => r.test(value)).length;
   if (value.length >= 12 || kinds >= 3) return "Strong password.";
   return "Good. Adding a number or a longer phrase makes it stronger.";

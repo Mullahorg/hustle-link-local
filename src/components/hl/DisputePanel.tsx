@@ -92,8 +92,8 @@ export function DisputePanel({
         <p className="text-base font-extrabold text-foreground">Problem reported</p>
         <p className="mt-1 text-[0.9375rem] font-semibold text-foreground">{current.reason}</p>
         <p className="mt-1 text-[0.9375rem] font-medium text-muted-foreground">
-          The money is on hold. Our team usually replies within a day, and both of you get a
-          notice with the decision.
+          The money is on hold. Our team usually replies within a day, and both of you get a notice
+          with the decision.
         </p>
         {current.opened_by === user.id ? (
           <Button
@@ -137,7 +137,9 @@ export function DisputePanel({
       </DialogTrigger>
       <DialogContent className="max-w-[92vw] rounded-3xl sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-xl font-extrabold">Report a problem with this payment</DialogTitle>
+          <DialogTitle className="text-xl font-extrabold">
+            Report a problem with this payment
+          </DialogTitle>
           <DialogDescription className="text-[0.9375rem] font-medium text-muted-foreground">
             Nobody gets the money until our team decides. Try talking to the other person first.
           </DialogDescription>

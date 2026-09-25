@@ -475,7 +475,7 @@ function SettingsBody() {
         <SecuritySettings
           hasPassword={Boolean(
             user?.identities?.some((identity) => identity.provider === "email") ??
-              user?.app_metadata?.provider === "email",
+            user?.app_metadata?.provider === "email",
           )}
         />
       </Section>

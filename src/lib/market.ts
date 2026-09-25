@@ -61,10 +61,10 @@ export const listingTypeLabel: Record<ListingType, string> = {
 export type ListingDetail = {
   listing: ListingRow &
     SellerFields & {
-    phone: string | null;
-    seller_id: string;
-    updated_at: string;
-  };
+      phone: string | null;
+      seller_id: string;
+      updated_at: string;
+    };
   seller: {
     id: string;
     full_name: string | null;
@@ -221,19 +221,21 @@ export async function uploadListingPhotos(userId: string, files: File[]): Promis
   return paths;
 }
 
-export async function createListing(input: {
-  sellerId: string;
-  title: string;
-  description: string;
-  category_slug: string;
-  condition: ListingCondition;
-  price_cents: number | null;
-  price_note: string | null;
-  unit_label: string | null;
-  area: string;
-  phone: string | null;
-  images: string[];
-} & SellerFields): Promise<string> {
+export async function createListing(
+  input: {
+    sellerId: string;
+    title: string;
+    description: string;
+    category_slug: string;
+    condition: ListingCondition;
+    price_cents: number | null;
+    price_note: string | null;
+    unit_label: string | null;
+    area: string;
+    phone: string | null;
+    images: string[];
+  } & SellerFields,
+): Promise<string> {
   const { data, error } = await supabase
     .from("market_listings")
     .insert({
@@ -372,7 +374,6 @@ export async function cancelOrder(orderId: string) {
   const { error } = await supabase.rpc("market_cancel_order", { _order_id: orderId });
   if (error) throw new Error(error.message);
 }
-
 
 export async function placeOrder(input: {
   listingId: string;

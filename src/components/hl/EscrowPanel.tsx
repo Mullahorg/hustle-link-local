@@ -4,6 +4,7 @@ import { Check, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { DisputePanel } from "@/components/hl/DisputePanel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
@@ -208,6 +209,12 @@ export function EscrowPanel({
               </Button>
             ) : null}
           </div>
+        ) : null}
+        {row && row.worker_id ? (
+          <DisputePanel
+            jobId={jobId}
+            moneyHeld={["secured", "in_progress", "awaiting_confirmation"].includes(row.status)}
+          />
         ) : null}
       </div>
     </section>

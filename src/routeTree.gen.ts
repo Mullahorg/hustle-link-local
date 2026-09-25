@@ -27,6 +27,7 @@ import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
+import { Route as AdminDisputesRouteImport } from './routes/admin.disputes'
 import { Route as AdminJobsRouteImport } from './routes/admin.jobs'
 import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
@@ -38,6 +39,7 @@ import { Route as JobsJobIdRouteImport } from './routes/jobs.$jobId'
 import { Route as MarketIndexRouteImport } from './routes/market.index'
 import { Route as MarketListingIdRouteImport } from './routes/market.$listingId'
 import { Route as MarketNewRouteImport } from './routes/market.new'
+import { Route as MarketSellerRouteImport } from './routes/market.seller'
 import { Route as MessagesConversationIdRouteImport } from './routes/messages.$conversationId'
 import { Route as WorkersWorkerIdRouteImport } from './routes/workers.$workerId'
 import { Route as ApiPublicWebhooksPayheroRouteImport } from './routes/api/public/webhooks/payhero'
@@ -132,6 +134,11 @@ const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
   path: '/categories',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminDisputesRoute = AdminDisputesRouteImport.update({
+  id: '/disputes',
+  path: '/disputes',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminJobsRoute = AdminJobsRouteImport.update({
   id: '/jobs',
   path: '/jobs',
@@ -187,6 +194,11 @@ const MarketNewRoute = MarketNewRouteImport.update({
   path: '/market/new',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MarketSellerRoute = MarketSellerRouteImport.update({
+  id: '/market/seller',
+  path: '/market/seller',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MessagesConversationIdRoute = MessagesConversationIdRouteImport.update({
   id: '/$conversationId',
   path: '/$conversationId',
@@ -222,6 +234,7 @@ export interface FileRoutesByFullPath {
   '/wallet': typeof WalletRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/disputes': typeof AdminDisputesRoute
   '/admin/jobs': typeof AdminJobsRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/reports': typeof AdminReportsRoute
@@ -232,6 +245,7 @@ export interface FileRoutesByFullPath {
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/market/$listingId': typeof MarketListingIdRoute
   '/market/new': typeof MarketNewRoute
+  '/market/seller': typeof MarketSellerRoute
   '/messages/$conversationId': typeof MessagesConversationIdRoute
   '/workers/$workerId': typeof WorkersWorkerIdRoute
   '/admin/': typeof AdminIndexRoute
@@ -255,6 +269,7 @@ export interface FileRoutesByTo {
   '/wallet': typeof WalletRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/disputes': typeof AdminDisputesRoute
   '/admin/jobs': typeof AdminJobsRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/reports': typeof AdminReportsRoute
@@ -265,6 +280,7 @@ export interface FileRoutesByTo {
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/market/$listingId': typeof MarketListingIdRoute
   '/market/new': typeof MarketNewRoute
+  '/market/seller': typeof MarketSellerRoute
   '/messages/$conversationId': typeof MessagesConversationIdRoute
   '/workers/$workerId': typeof WorkersWorkerIdRoute
   '/admin': typeof AdminIndexRoute
@@ -290,6 +306,7 @@ export interface FileRoutesById {
   '/wallet': typeof WalletRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/disputes': typeof AdminDisputesRoute
   '/admin/jobs': typeof AdminJobsRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/reports': typeof AdminReportsRoute
@@ -300,6 +317,7 @@ export interface FileRoutesById {
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/market/$listingId': typeof MarketListingIdRoute
   '/market/new': typeof MarketNewRoute
+  '/market/seller': typeof MarketSellerRoute
   '/messages/$conversationId': typeof MessagesConversationIdRoute
   '/workers/$workerId': typeof WorkersWorkerIdRoute
   '/admin/': typeof AdminIndexRoute
@@ -326,6 +344,7 @@ export interface FileRouteTypes {
     | '/wallet'
     | '/admin/audit'
     | '/admin/categories'
+    | '/admin/disputes'
     | '/admin/jobs'
     | '/admin/payments'
     | '/admin/reports'
@@ -336,6 +355,7 @@ export interface FileRouteTypes {
     | '/jobs/$jobId'
     | '/market/$listingId'
     | '/market/new'
+    | '/market/seller'
     | '/messages/$conversationId'
     | '/workers/$workerId'
     | '/admin/'
@@ -359,6 +379,7 @@ export interface FileRouteTypes {
     | '/wallet'
     | '/admin/audit'
     | '/admin/categories'
+    | '/admin/disputes'
     | '/admin/jobs'
     | '/admin/payments'
     | '/admin/reports'
@@ -369,6 +390,7 @@ export interface FileRouteTypes {
     | '/jobs/$jobId'
     | '/market/$listingId'
     | '/market/new'
+    | '/market/seller'
     | '/messages/$conversationId'
     | '/workers/$workerId'
     | '/admin'
@@ -393,6 +415,7 @@ export interface FileRouteTypes {
     | '/wallet'
     | '/admin/audit'
     | '/admin/categories'
+    | '/admin/disputes'
     | '/admin/jobs'
     | '/admin/payments'
     | '/admin/reports'
@@ -403,6 +426,7 @@ export interface FileRouteTypes {
     | '/jobs/$jobId'
     | '/market/$listingId'
     | '/market/new'
+    | '/market/seller'
     | '/messages/$conversationId'
     | '/workers/$workerId'
     | '/admin/'
@@ -429,6 +453,7 @@ export interface RootRouteChildren {
   JobsJobIdRoute: typeof JobsJobIdRoute
   MarketListingIdRoute: typeof MarketListingIdRoute
   MarketNewRoute: typeof MarketNewRoute
+  MarketSellerRoute: typeof MarketSellerRoute
   WorkersWorkerIdRoute: typeof WorkersWorkerIdRoute
   MarketIndexRoute: typeof MarketIndexRoute
   ApiPublicWebhooksPayheroRoute: typeof ApiPublicWebhooksPayheroRoute
@@ -562,6 +587,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCategoriesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/disputes': {
+      id: '/admin/disputes'
+      path: '/disputes'
+      fullPath: '/admin/disputes'
+      preLoaderRoute: typeof AdminDisputesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/jobs': {
       id: '/admin/jobs'
       path: '/jobs'
@@ -639,6 +671,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MarketNewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/market/seller': {
+      id: '/market/seller'
+      path: '/market/seller'
+      fullPath: '/market/seller'
+      preLoaderRoute: typeof MarketSellerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/messages/$conversationId': {
       id: '/messages/$conversationId'
       path: '/$conversationId'
@@ -666,6 +705,7 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminAuditRoute: typeof AdminAuditRoute
   AdminCategoriesRoute: typeof AdminCategoriesRoute
+  AdminDisputesRoute: typeof AdminDisputesRoute
   AdminJobsRoute: typeof AdminJobsRoute
   AdminPaymentsRoute: typeof AdminPaymentsRoute
   AdminReportsRoute: typeof AdminReportsRoute
@@ -679,6 +719,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAuditRoute: AdminAuditRoute,
   AdminCategoriesRoute: AdminCategoriesRoute,
+  AdminDisputesRoute: AdminDisputesRoute,
   AdminJobsRoute: AdminJobsRoute,
   AdminPaymentsRoute: AdminPaymentsRoute,
   AdminReportsRoute: AdminReportsRoute,
@@ -722,6 +763,7 @@ const rootRouteChildren: RootRouteChildren = {
   JobsJobIdRoute: JobsJobIdRoute,
   MarketListingIdRoute: MarketListingIdRoute,
   MarketNewRoute: MarketNewRoute,
+  MarketSellerRoute: MarketSellerRoute,
   WorkersWorkerIdRoute: WorkersWorkerIdRoute,
   MarketIndexRoute: MarketIndexRoute,
   ApiPublicWebhooksPayheroRoute: ApiPublicWebhooksPayheroRoute,

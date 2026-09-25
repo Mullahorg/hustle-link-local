@@ -51,6 +51,7 @@ import {
   savedListingIdsQuery,
   setListingStatus,
   toggleSaveListing,
+  type ListingDetail,
 } from "@/lib/market";
 import { openConversation } from "@/lib/account";
 import { money } from "@/lib/wallet";
@@ -509,19 +510,24 @@ function ListingScreen() {
   );
 }
 
-type FullListing = NonNullable<ReturnType<typeof useListingType>>;
-function useListingType() {
-  return null as unknown as import("@/lib/market").ListingDetail["listing"] | null;
-}
+type FullListing = ListingDetail["listing"];
 
 function ListingFacts({ listing }: { listing: FullListing }) {
   const facts: { icon: React.ReactNode; text: string }[] = [];
   if (listing.listing_type && listing.listing_type !== "product")
-    facts.push({ icon: <Tag className="size-5" aria-hidden="true" />, text: listingTypeLabel[listing.listing_type] });
-  if (listing.stock_qty !== null && listing.stock_qty !== undefined && listing.status === "available")
+    facts.push({
+      icon: <Tag className="size-5" aria-hidden="true" />,
+      text: listingTypeLabel[listing.listing_type],
+    });
+  if (
+    listing.stock_qty !== null &&
+    listing.stock_qty !== undefined &&
+    listing.status === "available"
+  )
     facts.push({
       icon: <Package className="size-5" aria-hidden="true" />,
-      text: listing.stock_qty <= 3 ? `Only ${listing.stock_qty} left` : `${listing.stock_qty} in stock`,
+      text:
+        listing.stock_qty <= 3 ? `Only ${listing.stock_qty} left` : `${listing.stock_qty} in stock`,
     });
   if (listing.offers_delivery)
     facts.push({
@@ -529,13 +535,23 @@ function ListingFacts({ listing }: { listing: FullListing }) {
       text: `Delivery ${listing.delivery_fee_cents > 0 ? money(listing.delivery_fee_cents) : "free"}${listing.delivery_note ? `, ${listing.delivery_note}` : ""}`,
     });
   if (listing.offers_pickup)
-    facts.push({ icon: <MapPin className="size-5" aria-hidden="true" />, text: `Collect in ${listing.area}` });
-  if (listing.negotiable) facts.push({ icon: <MessageCircle className="size-5" aria-hidden="true" />, text: "Open to offers" });
+    facts.push({
+      icon: <MapPin className="size-5" aria-hidden="true" />,
+      text: `Collect in ${listing.area}`,
+    });
+  if (listing.negotiable)
+    facts.push({
+      icon: <MessageCircle className="size-5" aria-hidden="true" />,
+      text: "Open to offers",
+    });
   if (facts.length === 0) return null;
   return (
     <ul className="mt-4 grid gap-2 rounded-2xl bg-secondary p-4">
       {facts.map((fact) => (
-        <li key={fact.text} className="flex items-center gap-2 text-[0.9375rem] font-bold text-secondary-foreground">
+        <li
+          key={fact.text}
+          className="flex items-center gap-2 text-[0.9375rem] font-bold text-secondary-foreground"
+        >
           {fact.icon}
           {fact.text}
         </li>
@@ -552,12 +568,17 @@ function OrderSteps({
   current: string;
 }) {
   const steps = fulfilmentSteps(fulfilment);
-  const at = Math.max(0, steps.findIndex(([key]) => key === current));
+  const at = Math.max(
+    0,
+    steps.findIndex(([key]) => key === current),
+  );
   return (
     <ol className="mt-3 flex gap-1" aria-label="Order progress">
       {steps.map(([key, label], index) => (
         <li key={key} className="flex-1">
-          <span className={cn("block h-1.5 rounded-full", index <= at ? "bg-primary" : "bg-border")} />
+          <span
+            className={cn("block h-1.5 rounded-full", index <= at ? "bg-primary" : "bg-border")}
+          />
           <span
             className={cn(
               "mt-1 block text-[0.8125rem] font-bold",
