@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
+import { emailVerificationDecision } from "@/lib/email.functions";
 
 import { AdminPage } from "@/components/admin/AdminShell";
 import { ConfirmAction } from "@/components/admin/Confirm";
@@ -123,8 +126,15 @@ function ReviewDialog({
   const trail = useQuery(verificationTrailQuery(row.user_id, open));
   const writable = can("verification.write");
 
+  const sendEmail = useServerFn(emailVerificationDecision);
   const decide = async (status: VerificationStatus, notes?: string) => {
     await reviewVerification(row.id, status, notes);
+    toast.success("Decision saved. The member was notified in the app.");
+    void sendEmail({ data: { requestId: row.id } })
+      .then((r) =>
+        r.sent ? toast.success("Email sent to the member") : toast.info(`Email not sent: ${r.message}`),
+      )
+      .catch(() => toast.info("Email not sent — check email settings"));
     await trail.refetch();
     await onDone();
   };
