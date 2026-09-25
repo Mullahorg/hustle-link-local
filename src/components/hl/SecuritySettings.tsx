@@ -76,7 +76,10 @@ export function SecuritySettings({ hasPassword }: { hasPassword: boolean }) {
             onChange={(e) => setNext(e.target.value)}
             autoComplete="new-password"
           />
-          <span className="block text-[0.875rem] font-semibold text-muted-foreground" aria-live="polite">
+          <span
+            className="block text-[0.875rem] font-semibold text-muted-foreground"
+            aria-live="polite"
+          >
             {passwordHint(next)}
           </span>
         </label>

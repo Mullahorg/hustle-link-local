@@ -32,7 +32,14 @@ type Row = {
   money_status: string | null;
 };
 
-const FILTERS = ["open", "resolved_refund", "resolved_release", "closed", "withdrawn", "all"] as const;
+const FILTERS = [
+  "open",
+  "resolved_refund",
+  "resolved_release",
+  "closed",
+  "withdrawn",
+  "all",
+] as const;
 const FILTER_LABEL: Record<(typeof FILTERS)[number], string> = {
   open: "Open",
   resolved_refund: "Refunded",
@@ -60,7 +67,12 @@ function AdminDisputes() {
     >
       <div className="mb-4 flex flex-wrap gap-2">
         {FILTERS.map((value) => (
-          <Button key={value} size="sm" variant={status === value ? "default" : "outline"} onClick={() => setStatus(value)}>
+          <Button
+            key={value}
+            size="sm"
+            variant={status === value ? "default" : "outline"}
+            onClick={() => setStatus(value)}
+          >
             {FILTER_LABEL[value]}
           </Button>
         ))}
@@ -93,7 +105,11 @@ function DisputeCard({ row }: { row: Row }) {
   const [note, setNote] = useState("");
   const decide = useMutation({
     mutationFn: async (outcome: "refund" | "release" | "close") => {
-      const { error } = await supabase.rpc("admin_resolve_dispute", { _id: row.id, _outcome: outcome, _note: note });
+      const { error } = await supabase.rpc("admin_resolve_dispute", {
+        _id: row.id,
+        _outcome: outcome,
+        _note: note,
+      });
       if (error) throw new Error(error.message);
     },
     onSuccess: async () => {
@@ -109,29 +125,48 @@ function DisputeCard({ row }: { row: Row }) {
     <article className="rounded-2xl border-2 border-border bg-card p-4">
       <div className="flex flex-wrap items-center gap-2">
         <Badge variant="secondary">{row.kind === "order" ? "Market order" : "Job payment"}</Badge>
-        <Badge variant={row.status === "open" ? "destructive" : "outline"}>{FILTER_LABEL[row.status as keyof typeof FILTER_LABEL] ?? row.status}</Badge>
-        <span className="text-sm text-muted-foreground">{new Date(row.created_at).toLocaleString()}</span>
+        <Badge variant={row.status === "open" ? "destructive" : "outline"}>
+          {FILTER_LABEL[row.status as keyof typeof FILTER_LABEL] ?? row.status}
+        </Badge>
+        <span className="text-sm text-muted-foreground">
+          {new Date(row.created_at).toLocaleString()}
+        </span>
       </div>
       <p className="mt-2 font-extrabold">
         {row.kind === "order" && row.listing_id ? (
-          <Link to="/market/$listingId" params={{ listingId: row.listing_id }} className="underline underline-offset-4">
+          <Link
+            to="/market/$listingId"
+            params={{ listingId: row.listing_id }}
+            className="underline underline-offset-4"
+          >
             {row.subject_title}
           </Link>
         ) : row.job_id ? (
-          <Link to="/jobs/$jobId" params={{ jobId: row.job_id }} className="underline underline-offset-4">
+          <Link
+            to="/jobs/$jobId"
+            params={{ jobId: row.job_id }}
+            className="underline underline-offset-4"
+          >
             {row.subject_title}
           </Link>
         ) : (
           row.subject_title
         )}
         {row.amount_cents ? ` · ${money(row.amount_cents)}` : ""}
-        {row.money_status ? <span className="font-semibold text-muted-foreground"> ({row.money_status})</span> : null}
+        {row.money_status ? (
+          <span className="font-semibold text-muted-foreground"> ({row.money_status})</span>
+        ) : null}
       </p>
       <p className="mt-1 text-sm">
-        <b>{row.opened_by_name ?? "Someone"}</b> reported <b>{row.against_name ?? "the other person"}</b>: {row.reason}
+        <b>{row.opened_by_name ?? "Someone"}</b> reported{" "}
+        <b>{row.against_name ?? "the other person"}</b>: {row.reason}
       </p>
-      {row.details ? <p className="mt-1 text-sm whitespace-pre-line text-muted-foreground">{row.details}</p> : null}
-      {row.resolution_note ? <p className="mt-2 text-sm font-semibold">Decision: {row.resolution_note}</p> : null}
+      {row.details ? (
+        <p className="mt-1 text-sm whitespace-pre-line text-muted-foreground">{row.details}</p>
+      ) : null}
+      {row.resolution_note ? (
+        <p className="mt-2 text-sm font-semibold">Decision: {row.resolution_note}</p>
+      ) : null}
 
       {row.status === "open" && can("payments.write") ? (
         <div className="mt-3 space-y-2 border-t-2 border-border pt-3">
@@ -142,13 +177,24 @@ function DisputeCard({ row }: { row: Row }) {
             className="min-h-20"
           />
           <div className="flex flex-wrap gap-2">
-            <Button disabled={decide.isPending || note.trim().length < 3} onClick={() => decide.mutate("refund")}>
+            <Button
+              disabled={decide.isPending || note.trim().length < 3}
+              onClick={() => decide.mutate("refund")}
+            >
               Refund the {payer}
             </Button>
-            <Button variant="outline" disabled={decide.isPending || note.trim().length < 3} onClick={() => decide.mutate("release")}>
+            <Button
+              variant="outline"
+              disabled={decide.isPending || note.trim().length < 3}
+              onClick={() => decide.mutate("release")}
+            >
               Pay the {payee}
             </Button>
-            <Button variant="ghost" disabled={decide.isPending || note.trim().length < 3} onClick={() => decide.mutate("close")}>
+            <Button
+              variant="ghost"
+              disabled={decide.isPending || note.trim().length < 3}
+              onClick={() => decide.mutate("close")}
+            >
               Close, no money change
             </Button>
           </div>
