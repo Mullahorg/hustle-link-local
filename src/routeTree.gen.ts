@@ -36,6 +36,7 @@ import { Route as AdminReviewsRouteImport } from './routes/admin.reviews'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminVerificationRouteImport } from './routes/admin.verification'
+import { Route as BusinessesSlugRouteImport } from './routes/businesses.$slug'
 import { Route as JobsJobIdRouteImport } from './routes/jobs.$jobId'
 import { Route as MarketIndexRouteImport } from './routes/market.index'
 import { Route as MarketListingIdRouteImport } from './routes/market.$listingId'
@@ -180,6 +181,11 @@ const AdminVerificationRoute = AdminVerificationRouteImport.update({
   path: '/verification',
   getParentRoute: () => AdminRoute,
 } as any)
+const BusinessesSlugRoute = BusinessesSlugRouteImport.update({
+  id: '/businesses/$slug',
+  path: '/businesses/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const JobsJobIdRoute = JobsJobIdRouteImport.update({
   id: '/jobs/$jobId',
   path: '/jobs/$jobId',
@@ -249,6 +255,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verification': typeof AdminVerificationRoute
+  '/businesses/$slug': typeof BusinessesSlugRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/market/$listingId': typeof MarketListingIdRoute
   '/market/new': typeof MarketNewRoute
@@ -285,6 +292,7 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verification': typeof AdminVerificationRoute
+  '/businesses/$slug': typeof BusinessesSlugRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/market/$listingId': typeof MarketListingIdRoute
   '/market/new': typeof MarketNewRoute
@@ -323,6 +331,7 @@ export interface FileRoutesById {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verification': typeof AdminVerificationRoute
+  '/businesses/$slug': typeof BusinessesSlugRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/market/$listingId': typeof MarketListingIdRoute
   '/market/new': typeof MarketNewRoute
@@ -362,6 +371,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/users'
     | '/admin/verification'
+    | '/businesses/$slug'
     | '/jobs/$jobId'
     | '/market/$listingId'
     | '/market/new'
@@ -398,6 +408,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/users'
     | '/admin/verification'
+    | '/businesses/$slug'
     | '/jobs/$jobId'
     | '/market/$listingId'
     | '/market/new'
@@ -435,6 +446,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/users'
     | '/admin/verification'
+    | '/businesses/$slug'
     | '/jobs/$jobId'
     | '/market/$listingId'
     | '/market/new'
@@ -463,6 +475,7 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   VerifyRoute: typeof VerifyRoute
   WalletRoute: typeof WalletRoute
+  BusinessesSlugRoute: typeof BusinessesSlugRoute
   JobsJobIdRoute: typeof JobsJobIdRoute
   MarketListingIdRoute: typeof MarketListingIdRoute
   MarketNewRoute: typeof MarketNewRoute
@@ -663,6 +676,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminVerificationRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/businesses/$slug': {
+      id: '/businesses/$slug'
+      path: '/businesses/$slug'
+      fullPath: '/businesses/$slug'
+      preLoaderRoute: typeof BusinessesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/jobs/$jobId': {
       id: '/jobs/$jobId'
       path: '/jobs/$jobId'
@@ -781,6 +801,7 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   VerifyRoute: VerifyRoute,
   WalletRoute: WalletRoute,
+  BusinessesSlugRoute: BusinessesSlugRoute,
   JobsJobIdRoute: JobsJobIdRoute,
   MarketListingIdRoute: MarketListingIdRoute,
   MarketNewRoute: MarketNewRoute,
