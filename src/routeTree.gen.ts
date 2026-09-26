@@ -14,6 +14,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as ActivityRouteImport } from './routes/activity'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as BusinessRouteImport } from './routes/business'
 import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as MyWorkRouteImport } from './routes/my-work'
@@ -27,6 +28,7 @@ import { Route as VerifyRouteImport } from './routes/verify'
 import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
+import { Route as AdminBusinessesRouteImport } from './routes/admin.businesses'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
 import { Route as AdminDisputesRouteImport } from './routes/admin.disputes'
 import { Route as AdminJobsRouteImport } from './routes/admin.jobs'
@@ -69,6 +71,11 @@ const AdminRoute = AdminRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BusinessRoute = BusinessRouteImport.update({
+  id: '/business',
+  path: '/business',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DiscoverRoute = DiscoverRouteImport.update({
@@ -134,6 +141,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const AdminAuditRoute = AdminAuditRouteImport.update({
   id: '/audit',
   path: '/audit',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminBusinessesRoute = AdminBusinessesRouteImport.update({
+  id: '/businesses',
+  path: '/businesses',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
@@ -234,6 +246,7 @@ export interface FileRoutesByFullPath {
   '/activity': typeof ActivityRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
+  '/business': typeof BusinessRoute
   '/discover': typeof DiscoverRoute
   '/messages': typeof MessagesRouteWithChildren
   '/my-work': typeof MyWorkRoute
@@ -246,6 +259,7 @@ export interface FileRoutesByFullPath {
   '/verify': typeof VerifyRoute
   '/wallet': typeof WalletRoute
   '/admin/audit': typeof AdminAuditRoute
+  '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/disputes': typeof AdminDisputesRoute
   '/admin/jobs': typeof AdminJobsRoute
@@ -271,6 +285,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/activity': typeof ActivityRoute
   '/auth': typeof AuthRoute
+  '/business': typeof BusinessRoute
   '/discover': typeof DiscoverRoute
   '/messages': typeof MessagesRouteWithChildren
   '/my-work': typeof MyWorkRoute
@@ -283,6 +298,7 @@ export interface FileRoutesByTo {
   '/verify': typeof VerifyRoute
   '/wallet': typeof WalletRoute
   '/admin/audit': typeof AdminAuditRoute
+  '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/disputes': typeof AdminDisputesRoute
   '/admin/jobs': typeof AdminJobsRoute
@@ -310,6 +326,7 @@ export interface FileRoutesById {
   '/activity': typeof ActivityRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
+  '/business': typeof BusinessRoute
   '/discover': typeof DiscoverRoute
   '/messages': typeof MessagesRouteWithChildren
   '/my-work': typeof MyWorkRoute
@@ -322,6 +339,7 @@ export interface FileRoutesById {
   '/verify': typeof VerifyRoute
   '/wallet': typeof WalletRoute
   '/admin/audit': typeof AdminAuditRoute
+  '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/disputes': typeof AdminDisputesRoute
   '/admin/jobs': typeof AdminJobsRoute
@@ -350,6 +368,7 @@ export interface FileRouteTypes {
     | '/activity'
     | '/admin'
     | '/auth'
+    | '/business'
     | '/discover'
     | '/messages'
     | '/my-work'
@@ -362,6 +381,7 @@ export interface FileRouteTypes {
     | '/verify'
     | '/wallet'
     | '/admin/audit'
+    | '/admin/businesses'
     | '/admin/categories'
     | '/admin/disputes'
     | '/admin/jobs'
@@ -387,6 +407,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/activity'
     | '/auth'
+    | '/business'
     | '/discover'
     | '/messages'
     | '/my-work'
@@ -399,6 +420,7 @@ export interface FileRouteTypes {
     | '/verify'
     | '/wallet'
     | '/admin/audit'
+    | '/admin/businesses'
     | '/admin/categories'
     | '/admin/disputes'
     | '/admin/jobs'
@@ -425,6 +447,7 @@ export interface FileRouteTypes {
     | '/activity'
     | '/admin'
     | '/auth'
+    | '/business'
     | '/discover'
     | '/messages'
     | '/my-work'
@@ -437,6 +460,7 @@ export interface FileRouteTypes {
     | '/verify'
     | '/wallet'
     | '/admin/audit'
+    | '/admin/businesses'
     | '/admin/categories'
     | '/admin/disputes'
     | '/admin/jobs'
@@ -464,6 +488,7 @@ export interface RootRouteChildren {
   ActivityRoute: typeof ActivityRoute
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
+  BusinessRoute: typeof BusinessRoute
   DiscoverRoute: typeof DiscoverRoute
   MessagesRoute: typeof MessagesRouteWithChildren
   MyWorkRoute: typeof MyWorkRoute
@@ -520,6 +545,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/business': {
+      id: '/business'
+      path: '/business'
+      fullPath: '/business'
+      preLoaderRoute: typeof BusinessRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/discover': {
@@ -611,6 +643,13 @@ declare module '@tanstack/react-router' {
       path: '/audit'
       fullPath: '/admin/audit'
       preLoaderRoute: typeof AdminAuditRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/businesses': {
+      id: '/admin/businesses'
+      path: '/businesses'
+      fullPath: '/admin/businesses'
+      preLoaderRoute: typeof AdminBusinessesRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/categories': {
@@ -744,6 +783,7 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminAuditRoute: typeof AdminAuditRoute
+  AdminBusinessesRoute: typeof AdminBusinessesRoute
   AdminCategoriesRoute: typeof AdminCategoriesRoute
   AdminDisputesRoute: typeof AdminDisputesRoute
   AdminJobsRoute: typeof AdminJobsRoute
@@ -758,6 +798,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAuditRoute: AdminAuditRoute,
+  AdminBusinessesRoute: AdminBusinessesRoute,
   AdminCategoriesRoute: AdminCategoriesRoute,
   AdminDisputesRoute: AdminDisputesRoute,
   AdminJobsRoute: AdminJobsRoute,
@@ -790,6 +831,7 @@ const rootRouteChildren: RootRouteChildren = {
   ActivityRoute: ActivityRoute,
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
+  BusinessRoute: BusinessRoute,
   DiscoverRoute: DiscoverRoute,
   MessagesRoute: MessagesRouteWithChildren,
   MyWorkRoute: MyWorkRoute,
