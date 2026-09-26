@@ -31,11 +31,15 @@ import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminBusinessesRouteImport } from './routes/admin.businesses'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
 import { Route as AdminDisputesRouteImport } from './routes/admin.disputes'
+import { Route as AdminFlagsRouteImport } from './routes/admin.flags'
+import { Route as AdminHealthRouteImport } from './routes/admin.health'
 import { Route as AdminJobsRouteImport } from './routes/admin.jobs'
+import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
 import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminReviewsRouteImport } from './routes/admin.reviews'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminStorageRouteImport } from './routes/admin.storage'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminVerificationRouteImport } from './routes/admin.verification'
 import { Route as BusinessesSlugRouteImport } from './routes/businesses.$slug'
@@ -158,9 +162,24 @@ const AdminDisputesRoute = AdminDisputesRouteImport.update({
   path: '/disputes',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminFlagsRoute = AdminFlagsRouteImport.update({
+  id: '/flags',
+  path: '/flags',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminHealthRoute = AdminHealthRouteImport.update({
+  id: '/health',
+  path: '/health',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminJobsRoute = AdminJobsRouteImport.update({
   id: '/jobs',
   path: '/jobs',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminOrdersRoute = AdminOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminPaymentsRoute = AdminPaymentsRouteImport.update({
@@ -181,6 +200,11 @@ const AdminReviewsRoute = AdminReviewsRouteImport.update({
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminStorageRoute = AdminStorageRouteImport.update({
+  id: '/storage',
+  path: '/storage',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
@@ -262,11 +286,15 @@ export interface FileRoutesByFullPath {
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/disputes': typeof AdminDisputesRoute
+  '/admin/flags': typeof AdminFlagsRoute
+  '/admin/health': typeof AdminHealthRoute
   '/admin/jobs': typeof AdminJobsRoute
+  '/admin/orders': typeof AdminOrdersRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/reviews': typeof AdminReviewsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/storage': typeof AdminStorageRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verification': typeof AdminVerificationRoute
   '/businesses/$slug': typeof BusinessesSlugRoute
@@ -301,11 +329,15 @@ export interface FileRoutesByTo {
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/disputes': typeof AdminDisputesRoute
+  '/admin/flags': typeof AdminFlagsRoute
+  '/admin/health': typeof AdminHealthRoute
   '/admin/jobs': typeof AdminJobsRoute
+  '/admin/orders': typeof AdminOrdersRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/reviews': typeof AdminReviewsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/storage': typeof AdminStorageRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verification': typeof AdminVerificationRoute
   '/businesses/$slug': typeof BusinessesSlugRoute
@@ -342,11 +374,15 @@ export interface FileRoutesById {
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/disputes': typeof AdminDisputesRoute
+  '/admin/flags': typeof AdminFlagsRoute
+  '/admin/health': typeof AdminHealthRoute
   '/admin/jobs': typeof AdminJobsRoute
+  '/admin/orders': typeof AdminOrdersRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/reviews': typeof AdminReviewsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/storage': typeof AdminStorageRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verification': typeof AdminVerificationRoute
   '/businesses/$slug': typeof BusinessesSlugRoute
@@ -384,11 +420,15 @@ export interface FileRouteTypes {
     | '/admin/businesses'
     | '/admin/categories'
     | '/admin/disputes'
+    | '/admin/flags'
+    | '/admin/health'
     | '/admin/jobs'
+    | '/admin/orders'
     | '/admin/payments'
     | '/admin/reports'
     | '/admin/reviews'
     | '/admin/settings'
+    | '/admin/storage'
     | '/admin/users'
     | '/admin/verification'
     | '/businesses/$slug'
@@ -423,11 +463,15 @@ export interface FileRouteTypes {
     | '/admin/businesses'
     | '/admin/categories'
     | '/admin/disputes'
+    | '/admin/flags'
+    | '/admin/health'
     | '/admin/jobs'
+    | '/admin/orders'
     | '/admin/payments'
     | '/admin/reports'
     | '/admin/reviews'
     | '/admin/settings'
+    | '/admin/storage'
     | '/admin/users'
     | '/admin/verification'
     | '/businesses/$slug'
@@ -463,11 +507,15 @@ export interface FileRouteTypes {
     | '/admin/businesses'
     | '/admin/categories'
     | '/admin/disputes'
+    | '/admin/flags'
+    | '/admin/health'
     | '/admin/jobs'
+    | '/admin/orders'
     | '/admin/payments'
     | '/admin/reports'
     | '/admin/reviews'
     | '/admin/settings'
+    | '/admin/storage'
     | '/admin/users'
     | '/admin/verification'
     | '/businesses/$slug'
@@ -666,11 +714,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDisputesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/flags': {
+      id: '/admin/flags'
+      path: '/flags'
+      fullPath: '/admin/flags'
+      preLoaderRoute: typeof AdminFlagsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/health': {
+      id: '/admin/health'
+      path: '/health'
+      fullPath: '/admin/health'
+      preLoaderRoute: typeof AdminHealthRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/jobs': {
       id: '/admin/jobs'
       path: '/jobs'
       fullPath: '/admin/jobs'
       preLoaderRoute: typeof AdminJobsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/orders': {
+      id: '/admin/orders'
+      path: '/orders'
+      fullPath: '/admin/orders'
+      preLoaderRoute: typeof AdminOrdersRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/payments': {
@@ -699,6 +768,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/admin/settings'
       preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/storage': {
+      id: '/admin/storage'
+      path: '/storage'
+      fullPath: '/admin/storage'
+      preLoaderRoute: typeof AdminStorageRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/users': {
@@ -786,11 +862,15 @@ interface AdminRouteChildren {
   AdminBusinessesRoute: typeof AdminBusinessesRoute
   AdminCategoriesRoute: typeof AdminCategoriesRoute
   AdminDisputesRoute: typeof AdminDisputesRoute
+  AdminFlagsRoute: typeof AdminFlagsRoute
+  AdminHealthRoute: typeof AdminHealthRoute
   AdminJobsRoute: typeof AdminJobsRoute
+  AdminOrdersRoute: typeof AdminOrdersRoute
   AdminPaymentsRoute: typeof AdminPaymentsRoute
   AdminReportsRoute: typeof AdminReportsRoute
   AdminReviewsRoute: typeof AdminReviewsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminStorageRoute: typeof AdminStorageRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminVerificationRoute: typeof AdminVerificationRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -801,11 +881,15 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminBusinessesRoute: AdminBusinessesRoute,
   AdminCategoriesRoute: AdminCategoriesRoute,
   AdminDisputesRoute: AdminDisputesRoute,
+  AdminFlagsRoute: AdminFlagsRoute,
+  AdminHealthRoute: AdminHealthRoute,
   AdminJobsRoute: AdminJobsRoute,
+  AdminOrdersRoute: AdminOrdersRoute,
   AdminPaymentsRoute: AdminPaymentsRoute,
   AdminReportsRoute: AdminReportsRoute,
   AdminReviewsRoute: AdminReviewsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
+  AdminStorageRoute: AdminStorageRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminVerificationRoute: AdminVerificationRoute,
   AdminIndexRoute: AdminIndexRoute,
