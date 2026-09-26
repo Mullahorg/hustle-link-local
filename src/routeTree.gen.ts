@@ -14,6 +14,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as ActivityRouteImport } from './routes/activity'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as BusinessRouteImport } from './routes/business'
 import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as MyWorkRouteImport } from './routes/my-work'
@@ -27,15 +28,21 @@ import { Route as VerifyRouteImport } from './routes/verify'
 import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
+import { Route as AdminBusinessesRouteImport } from './routes/admin.businesses'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
 import { Route as AdminDisputesRouteImport } from './routes/admin.disputes'
+import { Route as AdminFlagsRouteImport } from './routes/admin.flags'
+import { Route as AdminHealthRouteImport } from './routes/admin.health'
 import { Route as AdminJobsRouteImport } from './routes/admin.jobs'
+import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
 import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminReviewsRouteImport } from './routes/admin.reviews'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminStorageRouteImport } from './routes/admin.storage'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminVerificationRouteImport } from './routes/admin.verification'
+import { Route as BusinessesSlugRouteImport } from './routes/businesses.$slug'
 import { Route as JobsJobIdRouteImport } from './routes/jobs.$jobId'
 import { Route as MarketIndexRouteImport } from './routes/market.index'
 import { Route as MarketListingIdRouteImport } from './routes/market.$listingId'
@@ -68,6 +75,11 @@ const AdminRoute = AdminRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BusinessRoute = BusinessRouteImport.update({
+  id: '/business',
+  path: '/business',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DiscoverRoute = DiscoverRouteImport.update({
@@ -135,6 +147,11 @@ const AdminAuditRoute = AdminAuditRouteImport.update({
   path: '/audit',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminBusinessesRoute = AdminBusinessesRouteImport.update({
+  id: '/businesses',
+  path: '/businesses',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
   id: '/categories',
   path: '/categories',
@@ -145,9 +162,24 @@ const AdminDisputesRoute = AdminDisputesRouteImport.update({
   path: '/disputes',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminFlagsRoute = AdminFlagsRouteImport.update({
+  id: '/flags',
+  path: '/flags',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminHealthRoute = AdminHealthRouteImport.update({
+  id: '/health',
+  path: '/health',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminJobsRoute = AdminJobsRouteImport.update({
   id: '/jobs',
   path: '/jobs',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminOrdersRoute = AdminOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminPaymentsRoute = AdminPaymentsRouteImport.update({
@@ -170,6 +202,11 @@ const AdminSettingsRoute = AdminSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminStorageRoute = AdminStorageRouteImport.update({
+  id: '/storage',
+  path: '/storage',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -179,6 +216,11 @@ const AdminVerificationRoute = AdminVerificationRouteImport.update({
   id: '/verification',
   path: '/verification',
   getParentRoute: () => AdminRoute,
+} as any)
+const BusinessesSlugRoute = BusinessesSlugRouteImport.update({
+  id: '/businesses/$slug',
+  path: '/businesses/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const JobsJobIdRoute = JobsJobIdRouteImport.update({
   id: '/jobs/$jobId',
@@ -228,6 +270,7 @@ export interface FileRoutesByFullPath {
   '/activity': typeof ActivityRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
+  '/business': typeof BusinessRoute
   '/discover': typeof DiscoverRoute
   '/messages': typeof MessagesRouteWithChildren
   '/my-work': typeof MyWorkRoute
@@ -240,15 +283,21 @@ export interface FileRoutesByFullPath {
   '/verify': typeof VerifyRoute
   '/wallet': typeof WalletRoute
   '/admin/audit': typeof AdminAuditRoute
+  '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/disputes': typeof AdminDisputesRoute
+  '/admin/flags': typeof AdminFlagsRoute
+  '/admin/health': typeof AdminHealthRoute
   '/admin/jobs': typeof AdminJobsRoute
+  '/admin/orders': typeof AdminOrdersRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/reviews': typeof AdminReviewsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/storage': typeof AdminStorageRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verification': typeof AdminVerificationRoute
+  '/businesses/$slug': typeof BusinessesSlugRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/market/$listingId': typeof MarketListingIdRoute
   '/market/new': typeof MarketNewRoute
@@ -264,6 +313,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/activity': typeof ActivityRoute
   '/auth': typeof AuthRoute
+  '/business': typeof BusinessRoute
   '/discover': typeof DiscoverRoute
   '/messages': typeof MessagesRouteWithChildren
   '/my-work': typeof MyWorkRoute
@@ -276,15 +326,21 @@ export interface FileRoutesByTo {
   '/verify': typeof VerifyRoute
   '/wallet': typeof WalletRoute
   '/admin/audit': typeof AdminAuditRoute
+  '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/disputes': typeof AdminDisputesRoute
+  '/admin/flags': typeof AdminFlagsRoute
+  '/admin/health': typeof AdminHealthRoute
   '/admin/jobs': typeof AdminJobsRoute
+  '/admin/orders': typeof AdminOrdersRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/reviews': typeof AdminReviewsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/storage': typeof AdminStorageRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verification': typeof AdminVerificationRoute
+  '/businesses/$slug': typeof BusinessesSlugRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/market/$listingId': typeof MarketListingIdRoute
   '/market/new': typeof MarketNewRoute
@@ -302,6 +358,7 @@ export interface FileRoutesById {
   '/activity': typeof ActivityRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
+  '/business': typeof BusinessRoute
   '/discover': typeof DiscoverRoute
   '/messages': typeof MessagesRouteWithChildren
   '/my-work': typeof MyWorkRoute
@@ -314,15 +371,21 @@ export interface FileRoutesById {
   '/verify': typeof VerifyRoute
   '/wallet': typeof WalletRoute
   '/admin/audit': typeof AdminAuditRoute
+  '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/disputes': typeof AdminDisputesRoute
+  '/admin/flags': typeof AdminFlagsRoute
+  '/admin/health': typeof AdminHealthRoute
   '/admin/jobs': typeof AdminJobsRoute
+  '/admin/orders': typeof AdminOrdersRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/reviews': typeof AdminReviewsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/storage': typeof AdminStorageRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verification': typeof AdminVerificationRoute
+  '/businesses/$slug': typeof BusinessesSlugRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/market/$listingId': typeof MarketListingIdRoute
   '/market/new': typeof MarketNewRoute
@@ -341,6 +404,7 @@ export interface FileRouteTypes {
     | '/activity'
     | '/admin'
     | '/auth'
+    | '/business'
     | '/discover'
     | '/messages'
     | '/my-work'
@@ -353,15 +417,21 @@ export interface FileRouteTypes {
     | '/verify'
     | '/wallet'
     | '/admin/audit'
+    | '/admin/businesses'
     | '/admin/categories'
     | '/admin/disputes'
+    | '/admin/flags'
+    | '/admin/health'
     | '/admin/jobs'
+    | '/admin/orders'
     | '/admin/payments'
     | '/admin/reports'
     | '/admin/reviews'
     | '/admin/settings'
+    | '/admin/storage'
     | '/admin/users'
     | '/admin/verification'
+    | '/businesses/$slug'
     | '/jobs/$jobId'
     | '/market/$listingId'
     | '/market/new'
@@ -377,6 +447,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/activity'
     | '/auth'
+    | '/business'
     | '/discover'
     | '/messages'
     | '/my-work'
@@ -389,15 +460,21 @@ export interface FileRouteTypes {
     | '/verify'
     | '/wallet'
     | '/admin/audit'
+    | '/admin/businesses'
     | '/admin/categories'
     | '/admin/disputes'
+    | '/admin/flags'
+    | '/admin/health'
     | '/admin/jobs'
+    | '/admin/orders'
     | '/admin/payments'
     | '/admin/reports'
     | '/admin/reviews'
     | '/admin/settings'
+    | '/admin/storage'
     | '/admin/users'
     | '/admin/verification'
+    | '/businesses/$slug'
     | '/jobs/$jobId'
     | '/market/$listingId'
     | '/market/new'
@@ -414,6 +491,7 @@ export interface FileRouteTypes {
     | '/activity'
     | '/admin'
     | '/auth'
+    | '/business'
     | '/discover'
     | '/messages'
     | '/my-work'
@@ -426,15 +504,21 @@ export interface FileRouteTypes {
     | '/verify'
     | '/wallet'
     | '/admin/audit'
+    | '/admin/businesses'
     | '/admin/categories'
     | '/admin/disputes'
+    | '/admin/flags'
+    | '/admin/health'
     | '/admin/jobs'
+    | '/admin/orders'
     | '/admin/payments'
     | '/admin/reports'
     | '/admin/reviews'
     | '/admin/settings'
+    | '/admin/storage'
     | '/admin/users'
     | '/admin/verification'
+    | '/businesses/$slug'
     | '/jobs/$jobId'
     | '/market/$listingId'
     | '/market/new'
@@ -452,6 +536,7 @@ export interface RootRouteChildren {
   ActivityRoute: typeof ActivityRoute
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
+  BusinessRoute: typeof BusinessRoute
   DiscoverRoute: typeof DiscoverRoute
   MessagesRoute: typeof MessagesRouteWithChildren
   MyWorkRoute: typeof MyWorkRoute
@@ -463,6 +548,7 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   VerifyRoute: typeof VerifyRoute
   WalletRoute: typeof WalletRoute
+  BusinessesSlugRoute: typeof BusinessesSlugRoute
   JobsJobIdRoute: typeof JobsJobIdRoute
   MarketListingIdRoute: typeof MarketListingIdRoute
   MarketNewRoute: typeof MarketNewRoute
@@ -507,6 +593,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/business': {
+      id: '/business'
+      path: '/business'
+      fullPath: '/business'
+      preLoaderRoute: typeof BusinessRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/discover': {
@@ -600,6 +693,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAuditRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/businesses': {
+      id: '/admin/businesses'
+      path: '/businesses'
+      fullPath: '/admin/businesses'
+      preLoaderRoute: typeof AdminBusinessesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/categories': {
       id: '/admin/categories'
       path: '/categories'
@@ -614,11 +714,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDisputesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/flags': {
+      id: '/admin/flags'
+      path: '/flags'
+      fullPath: '/admin/flags'
+      preLoaderRoute: typeof AdminFlagsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/health': {
+      id: '/admin/health'
+      path: '/health'
+      fullPath: '/admin/health'
+      preLoaderRoute: typeof AdminHealthRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/jobs': {
       id: '/admin/jobs'
       path: '/jobs'
       fullPath: '/admin/jobs'
       preLoaderRoute: typeof AdminJobsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/orders': {
+      id: '/admin/orders'
+      path: '/orders'
+      fullPath: '/admin/orders'
+      preLoaderRoute: typeof AdminOrdersRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/payments': {
@@ -649,6 +770,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSettingsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/storage': {
+      id: '/admin/storage'
+      path: '/storage'
+      fullPath: '/admin/storage'
+      preLoaderRoute: typeof AdminStorageRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/users': {
       id: '/admin/users'
       path: '/users'
@@ -662,6 +790,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/verification'
       preLoaderRoute: typeof AdminVerificationRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/businesses/$slug': {
+      id: '/businesses/$slug'
+      path: '/businesses/$slug'
+      fullPath: '/businesses/$slug'
+      preLoaderRoute: typeof BusinessesSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/jobs/$jobId': {
       id: '/jobs/$jobId'
@@ -724,13 +859,18 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminAuditRoute: typeof AdminAuditRoute
+  AdminBusinessesRoute: typeof AdminBusinessesRoute
   AdminCategoriesRoute: typeof AdminCategoriesRoute
   AdminDisputesRoute: typeof AdminDisputesRoute
+  AdminFlagsRoute: typeof AdminFlagsRoute
+  AdminHealthRoute: typeof AdminHealthRoute
   AdminJobsRoute: typeof AdminJobsRoute
+  AdminOrdersRoute: typeof AdminOrdersRoute
   AdminPaymentsRoute: typeof AdminPaymentsRoute
   AdminReportsRoute: typeof AdminReportsRoute
   AdminReviewsRoute: typeof AdminReviewsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminStorageRoute: typeof AdminStorageRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminVerificationRoute: typeof AdminVerificationRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -738,13 +878,18 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAuditRoute: AdminAuditRoute,
+  AdminBusinessesRoute: AdminBusinessesRoute,
   AdminCategoriesRoute: AdminCategoriesRoute,
   AdminDisputesRoute: AdminDisputesRoute,
+  AdminFlagsRoute: AdminFlagsRoute,
+  AdminHealthRoute: AdminHealthRoute,
   AdminJobsRoute: AdminJobsRoute,
+  AdminOrdersRoute: AdminOrdersRoute,
   AdminPaymentsRoute: AdminPaymentsRoute,
   AdminReportsRoute: AdminReportsRoute,
   AdminReviewsRoute: AdminReviewsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
+  AdminStorageRoute: AdminStorageRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminVerificationRoute: AdminVerificationRoute,
   AdminIndexRoute: AdminIndexRoute,
@@ -770,6 +915,7 @@ const rootRouteChildren: RootRouteChildren = {
   ActivityRoute: ActivityRoute,
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
+  BusinessRoute: BusinessRoute,
   DiscoverRoute: DiscoverRoute,
   MessagesRoute: MessagesRouteWithChildren,
   MyWorkRoute: MyWorkRoute,
@@ -781,6 +927,7 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   VerifyRoute: VerifyRoute,
   WalletRoute: WalletRoute,
+  BusinessesSlugRoute: BusinessesSlugRoute,
   JobsJobIdRoute: JobsJobIdRoute,
   MarketListingIdRoute: MarketListingIdRoute,
   MarketNewRoute: MarketNewRoute,
